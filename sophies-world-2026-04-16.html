@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sophie's World — April 16, 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', Arial, sans-serif;
+    background: #f0f4ff;
+    color: #2d2d2d;
+    padding: 20px;
+  }
+
+  .wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #ff6eb4 0%, #ff9a3c 50%, #ffda47 100%);
+    border-radius: 24px 24px 0 0;
+    padding: 36px 32px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: "✨🌍✨";
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 6px;
+  }
+  .header h1 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.92);
+    margin-top: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 50px;
+    padding: 5px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── GREETING BAND ── */
+  .greeting {
+    background: #fff;
+    border-left: 5px solid #ff6eb4;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1.6;
+  }
+  .greeting span { color: #ff6eb4; }
+
+  /* ── SECTION CARDS ── */
+  .card {
+    background: #fff;
+    padding: 24px 28px;
+    margin-top: 3px;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-wbt   { border-top: 4px solid #a78bfa; }
+  .label-wbt  { background: #ede9fe; color: #6d28d9; }
+
+  .card-world { border-top: 4px solid #34d399; }
+  .label-world{ background: #d1fae5; color: #065f46; }
+
+  .card-sg    { border-top: 4px solid #f472b6; }
+  .label-sg   { background: #fce7f3; color: #9d174d; }
+
+  .card-usa   { border-top: 4px solid #60a5fa; }
+  .label-usa  { background: #dbeafe; color: #1e40af; }
+
+  .card-kpop  { border-top: 4px solid #f9a8d4; }
+  .label-kpop { background: #fdf2f8; color: #be185d; }
+
+  .card-money { border-top: 4px solid #fbbf24; }
+  .label-money{ background: #fef3c7; color: #92400e; }
+
+  .card-challenge { border-top: 4px solid #fb923c; background: #fff7ed; }
+  .label-challenge{ background: #ffedd5; color: #9a3412; }
+
+  .card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.2;
+    color: #1a1a2e;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #3d3d3d;
+    margin-bottom: 10px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ── LEARN MORE LINKS ── */
+  .learn-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .learn-more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 5px 13px;
+    border-radius: 50px;
+    border: 2px solid;
+    transition: opacity 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .learn-more a:hover { opacity: 0.8; }
+  .link-green  { color: #065f46; border-color: #34d399; background: #d1fae5; }
+  .link-purple { color: #5b21b6; border-color: #a78bfa; background: #ede9fe; }
+  .link-pink   { color: #9d174d; border-color: #f472b6; background: #fce7f3; }
+  .link-blue   { color: #1e40af; border-color: #60a5fa; background: #dbeafe; }
+  .link-rose   { color: #be185d; border-color: #f9a8d4; background: #fdf2f8; }
+  .link-amber  { color: #92400e; border-color: #fbbf24; background: #fef3c7; }
+  .link-orange { color: #9a3412; border-color: #fb923c; background: #ffedd5; }
+
+  /* ── FACT PILLS ── */
+  .fact-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .fact-item {
+    background: #f5f3ff;
+    border-left: 4px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .fact-item strong { color: #6d28d9; }
+
+  /* ── WORLD WATCH STORIES ── */
+  .world-stories { display: flex; flex-direction: column; gap: 16px; margin-top: 4px; }
+  .world-story {
+    background: #f0fdf4;
+    border-left: 4px solid #34d399;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+  }
+  .world-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #065f46;
+    margin-bottom: 6px;
+  }
+  .world-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .world-story p:last-of-type { margin-bottom: 0; }
+  .world-story .analogy {
+    background: #dcfce7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: #166534;
+    margin-top: 8px;
+  }
+  .world-story .story-links { margin-top: 10px; }
+
+  /* ── SG SPOTS ── */
+  .sg-spots { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .sg-spot {
+    background: #fdf2f8;
+    border-left: 4px solid #f472b6;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+  }
+  .sg-spot h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .sg-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
+
+  /* ── KPOP BANDS ── */
+  .kpop-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .kpop-item {
+    background: #fdf2f8;
+    border-left: 4px solid #f9a8d4;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+  }
+  .kpop-item h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .kpop-item p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
+
+  /* ── MONEY HIGHLIGHT ── */
+  .money-highlight {
+    background: #fffbeb;
+    border: 2px dashed #fbbf24;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .money-highlight strong { color: #b45309; }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-q {
+    background: #fff;
+    border: 3px solid #fb923c;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .challenge-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #9a6a3e;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .footer .hearts {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+  .footer strong { color: #ff6eb4; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #ff6eb4, #ff9a3c, #ffda47, #34d399, #60a5fa, #a78bfa);
+    border-radius: 3px;
+    margin: 3px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Sophie's World</h1>
+    <div class="subtitle">Your weekly dose of wow, fun &amp; big ideas</div>
+    <div class="date-badge">📅 April 16, 2026 · Issue #1</div>
+  </div>
+
+  <!-- GREETING -->
+  <div class="greeting">
+    Hey Sophie! 👋 Welcome to your very first issue of <span>Sophie's World</span> — a newsletter made just for you, packed with cool facts, world news, K-pop updates, money tips, and more. Ready to explore? Let's go! 🚀
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WEIRD BUT TRUE -->
+  <div class="card card-wbt">
+    <div class="section-label label-wbt">🤯 Weird But True</div>
+    <h2>3 Facts That Will Blow Your Mind</h2>
+    <div class="fact-list">
+      <div class="fact-item">
+        <strong>🦜 The World's Chubbiest Parrot Can't Fly!</strong> The kākāpō parrot from New Zealand can weigh up to 9 pounds — the same as a newborn baby — and it <em>cannot fly at all</em>. It just climbs trees and slides down. It also only has babies when one special tree grows lots of berries, which happens only once every few years!
+      </div>
+      <div class="fact-item">
+        <strong>🐌 A Tiny Snail Has More Teeth Than a Shark!</strong> The limpet (a little sea snail) has over 750 teeth — way more than a shark's 300! And those tiny teeth are made of the strongest natural material ever discovered. Stronger than spider silk!
+      </div>
+      <div class="fact-item">
+        <strong>🪼 This Jellyfish Never Has to Die!</strong> There's a jellyfish called <em>Turritopsis dohrnii</em> that can technically live forever. When it gets old or sick, it shrinks back into a tiny blob and starts its whole life over again — like pressing the undo button on aging!
+      </div>
+    </div>
+    <div class="learn-more">
+      <a href="https://newsforkids.net" class="link-purple">🔍 NewsForKids.net</a>
+      <a href="https://www.natgeokids.com/uk/discover/animals/general-animals/animal-records/" class="link-purple">🌿 Nat Geo Kids: Animal Records</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WORLD WATCH -->
+  <div class="card card-world">
+    <div class="section-label label-world">🌍 World Watch</div>
+    <h2>Two Big Things Happening in the World Right Now</h2>
+    <div class="world-stories">
+
+      <div class="world-story">
+        <h3>🛢️ Story 1: A War That's Making Everything More Expensive</h3>
+        <p>
+          Since February 2026, the United States and Iran have been in a serious conflict. The US and Israel launched airstrikes on Iran, and Iran fought back by blocking a very important stretch of water called the <strong>Strait of Hormuz</strong> — a narrow gap in the ocean just 21 miles wide. Here's why it matters: <strong>20% of all the world's oil</strong> travels through that gap every single day. Right now, instead of 130+ ships crossing it daily, only about 9 are getting through.
+        </p>
+        <p>
+          When oil can't move freely, prices for gas — and for <em>everything</em> that gets delivered by truck — start to go up. The IMF (a big global money organisation) warned this week that if things don't improve, the whole world could head into a <strong>recession</strong>, which means businesses slow down and life gets harder for a lot of families everywhere.
+        </p>
+        <div class="analogy">
+          💡 Think of it this way: imagine the only hallway to your school cafeteria got blocked, so nobody could get lunch. Now imagine that hallway was the only path for the world's fuel — that's the Strait of Hormuz.
+        </div>
+        <div class="story-links learn-more">
+          <a href="https://www.britannica.com/event/2026-Iran-war" class="link-green">📖 Britannica: 2026 Iran War</a>
+          <a href="https://time.com/article/2026/04/15/imf-global-recession-war-us-israel-iran-energy-hormuz/" class="link-green">📰 Time: IMF's Warning</a>
+        </div>
+      </div>
+
+      <div class="world-story">
+        <h3>🛍️ Story 2: Why Your Toys and Clothes Might Cost More Soon</h3>
+        <p>
+          The US government has put a <strong>145% tariff</strong> on things made in China — which is a huge extra tax. So if a toy costs $10 to make, the government adds almost $14.50 more before it hits the store shelf. Walmart, Amazon, and Target have already started raising prices. Researchers say American families are paying about <strong>$1,500 extra per year</strong> because of these taxes.
+        </p>
+        <p>
+          A lot of things we use every day — phones, shoes, backpacks — are made in China. The US and China are in a big disagreement about trade (how countries buy and sell from each other), and right now both sides are refusing to budge. The leaders of both countries may meet in May to talk it out.
+        </p>
+        <div class="analogy">
+          💡 A tariff is like a cover charge at a party — except it's for products from other countries. The more you charge, the fewer people (or products) come in.
+        </div>
+        <div class="story-links learn-more">
+          <a href="https://www.timeforkids.com/g34/tfk-explains-tariffs-g3/?rl=en-690" class="link-green">📚 Time for Kids: What Is a Tariff?</a>
+          <a href="https://newsforkids.net/articles/2025/04/08/trumps-new-tariffs-cause-worries-worldwide/" class="link-green">🌐 NewsForKids: Tariff Worries</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SINGAPORE SPOTLIGHT -->
+  <div class="card card-sg">
+    <div class="section-label label-sg">🇸🇬 Singapore Spotlight</div>
+    <h2>What's Happening Back in Singapore!</h2>
+    <div class="sg-spots">
+      <div class="sg-spot">
+        <h3>🚠 Pokémon Cable Cars!</h3>
+        <p>Until April 30, the Singapore Cable Car has been turned into a Pokémon adventure! Cabins are decorated with Pikachu and Eevee, and at night you get a special UV torch to hunt for hidden glowing Pokémon — including Mew, Charizard, and Dragonite — hiding inside the cabin. How cool is that?!</p>
+      </div>
+      <div class="sg-spot">
+        <h3>🐧 Easter Egg Hunt… With Real Animals!</h3>
+        <p>The Singapore Zoo is running its Easter Eggs-travaganza until April 26! Visitors can get up close with Gentoo penguins, scarlet macaws, and Papuan hornbills. There's also a giant Gachapon egg machine with prizes. Maybe something to do next time you visit Singapore! 🥚🐾</p>
+      </div>
+    </div>
+    <div class="learn-more">
+      <a href="https://www.visitsingapore.com/whats-happening/" class="link-pink">🇸🇬 VisitSingapore: What's On</a>
+      <a href="https://www.mandai.com/en/singapore-zoo.html" class="link-pink">🐾 Mandai Wildlife Reserve</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- USA CORNER -->
+  <div class="card card-usa">
+    <div class="section-label label-usa">🇺🇸 USA Corner</div>
+    <h2>The Biggest Gymnastics Competition Is Happening RIGHT NOW! 🤸‍♀️</h2>
+    <p>
+      This week (April 16–18), the best college gymnasts in America are competing at the <strong>NCAA Women's Gymnastics Championships</strong> in Fort Worth, Texas — and it's happening today!
+    </p>
+    <p>
+      LSU's Kaliya Lincoln landed an incredible <em>Yurchenko 1.5 vault</em> and scored a near-perfect <strong>9.9625</strong> — with two judges giving her a full 10! Florida's eMjae Frazier is another gymnast to watch as teams battle for the national title on Saturday.
+    </p>
+    <p>
+      These athletes started gymnastics just like you — with a dream and lots of practice. Who knows where you could end up? 🌟
+    </p>
+    <div class="learn-more">
+      <a href="https://www.ncaa.com/sports/gymnastics-women/d1" class="link-blue">🤸 NCAA Women's Gymnastics</a>
+      <a href="https://www.usagym.org/pages/education/pages/fun_facts.html" class="link-blue">⭐ USA Gymnastics Fun Facts</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- K-POP CORNER -->
+  <div class="card card-kpop">
+    <div class="section-label label-kpop">🎤 K-pop Corner</div>
+    <h2>Katseye + BLACKPINK: Big Moments This Week!</h2>
+    <div class="kpop-grid">
+      <div class="kpop-item">
+        <h3>✨ Katseye Turn Coachella into "Katseye City"!</h3>
+        <p>Katseye dropped their new song <strong>"Pinky Up"</strong> on April 9 and then — just two days later — performed at Coachella in front of 50,000 fans! They transformed the whole stage into "Katseye City" with rooftops and buildings named after their songs. Their music video got 16 million views in just a few days! They perform again this Friday (April 17) — can't miss it! 🏙️🎶</p>
+      </div>
+      <div class="kpop-item">
+        <h3>🖤💗 BLACKPINK Are BACK!</h3>
+        <p>BLACKPINK released their mini-album <strong><em>Deadline</em></strong> in February and it sold over <strong>1.4 million copies on the very first day</strong> — the highest first-day sales ever for a K-pop girl group! Have you listened to it yet? 🎧</p>
+      </div>
+    </div>
+    <div class="learn-more">
+      <a href="https://www.youtube.com/@KATSEYE" class="link-rose">▶️ Katseye on YouTube</a>
+      <a href="https://www.youtube.com/@BLACKPINK" class="link-rose">▶️ BLACKPINK on YouTube</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MONEY MOVES -->
+  <div class="card card-money">
+    <div class="section-label label-money">💰 Money Moves</div>
+    <h2>The Secret Trick Smart Savers Know: Pay Yourself First!</h2>
+    <p>
+      Most people spend their money first and save whatever's left over. But guess what? Usually nothing is left! 😅
+    </p>
+    <p>
+      Smart savers do it backwards: the moment they get money — allowance, birthday money, anything — they put a piece of it in savings <em>before</em> spending anything. This is called <strong>"Pay Yourself First."</strong>
+    </p>
+    <div class="money-highlight">
+      💡 <strong>Try this:</strong> If you save just $2 a week, by the end of the year you'd have <strong>$104</strong> — and if it's in a bank account earning interest, it grows even more without you doing anything extra! 🏦
+    </div>
+    <p style="margin-top: 12px;">
+      <strong>Cool kid entrepreneur:</strong> A girl named Gabby Goodwin got tired of her hair barrettes falling out all the time. So she and her mom invented <em>GaBBY Bows</em> — a double-snap barrette that actually stayed in! She started with a small idea, used her savings to invest in it, and turned it into a real business. Every big business starts with one problem someone decided to solve. What problem would <em>you</em> solve? 🤔
+    </p>
+    <div class="learn-more">
+      <a href="https://www.practicalmoneymaths.co.nz/resources/fun-maths-activities-for-kids-savings" class="link-amber">🏦 Fun Savings Activities for Kids</a>
+      <a href="https://kidpreneurs.org/" class="link-amber">💡 Kidpreneurs.org</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CHALLENGE -->
+  <div class="card card-challenge">
+    <div class="section-label label-challenge">🧠 Sophie's Challenge</div>
+    <h2>Can You Figure This Out?</h2>
+    <div class="challenge-q">
+      In Story 1 this week, you learned that the Strait of Hormuz is only <strong>21 miles wide</strong> at its narrowest point, but <strong>20% of the world's oil</strong> passes through it every day.<br><br>
+      If the whole world uses <strong>100 million barrels of oil</strong> every day, how many barrels travel through the Strait of Hormuz? And if Iran is only allowing <strong>9 ships</strong> through per day (instead of 130), what fraction of normal traffic is still getting through? 🚢🛢️
+    </div>
+    <p class="challenge-hint">Hint: For the first part, think percentages! For the second, try writing it as a fraction: 9 out of 130. Then try turning it into a decimal. Email Dad your working! 😄</p>
+    <div class="learn-more" style="justify-content: center;">
+      <a href="https://www.eia.gov/todayinenergy/detail.php?id=54679" class="link-orange">🔎 US Energy Info: Strait of Hormuz</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer" style="background: #fff; border-radius: 0 0 24px 24px; margin-top: 3px;">
+    <span class="hearts">💖 🌏 💖</span>
+    <strong>Sophie's World</strong> · Issue #1 · April 16, 2026<br>
+    Made with love by Dad &amp; Claude 🤖❤️<br>
+    <span style="font-size:12px; color: #bbb;">Fremont, California ↔ Singapore</span>
+  </div>
+
+</div>
+</body>
+</html>
