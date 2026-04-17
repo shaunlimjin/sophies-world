@@ -95,7 +95,7 @@ def parse_claude_output(json_str: str) -> Optional[str]:
 
 
 def build_prompt(template_html: str, issue_date: date, issue_num: int) -> str:
-    formatted_date = issue_date.strftime("%B %-d, %Y")
+    formatted_date = f"{issue_date.strftime('%B')} {issue_date.day}, {issue_date.strftime('%Y')}"
     return f"""You are generating Issue #{issue_num} of Sophie's World newsletter, dated {formatted_date}.
 
 ## About Sophie
@@ -118,8 +118,7 @@ def run_claude(prompt: str) -> str:
     result = subprocess.run(
         [
             "claude", "-p", prompt,
-            "--tools", "WebSearch,WebFetch",
-            "--allowedTools", "WebSearch", "WebFetch",
+            "--allowedTools", "WebSearch,WebFetch",
             "--output-format", "json",
             "--max-turns", "10",
         ],
@@ -141,7 +140,7 @@ def main():
     if check_output_exists(output_path):
         return
 
-    template_html = TEMPLATE_PATH.read_text()
+    template_html = TEMPLATE_PATH.read_text(encoding="utf-8")
     prompt = build_prompt(template_html, today, issue_num)
 
     print(f"Generating Issue #{issue_num} for {today}...")
@@ -154,7 +153,7 @@ def main():
         print(raw_output[:500], file=sys.stderr)
         sys.exit(1)
 
-    output_path.write_text(html)
+    output_path.write_text(html, encoding="utf-8")
     print(f"Written: {output_path}")
 
 
