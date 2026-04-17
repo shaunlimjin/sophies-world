@@ -163,8 +163,9 @@
   .link-orange { color: #9a3412; border-color: #fb923c; background: #ffedd5; }
 
   /* ── FACT PILLS ── */
-  .fact-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .fact-list { display: block; margin-top: 4px; }
   .fact-item {
+    display: block;
     background: #f5f3ff;
     border-left: 4px solid #a78bfa;
     border-radius: 0 12px 12px 0;
@@ -172,17 +173,22 @@
     font-size: 15px;
     line-height: 1.65;
     color: #3d3d3d;
+    margin-bottom: 12px;
   }
+  .fact-item:last-child { margin-bottom: 0; }
   .fact-item strong { color: #6d28d9; }
 
   /* ── WORLD WATCH STORIES ── */
-  .world-stories { display: flex; flex-direction: column; gap: 16px; margin-top: 4px; }
+  .world-stories { display: block; margin-top: 4px; }
   .world-story {
+    display: block;
     background: #f0fdf4;
     border-left: 4px solid #34d399;
     border-radius: 0 12px 12px 0;
     padding: 14px 18px;
+    margin-bottom: 16px;
   }
+  .world-story:last-child { margin-bottom: 0; }
   .world-story h3 {
     font-size: 15px;
     font-weight: 800;
@@ -208,24 +214,30 @@
   .world-story .story-links { margin-top: 10px; }
 
   /* ── SG SPOTS ── */
-  .sg-spots { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .sg-spots { display: block; margin-top: 4px; }
   .sg-spot {
+    display: block;
     background: #fdf2f8;
     border-left: 4px solid #f472b6;
     border-radius: 0 12px 12px 0;
     padding: 12px 16px;
+    margin-bottom: 12px;
   }
+  .sg-spot:last-child { margin-bottom: 0; }
   .sg-spot h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
   .sg-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
 
   /* ── KPOP BANDS ── */
-  .kpop-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .kpop-grid { display: block; margin-top: 4px; }
   .kpop-item {
+    display: block;
     background: #fdf2f8;
     border-left: 4px solid #f9a8d4;
     border-radius: 0 12px 12px 0;
     padding: 12px 16px;
+    margin-bottom: 12px;
   }
+  .kpop-item:last-child { margin-bottom: 0; }
   .kpop-item h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
   .kpop-item p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
 
