@@ -34,7 +34,7 @@ claude -p "<prompt>" \
 
 - `--tools` restricts Claude to only web tools (no file editing, no bash)
 - `--allowedTools` auto-approves those tool calls without interactive prompts
-- `--output-format json` gives a structured envelope; the completed HTML is in the `result` field (verify exact field name at implementation time)
+- `--output-format json` gives a structured envelope; the completed HTML is in the `result` field
 - `--max-turns 10` caps the research loop
 
 ---
