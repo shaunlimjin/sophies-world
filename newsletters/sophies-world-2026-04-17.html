@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sophie's World · April 17, 2026 · Issue #2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', Arial, sans-serif;
+    background: #f0f4ff;
+    color: #2d2d2d;
+    padding: 20px;
+  }
+
+  .wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #ff6eb4 0%, #ff9a3c 50%, #ffda47 100%);
+    border-radius: 24px 24px 0 0;
+    padding: 36px 32px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: "✨🌍✨";
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 6px;
+  }
+  .header h1 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.92);
+    margin-top: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 50px;
+    padding: 5px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── GREETING BAND ── */
+  .greeting {
+    background: #fff;
+    border-left: 5px solid #ff6eb4;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1.6;
+  }
+  .greeting span { color: #ff6eb4; }
+
+  /* ── SECTION CARDS ── */
+  .card {
+    background: #fff;
+    padding: 24px 28px;
+    margin-top: 3px;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-wbt   { border-top: 4px solid #a78bfa; }
+  .label-wbt  { background: #ede9fe; color: #6d28d9; }
+
+  .card-world { border-top: 4px solid #34d399; }
+  .label-world{ background: #d1fae5; color: #065f46; }
+
+  .card-sg    { border-top: 4px solid #f472b6; }
+  .label-sg   { background: #fce7f3; color: #9d174d; }
+
+  .card-usa   { border-top: 4px solid #60a5fa; }
+  .label-usa  { background: #dbeafe; color: #1e40af; }
+
+  .card-kpop  { border-top: 4px solid #f9a8d4; }
+  .label-kpop { background: #fdf2f8; color: #be185d; }
+
+  .card-money { border-top: 4px solid #fbbf24; }
+  .label-money{ background: #fef3c7; color: #92400e; }
+
+  .card-challenge { border-top: 4px solid #fb923c; background: #fff7ed; }
+  .label-challenge{ background: #ffedd5; color: #9a3412; }
+
+  .card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.2;
+    color: #1a1a2e;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #3d3d3d;
+    margin-bottom: 10px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ── LEARN MORE LINKS ── */
+  .learn-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .learn-more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 5px 13px;
+    border-radius: 50px;
+    border: 2px solid;
+    transition: opacity 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .learn-more a:hover { opacity: 0.8; }
+  .link-green  { color: #065f46; border-color: #34d399; background: #d1fae5; }
+  .link-purple { color: #5b21b6; border-color: #a78bfa; background: #ede9fe; }
+  .link-pink   { color: #9d174d; border-color: #f472b6; background: #fce7f3; }
+  .link-blue   { color: #1e40af; border-color: #60a5fa; background: #dbeafe; }
+  .link-rose   { color: #be185d; border-color: #f9a8d4; background: #fdf2f8; }
+  .link-amber  { color: #92400e; border-color: #fbbf24; background: #fef3c7; }
+  .link-orange { color: #9a3412; border-color: #fb923c; background: #ffedd5; }
+
+  /* ── FACT PILLS ── */
+  .fact-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .fact-item {
+    background: #f5f3ff;
+    border-left: 4px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .fact-item strong { color: #6d28d9; }
+
+  /* ── WORLD WATCH STORIES ── */
+  .world-stories { display: flex; flex-direction: column; gap: 16px; margin-top: 4px; }
+  .world-story {
+    background: #f0fdf4;
+    border-left: 4px solid #34d399;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+  }
+  .world-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #065f46;
+    margin-bottom: 6px;
+  }
+  .world-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .world-story p:last-of-type { margin-bottom: 0; }
+  .world-story .analogy {
+    background: #dcfce7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: #166534;
+    margin-top: 8px;
+  }
+  .world-story .story-links { margin-top: 10px; }
+
+  /* ── SG SPOTS ── */
+  .sg-spots { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .sg-spot {
+    background: #fdf2f8;
+    border-left: 4px solid #f472b6;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+  }
+  .sg-spot h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .sg-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
+
+  /* ── KPOP BANDS ── */
+  .kpop-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .kpop-item {
+    background: #fdf2f8;
+    border-left: 4px solid #f9a8d4;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+  }
+  .kpop-item h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .kpop-item p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
+
+  /* ── MONEY HIGHLIGHT ── */
+  .money-highlight {
+    background: #fffbeb;
+    border: 2px dashed #fbbf24;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .money-highlight strong { color: #b45309; }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-q {
+    background: #fff;
+    border: 3px solid #fb923c;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .challenge-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #9a6a3e;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .footer .hearts {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+  .footer strong { color: #ff6eb4; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #ff6eb4, #ff9a3c, #ffda47, #34d399, #60a5fa, #a78bfa);
+    border-radius: 3px;
+    margin: 3px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Sophie's World</h1>
+    <div class="subtitle">Your weekly dose of wow, fun &amp; big ideas</div>
+    <div class="date-badge">📅 April 17, 2026 · Issue #2</div>
+  </div>
+
+  <!-- GREETING -->
+  <div class="greeting">Hey Sophie! 👋 Welcome back to Issue #2 of <span>Sophie's World</span>! This week is SO good — Katseye just made history at Coachella (right here in California! 🌵), a giant oil shipping route finally reopened after a big ceasefire, and we've got cube-shaped poop facts that will make you snort-laugh. Ready? Let's go! 🚀</div>
+
+  <div class="divider"></div>
+
+  <!-- WEIRD BUT TRUE -->
+  <div class="card card-wbt">
+    <div class="section-label label-wbt">🤯 Weird But True</div>
+    <h2>Nature Is Wonderfully Weird! 🌿</h2>
+    <div class="fact-list">
+      <div class="fact-item">
+        <strong>🦩 Flamingos Are Born GREY!</strong> Those gorgeous pink flamingos you've seen in photos? They actually hatch from their eggs completely grey and white. Their feathers slowly turn pink because of the shrimp and blue-green algae they eat — which are packed with special pink pigments called carotenoids. Stop eating shrimp, and a flamingo actually fades back to white! 🍤
+      </div>
+      <div class="fact-item">
+        <strong>🦦 Sloths Are Secret Breath-Holding Champions!</strong> Sloths look super slow hanging in trees — but underwater they are surprisingly incredible. A sloth can hold its breath for up to <em>40 minutes</em>. That's four times longer than a dolphin, which can only manage about 10 minutes! Scientists think sloths slow their heart rate way down to save oxygen. Sneakily amazing! 🌊
+      </div>
+      <div class="fact-item">
+        <strong>🎲 Wombats Make Cube-Shaped Poop!</strong> Every animal on Earth makes round or oval droppings — except the Australian wombat. These marsupials produce perfectly cube-shaped poop! Scientists discovered their intestines are stretchy and irregularly shaped, which squishes waste into little cubes as it moves through. Wombats even stack the cubes to mark their territory — and cubes don't roll away! 🐨
+      </div>
+    </div>
+    <div class="learn-more">
+      <a href="https://kids.nationalgeographic.com/animals" class="link-purple">🌿 Nat Geo Kids Animals</a>
+      <a href="https://www.britannica.com/animal/flamingo" class="link-purple">🦩 Flamingo Facts · Britannica</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WORLD WATCH -->
+  <div class="card card-world">
+    <div class="section-label label-world">🌍 World Watch</div>
+    <h2>Big News From Around the Globe 🗺️</h2>
+    <div class="world-stories">
+      <div class="world-story">
+        <h3>⛽ The World's Most Important Shipping Lane Is Open Again!</h3>
+        <p>There's a narrow strip of ocean between Iran and the Arabian Peninsula called the <strong>Strait of Hormuz</strong>. About one in every five barrels of oil in the whole world travels through it on giant tanker ships. After weeks of conflict between the USA and Iran, ships were blocked — and oil prices shot up by more than <strong>60%</strong>!</p>
+        <p>This week, the USA and Iran agreed to a <strong>two-week ceasefire</strong> — meaning both sides agreed to stop fighting. The strait is reopening, ships are moving again, and countries around the world breathed a huge sigh of relief. 😮‍💨</p>
+        <div class="analogy">
+          🍎 <strong>Think of it like this:</strong> Imagine the only road to your grocery store was suddenly blocked by a massive traffic jam. No delivery trucks could get through, so food prices shot way up. When the road finally cleared, trucks could roll again and prices could start coming back down. The Strait of Hormuz is like that road — but for oil!
+        </div>
+        <div class="story-links learn-more">
+          <a href="https://www.bbc.co.uk/newsround" class="link-green">📰 BBC Newsround</a>
+          <a href="https://newsforkids.net" class="link-green">🌍 News For Kids</a>
+        </div>
+      </div>
+
+      <div class="world-story">
+        <h3>📈 The World Economy Is Feeling the Squeeze</h3>
+        <p>The <strong>International Monetary Fund (IMF)</strong> — a big organisation that watches over the world's money — released an important report this week. It says the global economy is <strong>slowing down</strong> because of the Middle East conflict. When oil gets expensive, everything connected to oil gets pricier too: petrol for cars, electricity, and even groceries (because farmers and delivery trucks need fuel).</p>
+        <p>The IMF now predicts the world economy will grow by only <strong>3.1%</strong> in 2026 — slower than usual. Countries like Singapore and the USA are working together to keep prices from going too high for everyday families. 🤝</p>
+        <div class="analogy">
+          🧩 <strong>Think of it like this:</strong> Imagine your family's budget is like a jigsaw puzzle with lots of pieces — food, clothes, holidays, fun. When one important piece (like petrol) suddenly costs way more, the other pieces get much harder to fit in. That's exactly what's happening to families and governments all around the world right now.
+        </div>
+        <div class="story-links learn-more">
+          <a href="https://www.timeforkids.com" class="link-green">⏱️ Time for Kids</a>
+          <a href="https://www.bbc.co.uk/newsround" class="link-green">📰 BBC Newsround</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SINGAPORE SPOTLIGHT -->
+  <div class="card card-sg">
+    <div class="section-label label-sg">🇸🇬 Singapore Spotlight</div>
+    <h2>What's Happening in the Lion City! 🦁</h2>
+    <div class="sg-spots">
+      <div class="sg-spot">
+        <h3>🛢️ Singapore Is Watching Oil Prices Very Carefully</h3>
+        <p>Singapore's Prime Minister <strong>Lawrence Wong</strong> spoke out this week about the Middle East conflict. He noted that oil prices have risen more than <strong>60%</strong> since the war started — and Singapore gets a huge amount of its energy through ships passing near the Strait of Hormuz. As a small island with no oil of its own, Singapore depends entirely on imports. The ceasefire news is a really big deal! PM Wong is planning smart ways to keep energy steady and prices manageable for Singaporean families. 🏙️</p>
+      </div>
+      <div class="sg-spot">
+        <h3>🎡 Pokémon Adventure on the Singapore Cable Car!</h3>
+        <p>Until April 30, you can ride the <strong>Mount Faber Cable Car</strong> on a special Pokémon Day-to-Night Adventure! The cable cars are decorated with colourful Pokémon characters, and the ride whisks you high above the Singapore skyline with incredible harbour views. Imagine spotting Pikachu floating above the city! ⚡ If you ever visit Singapore this April, this one is a must!</p>
+      </div>
+    </div>
+    <div class="learn-more">
+      <a href="https://mothership.sg" class="link-pink">🇸🇬 Mothership SG News</a>
+      <a href="https://thetravelintern.com/things-to-do-in-singapore-2026/" class="link-pink">🎢 Things To Do in Singapore</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- USA CORNER -->
+  <div class="card card-usa">
+    <div class="section-label label-usa">🇺🇸 USA Corner</div>
+    <h2>California's Biggest Party Is Happening Right NOW! 🌵</h2>
+    <p>This very weekend — April 17 to 19 — the world-famous <strong>Coachella Valley Music and Arts Festival</strong> is happening in the California desert, just a few hours from Fremont! Thousands of music fans are at the Empire Polo Club in <strong>Indio, California</strong>, surrounded by towering palm trees, wild art sculptures, and non-stop live music from all over the world. 🎶</p>
+    <p>This year is extra special — it's Coachella's <strong>25th birthday</strong>! 🎂 Last weekend, Colombian superstar <strong>Karol G</strong> made history as the very first Latina ever to headline the festival. The desert was lit up by jaw-dropping light installations — including a rainbow maze and glowing cactus towers that stretched into the night sky. And yes — <strong>Katseye</strong> performed there too (see K-pop Corner! 🎤).</p>
+    <div class="learn-more">
+      <a href="https://patch.com/california/palmdesert/coachella-2026-photos-12-festival-highlights-weekend-1" class="link-blue">📸 Coachella 2026 Highlights</a>
+      <a href="https://www.timeforkids.com" class="link-blue">⏱️ Time for Kids</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- K-POP CORNER -->
+  <div class="card card-kpop">
+    <div class="section-label label-kpop">🎤 K-pop Corner</div>
+    <h2>Your Favourite Groups Are Making History! 💫</h2>
+    <div class="kpop-grid">
+      <div class="kpop-item">
+        <h3>🌟 Katseye OWNED Coachella!</h3>
+        <p>On April 10, <strong>Katseye</strong> stepped onto the iconic <strong>Sahara Stage</strong> at Coachella — one of the most famous stages on the planet. 🎉 They transformed it into <em>"Katseye City,"</em> complete with rooftop dance scenes and buildings named after their songs. The show kicked off with their brand-new single <strong>"Pinky Up"</strong> and had the entire crowd going absolutely wild! Katseye became one of only FOUR female groups ever to perform on the Sahara Stage — right alongside BLACKPINK, LE SSERAFIM, and XG. True QUEENS! 👑</p>
+        <p>Member <strong>Manon</strong> sat this one out as she is taking a break to look after her health. The whole group showed her so much love from the stage. 💖</p>
+      </div>
+      <div class="kpop-item">
+        <h3>💜 BLACKPINK's Jennie Gets Award Nomination!</h3>
+        <p><strong>Jennie</strong> from BLACKPINK is having an incredible solo year! Her collab remix of the song <strong>"Dracula"</strong> with indie band Tame Impala earned her an <strong>American Music Awards</strong> nomination for "Song of the Summer." 🎵 Jennie keeps proving that K-pop royalty can take on any style and any genre. Go Jennie! 🖤💖</p>
+      </div>
+    </div>
+    <div class="learn-more">
+      <a href="https://www.rollingstone.com/music/music-news/katseye-coachella-2026-performance-1235543469/" class="link-rose">🎤 Katseye at Coachella · Rolling Stone</a>
+      <a href="https://vogue.ph/lifestyle/music/katseye-fandom-april-2026/" class="link-rose">💖 Why the World Loves Katseye</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MONEY MOVES -->
+  <div class="card card-money">
+    <div class="section-label label-money">💰 Money Moves</div>
+    <h2>The 3-Jar Magic Trick 🫙🫙🫙</h2>
+    <p>Here's one of the best money habits you can start right now — it's called the <strong>3-Jar Method</strong>! Whenever you get pocket money, a birthday gift, or earn money from chores, divide it into three jars (or envelopes):</p>
+    <p>🫙 <strong>Jar 1 — Save (60%):</strong> This money grows over time. Save it for something big you really want, like new gymnastics gear or a special trip.</p>
+    <p>🫙 <strong>Jar 2 — Spend (30%):</strong> This is your fun money! Use it guilt-free on small treats or things you enjoy right now.</p>
+    <p>🫙 <strong>Jar 3 — Share (10%):</strong> Give this to someone who needs it — a charity, a school fundraiser, or a good cause. Giving actually feels amazing! 🌟</p>
+    <div class="money-highlight">
+      💡 <strong>Sophie's Tip:</strong> If you get $10, put $6 in Save, $3 in Spend, and $1 in Share. Do this every single time and your savings will grow surprisingly fast. Even saving just $6 a week adds up to over <strong>$300 in one year</strong> — just from your Save jar alone! 🚀
+    </div>
+    <p>🌟 <strong>Kid Entrepreneur Spotlight — Isabella Dymalovski:</strong> At just <strong>8 years old</strong>, Australian girl Isabella noticed there were hardly any skincare products made especially for kids — so she invented her own! She created <strong>Luv Ur Skin</strong>, a natural skincare range designed just for children. At age 13, she appeared on <em>Shark Tank</em> and landed a <strong>$65,000 investment deal</strong>. She turned a simple observation into a real business using her savings and her passion. If Isabella can do it at 8, imagine what you could build! 💪</p>
+    <div class="learn-more">
+      <a href="https://kidpreneurs.org/young-entrepreneurs-inspiring-stories/" class="link-amber">💡 Young Entrepreneur Stories</a>
+      <a href="https://www.tuttletwins.com/blogs/blog/fun-and-creative-kids-entrepreneur-ideas" class="link-amber">🚀 Business Ideas for Kids</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SOPHIE'S CHALLENGE -->
+  <div class="card card-challenge">
+    <div class="section-label label-challenge">🧠 Sophie's Challenge</div>
+    <h2>Can You Figure This Out? 🤔</h2>
+    <p>This week's puzzle is inspired by our <strong>World Watch</strong> story about the Strait of Hormuz and rising oil prices! 🛢️</p>
+    <div class="challenge-q">
+      ⛽ Oil prices jumped by <strong>60%</strong> because of the Middle East conflict.<br><br>
+      A family in Fremont used to spend <strong>$200 a month</strong> on petrol for their car.<br><br>
+      1️⃣ How much are they spending <em>now</em> each month?<br>
+      2️⃣ How much <em>extra</em> are they paying compared to before?<br>
+      3️⃣ How much extra does that add up to in a <em>whole year</em>? 📅
+    </div>
+    <div class="challenge-hint">💡 Hint: To find 60% more, multiply the original amount by 1.6 — or find 60% of $200 and add it to the original! (60% of $200 = 0.6 × $200 = ?)</div>
+    <div class="learn-more">
+      <a href="https://newsforkids.net" class="link-orange">🌍 News For Kids</a>
+      <a href="https://www.timeforkids.com" class="link-orange">⏱️ Time for Kids</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;">
+    <span class="hearts">💖 🌏 💖</span>
+    <strong>Sophie's World</strong> · Issue #2 · April 17, 2026<br>
+    Made with love by Dad &amp; Claude 🤖❤️<br>
+    <span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span>
+  </div>
+
+</div>
+</body>
+</html>
