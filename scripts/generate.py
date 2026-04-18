@@ -128,7 +128,13 @@ The previous issue covered the following stories and facts. Choose entirely diff
 ## Your Task
 Fill in the HTML template below. Replace every <!-- PLACEHOLDER --> comment with the correct HTML content.
 Search the web for current events and news happening THIS WEEK ({formatted_date}).
-Return ONLY the completed HTML — no explanation, no markdown fences, no commentary. Just the raw HTML.
+
+When you are done researching, output the completed HTML directly as your final message.
+CRITICAL RULES — if you break any of these the output is unusable:
+- Your final message MUST start with <!DOCTYPE html> and contain nothing else
+- Do NOT ask for permission, approval, or confirmation before outputting the HTML
+- Do NOT describe what you are about to write
+- Do NOT use markdown, code fences, or any wrapper — just the raw HTML
 {avoid_section}
 ## Section Rules
 {SECTION_RULES}
