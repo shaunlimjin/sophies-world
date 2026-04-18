@@ -10,61 +10,49 @@ from datetime import date
 from pathlib import Path
 from typing import List, Optional
 
+try:
+    import yaml
+except ImportError:
+    print("Error: pyyaml is required. Install it with: pip3 install pyyaml", file=sys.stderr)
+    sys.exit(1)
+
 SCRIPTS_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPTS_DIR.parent
 NEWSLETTERS_DIR = REPO_ROOT / "newsletters"
 TEMPLATE_PATH = SCRIPTS_DIR / "template.html"
+CONFIG_DIR = REPO_ROOT / "config"
 
-SOPHIE_PROFILE = """
-Sophie is a 4th-grader (age ~9-10) living in Fremont, California. Her family is Singaporean.
-She loves: gymnastics (active participant), skiing, K-pop (especially Katseye and BLACKPINK),
-non-fiction fun facts ("Weird But True" style), business fairs, and learning about saving money.
-"""
 
-SECTION_RULES = """
-Newsletter sections to fill in (replace each <!-- PLACEHOLDER --> comment with real HTML content):
+def load_config(repo_root: Path) -> dict:
+    config_dir = repo_root / "config"
 
-1. DATE_BADGE — Format: <div class="date-badge">📅 {month} {day}, {year} · Issue #{n}</div>
+    child_path = config_dir / "children" / "sophie.yaml"
+    if not child_path.exists():
+        print(f"Error: child config not found: {child_path}", file=sys.stderr)
+        sys.exit(1)
+    profile = yaml.safe_load(child_path.read_text(encoding="utf-8"))
 
-2. GREETING — Warm personalised opening. Reference Sophie's name and something from this week.
-   Use <span>Sophie's World</span> for the newsletter name.
+    sections_path = config_dir / "sections.yaml"
+    if not sections_path.exists():
+        print(f"Error: sections config not found: {sections_path}", file=sys.stderr)
+        sys.exit(1)
+    sections_data = yaml.safe_load(sections_path.read_text(encoding="utf-8"))
+    sections = sections_data.get("sections", {})
 
-3. WEIRD_BUT_TRUE — 2-3 wild fun facts (animals, science, nature). Search for recent or
-   timeless fascinating facts. Use .fact-list > .fact-item structure. Link to Nat Geo Kids,
-   Britannica, or NewsForKids.net using .link-purple class.
+    theme_name = profile.get("newsletter", {}).get("theme", "default")
+    theme_path = config_dir / "themes" / f"{theme_name}.yaml"
+    if not theme_path.exists():
+        print(f"Error: theme config not found: {theme_path}", file=sys.stderr)
+        sys.exit(1)
+    theme = yaml.safe_load(theme_path.read_text(encoding="utf-8"))
 
-4. WORLD_WATCH — 2 real, current events happening THIS WEEK. Search the web for what's in
-   the news right now. Explain each for a 4th grader with an analogy (.analogy div).
-   MUST include serious topics if relevant (conflicts, economy, tariffs). Use .link-green links
-   to Time for Kids, NewsForKids.net, Britannica, or BBC Newsround.
+    active_sections = profile.get("newsletter", {}).get("active_sections", [])
+    missing = [s for s in active_sections if s not in sections]
+    if missing:
+        print(f"Error: active_sections reference unknown section IDs: {missing}", file=sys.stderr)
+        sys.exit(1)
 
-5. SINGAPORE_SPOTLIGHT — A fun fact about Singapore (cultural, historical, economic, nature,
-   food, or quirky). Does not need to be current news — timeless or surprising facts are great.
-   Use .sg-spot items and .link-pink links.
-
-6. USA_CORNER — California/Fremont angle, or US sports/science/culture. Current this week.
-   Use .link-blue links.
-
-7. KPOP_CORNER — Current Katseye and BLACKPINK news. Search for their latest releases,
-   performances, or announcements. Use .kpop-item structure and .link-rose links to YouTube.
-
-8. MONEY_MOVES — One saving/entrepreneurship concept + a real kid entrepreneur story.
-   Include a .money-highlight tip box. Use .link-amber links.
-
-9. SOPHIES_CHALLENGE — A maths or reasoning puzzle TIED TO a World Watch story this week.
-   Include percentages, fractions, or basic reasoning. Reference the World Watch story by name.
-   Add a .challenge-hint. Use .link-orange links.
-
-10. FOOTER — Standard footer with issue number and date.
-    Format: <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;">
-    <span class="hearts">💖 🌏 💖</span>
-    <strong>Sophie's World</strong> · Issue #{n} · {Month} {DD}, {YYYY}<br>
-    Made with love by Dad &amp; Claude 🤖❤️<br>
-    <span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span></div>
-
-Reading level: 4th grade. Tone: warm, fun, curious. Use emojis naturally.
-Links: prefer Time for Kids, NewsForKids.net, Britannica, BBC Newsround, Nat Geo Kids.
-"""
+    return {"profile": profile, "sections": sections, "theme": theme}
 
 
 def get_next_issue_number(newsletters_dir: Path) -> int:
@@ -109,8 +97,67 @@ def parse_claude_output(json_str: str) -> Optional[str]:
     return result[html_start:]
 
 
-def build_prompt(template_html: str, issue_date: date, issue_num: int, recent_headlines: List[str] = []) -> str:
+def build_profile_description(profile: dict) -> str:
+    name = profile.get("name", "Sophie")
+    age_band = profile.get("age_band", "4th-grade")
+    location = profile.get("location", "Fremont, California")
+    cultural_parts = profile.get("cultural_context", [])
+    cultural_str = ". ".join(cultural_parts) + "." if cultural_parts else ""
+    active_interests = profile.get("interests", {}).get("active", [])
+    interests_str = ", ".join(active_interests) if active_interests else ""
+    return (
+        f"{name} is a {age_band} student living in {location}. {cultural_str}\n"
+        f"Active interests: {interests_str}."
+    )
+
+
+def build_section_rules(profile: dict, sections: dict) -> str:
+    active_section_ids = profile.get("newsletter", {}).get("active_sections", [])
+    lines = [
+        "Newsletter sections to fill in (replace each <!-- PLACEHOLDER --> comment with real HTML content):",
+        "",
+        "1. DATE_BADGE — Format: <div class=\"date-badge\">📅 {month} {day}, {year} · Issue #{n}</div>",
+        "",
+        "2. GREETING — Warm personalised opening. Reference Sophie's name and something from this week.",
+        "   Use <span>Sophie's World</span> for the newsletter name.",
+        "",
+    ]
+    for i, section_id in enumerate(active_section_ids, start=3):
+        section = sections[section_id]
+        goal = section.get("goal", "")
+        content_rules = section.get("content_rules", [])
+        link_style = section.get("link_style", "")
+        source_prefs = section.get("source_preferences", [])
+        rules_str = "; ".join(content_rules) if content_rules else ""
+        sources_str = ", ".join(source_prefs) if source_prefs else ""
+        lines.append(f"{i}. {section_id.upper()} — {goal}")
+        if rules_str:
+            lines.append(f"   Content rules: {rules_str}")
+        if link_style:
+            lines.append(f"   Link style: {link_style}")
+        if sources_str:
+            lines.append(f"   Preferred sources: {sources_str}")
+        lines.append("")
+
+    footer_num = len(active_section_ids) + 3
+    lines += [
+        f"{footer_num}. FOOTER — Standard footer with issue number and date.",
+        '    Format: <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;">',
+        '    <span class="hearts">💖 🌏 💖</span>',
+        "    <strong>Sophie's World</strong> · Issue #{n} · {Month} {DD}, {YYYY}<br>",
+        "    Made with love by Dad &amp; Claude 🤖❤️<br>",
+        '    <span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span></div>',
+        "",
+        "Reading level: 4th grade. Tone: warm, fun, curious. Use emojis naturally.",
+        "Links: prefer Time for Kids, NewsForKids.net, Britannica, BBC Newsround, Nat Geo Kids.",
+    ]
+    return "\n".join(lines)
+
+
+def build_prompt(template_html: str, issue_date: date, issue_num: int, config: dict, recent_headlines: List[str] = []) -> str:
     formatted_date = f"{issue_date.strftime('%B')} {issue_date.day}, {issue_date.strftime('%Y')}"
+    profile_description = build_profile_description(config["profile"])
+    section_rules = build_section_rules(config["profile"], config["sections"])
     avoid_section = ""
     if recent_headlines:
         headlines_list = "\n".join(f"- {h}" for h in recent_headlines)
@@ -123,7 +170,7 @@ The previous issue covered the following stories and facts. Choose entirely diff
     return f"""You are generating Issue #{issue_num} of Sophie's World newsletter, dated {formatted_date}.
 
 ## About Sophie
-{SOPHIE_PROFILE}
+{profile_description}
 
 ## Your Task
 Fill in the HTML template below. Replace every <!-- PLACEHOLDER --> comment with the correct HTML content.
@@ -137,7 +184,7 @@ CRITICAL RULES — if you break any of these the output is unusable:
 - Do NOT use markdown, code fences, or any wrapper — just the raw HTML
 {avoid_section}
 ## Section Rules
-{SECTION_RULES}
+{section_rules}
 
 ## Template to Fill In
 {template_html}
@@ -182,8 +229,9 @@ def main():
     if not args.test and check_output_exists(output_path):
         return
 
+    config = load_config(REPO_ROOT)
     template_html = TEMPLATE_PATH.read_text(encoding="utf-8")
-    prompt = build_prompt(template_html, today, issue_num, recent_headlines)
+    prompt = build_prompt(template_html, today, issue_num, config, recent_headlines)
 
     label = "TEST" if args.test else f"Issue #{issue_num}"
     print(f"Generating {label} for {today}...")
