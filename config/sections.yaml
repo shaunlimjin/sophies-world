@@ -65,7 +65,7 @@ sections:
     link_style: link-rose
     content_rules:
       - Search for their latest releases, performances, or announcements
-      - Use .kpop-item structure for each item
+      - Use .interest-item structure for each item
       - Keep content age-appropriate and exciting
       - Include 1–2 "Learn More" links
     source_preferences:
@@ -81,6 +81,7 @@ sections:
     content_rules:
       - Keep it age-appropriate and encouraging
       - Prefer athlete stories, fun facts, competition highlights, or safe basic technique explanations
+      - Use .interest-item structure for each item
       - Avoid risky coaching advice or unsafe training suggestions
       - Include 1–2 "Learn More" links
     source_preferences:

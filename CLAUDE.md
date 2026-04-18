@@ -71,6 +71,7 @@ sophies-world/
 - `generate.py` shells out to `claude -p ... --allowedTools WebSearch,WebFetch --output-format json`
 - `send.py` reads `.env` for Gmail credentials and sends via `smtp.gmail.com:587`
 - Both scripts are idempotent: `generate.py` skips if today's file exists; `send.py` always sends today's file
+- The HTML template now uses a generic interest-feature slot rather than a hardcoded K-pop slot, so interest sections like Gymnastics Corner and K-pop Corner can swap without changing the template structure
 
 ## Switching sections
 

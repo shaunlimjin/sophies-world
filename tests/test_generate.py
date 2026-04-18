@@ -267,13 +267,13 @@ def test_build_section_rules_section_swap():
     sections = {
         "gymnastics_corner": {
             "goal": "Share gymnastics news",
-            "content_rules": ["Keep it age-appropriate"],
+            "content_rules": ["Keep it age-appropriate", "Use .interest-item structure for each item"],
             "link_style": "link-rose",
             "source_preferences": ["USA Gymnastics"],
         },
         "kpop_corner": {
             "goal": "Share K-pop news",
-            "content_rules": ["Keep content age-appropriate"],
+            "content_rules": ["Keep content age-appropriate", "Use .interest-item structure for each item"],
             "link_style": "link-rose",
             "source_preferences": ["YouTube"],
         },
@@ -281,6 +281,17 @@ def test_build_section_rules_section_swap():
     result = generate.build_section_rules(profile, sections)
     assert "GYMNASTICS_CORNER" in result
     assert "KPOP_CORNER" not in result
+    assert ".interest-item" in result
+
+
+def test_template_uses_generic_interest_slot():
+    template = (Path(__file__).parent.parent / "scripts" / "template.html").read_text(encoding="utf-8")
+    assert "INTEREST_FEATURE" in template
+    assert "Interest Corner" in template
+    assert ".interest-grid" in template
+    assert ".interest-item" in template
+    assert "K-pop Corner" not in template
+    assert "KPOP_CORNER" not in template
 
 
 # ---------------------------------------------------------------------------
