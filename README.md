@@ -139,6 +139,7 @@ Controls:
 - active interests
 - active newsletter sections
 - selected theme
+- editorial defaults like reading level, tone, emoji usage, and global source preferences
 
 ### Section catalog
 `config/sections.yaml`
@@ -159,6 +160,17 @@ Currently controls:
 - section ordering mode
 
 Right now this is intentionally light, but it gives us a clean place to grow toward visual theming later.
+
+### Editorial defaults
+Child-specific editorial defaults now live in `config/children/sophie.yaml` under `newsletter.editorial`.
+
+That currently includes:
+- reading level
+- tone
+- emoji usage
+- global source preferences
+
+This keeps prompt-wide editorial policy out of Python and makes it easier to tune without editing code.
 
 ## Switching sections
 

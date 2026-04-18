@@ -51,7 +51,7 @@ sophies-world/
   .env.example                     # template for credentials
   config/
     children/
-      sophie.yaml                  # child profile: interests, active sections, theme
+      sophie.yaml                  # child profile: interests, active sections, theme, editorial defaults
     sections.yaml                  # section catalog: all reusable section definitions
     themes/
       default.yaml                 # theme metadata
@@ -77,6 +77,7 @@ sophies-world/
 - Both scripts are idempotent: `generate.py` skips if today's file exists; `send.py` always sends today's file
 - The HTML template now uses a generic interest-feature slot rather than a hardcoded K-pop slot, so interest sections like Gymnastics Corner and K-pop Corner can swap without changing the template structure
 - `generate.py` now resolves the newsletter template from `config/themes/default.yaml` via `template_path`, instead of hardcoding the template file in Python
+- Prompt-wide editorial defaults like reading level, tone, emoji usage, and global preferred sources now come from `config/children/sophie.yaml` under `newsletter.editorial`
 
 ## Switching sections
 

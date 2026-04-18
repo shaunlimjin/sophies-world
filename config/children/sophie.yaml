@@ -22,3 +22,16 @@ newsletter:
     - money_moves
     - sophies_challenge
   theme: default
+  editorial:
+    reading_level: 4th grade
+    tone:
+      - warm
+      - fun
+      - curious
+    use_emojis: true
+    global_source_preferences:
+      - Time for Kids
+      - NewsForKids.net
+      - Britannica
+      - BBC Newsround
+      - Nat Geo Kids

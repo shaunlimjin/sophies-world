@@ -256,6 +256,30 @@ def test_build_profile_description():
     assert "gymnastics" in result
 
 
+def test_build_editorial_defaults():
+    profile = {
+        "newsletter": {
+            "editorial": {
+                "reading_level": "4th grade",
+                "tone": ["warm", "fun", "curious"],
+                "use_emojis": True,
+                "global_source_preferences": ["Time for Kids", "Britannica"],
+            }
+        }
+    }
+    result = generate.build_editorial_defaults(profile)
+    assert "Reading level: 4th grade." in result
+    assert "Tone: warm, fun, curious." in result
+    assert "Use emojis naturally." in result
+    assert "Links: prefer Time for Kids, Britannica." in result
+
+
+
+def test_build_editorial_defaults_empty():
+    result = generate.build_editorial_defaults({})
+    assert result == ""
+
+
 # ---------------------------------------------------------------------------
 # build_section_rules tests
 # ---------------------------------------------------------------------------
@@ -326,7 +350,15 @@ def _minimal_config(name="TestChild"):
             "location": "Fremont, California",
             "cultural_context": ["Singaporean family in the USA"],
             "interests": {"active": ["gymnastics"]},
-            "newsletter": {"active_sections": ["weird_but_true"]},
+            "newsletter": {
+                "active_sections": ["weird_but_true"],
+                "editorial": {
+                    "reading_level": "4th grade",
+                    "tone": ["warm", "fun", "curious"],
+                    "use_emojis": True,
+                    "global_source_preferences": ["Time for Kids", "Britannica"],
+                },
+            },
         },
         "sections": {
             "weird_but_true": {
@@ -349,6 +381,9 @@ def test_build_prompt_contains_profile_info():
         config=config,
     )
     assert "TestChild" in result
+    assert "Reading level: 4th grade." in result
+    assert "Tone: warm, fun, curious." in result
+    assert "Links: prefer Time for Kids, Britannica." in result
 
 
 def test_build_prompt_with_headlines():

@@ -121,6 +121,27 @@ def build_profile_description(profile: dict) -> str:
     )
 
 
+def build_editorial_defaults(profile: dict) -> str:
+    editorial = profile.get("newsletter", {}).get("editorial", {})
+    reading_level = editorial.get("reading_level")
+    tone = editorial.get("tone", [])
+    use_emojis = editorial.get("use_emojis")
+    global_sources = editorial.get("global_source_preferences", [])
+
+    parts = []
+    if reading_level:
+        parts.append(f"Reading level: {reading_level}.")
+    if tone:
+        parts.append(f"Tone: {', '.join(tone)}.")
+    if use_emojis is True:
+        parts.append("Use emojis naturally.")
+    elif use_emojis is False:
+        parts.append("Avoid emojis unless they are essential.")
+    if global_sources:
+        parts.append(f"Links: prefer {', '.join(global_sources)}.")
+    return " ".join(parts)
+
+
 def build_section_rules(profile: dict, sections: dict) -> str:
     active_section_ids = profile.get("newsletter", {}).get("active_sections", [])
     lines = [
@@ -150,6 +171,7 @@ def build_section_rules(profile: dict, sections: dict) -> str:
         lines.append("")
 
     footer_num = len(active_section_ids) + 3
+    editorial_defaults = build_editorial_defaults(profile)
     lines += [
         f"{footer_num}. FOOTER — Standard footer with issue number and date.",
         '    Format: <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;">',
@@ -158,9 +180,9 @@ def build_section_rules(profile: dict, sections: dict) -> str:
         "    Made with love by Dad &amp; Claude 🤖❤️<br>",
         '    <span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span></div>',
         "",
-        "Reading level: 4th grade. Tone: warm, fun, curious. Use emojis naturally.",
-        "Links: prefer Time for Kids, NewsForKids.net, Britannica, BBC Newsround, Nat Geo Kids.",
     ]
+    if editorial_defaults:
+        lines.append(editorial_defaults)
     return "\n".join(lines)
 
 
