@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate a Sophie's World newsletter issue using the claude CLI."""
 
+import argparse
 import json
 import re
 import subprocess
@@ -156,18 +157,30 @@ def run_claude(prompt: str) -> str:
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--test", action="store_true", help="Write to newsletters/test/ and always regenerate")
+    args = parser.parse_args()
+
     today = date.today()
     issue_num = get_next_issue_number(NEWSLETTERS_DIR)
-    output_path = get_output_path(NEWSLETTERS_DIR, today)
+    recent_headlines = get_recent_headlines(NEWSLETTERS_DIR, today)
 
-    if check_output_exists(output_path):
+    if args.test:
+        output_dir = NEWSLETTERS_DIR / "test"
+        output_dir.mkdir(exist_ok=True)
+    else:
+        output_dir = NEWSLETTERS_DIR
+
+    output_path = get_output_path(output_dir, today)
+
+    if not args.test and check_output_exists(output_path):
         return
 
     template_html = TEMPLATE_PATH.read_text(encoding="utf-8")
-    recent_headlines = get_recent_headlines(NEWSLETTERS_DIR, today)
     prompt = build_prompt(template_html, today, issue_num, recent_headlines)
 
-    print(f"Generating Issue #{issue_num} for {today}...")
+    label = "TEST" if args.test else f"Issue #{issue_num}"
+    print(f"Generating {label} for {today}...")
     raw_output = run_claude(prompt)
 
     html = parse_claude_output(raw_output)
