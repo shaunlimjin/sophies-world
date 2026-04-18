@@ -36,8 +36,9 @@ Newsletter sections to fill in (replace each <!-- PLACEHOLDER --> comment with r
    MUST include serious topics if relevant (conflicts, economy, tariffs). Use .link-green links
    to Time for Kids, NewsForKids.net, Britannica, or BBC Newsround.
 
-5. SINGAPORE_SPOTLIGHT — Something current happening in Singapore this week (culture, food,
-   animals, tech, events). Search for it. Use .sg-spot items and .link-pink links.
+5. SINGAPORE_SPOTLIGHT — A fun fact about Singapore (cultural, historical, economic, nature,
+   food, or quirky). Does not need to be current news — timeless or surprising facts are great.
+   Use .sg-spot items and .link-pink links.
 
 6. USA_CORNER — California/Fremont angle, or US sports/science/culture. Current this week.
    Use .link-blue links.
