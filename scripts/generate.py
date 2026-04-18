@@ -20,7 +20,6 @@ SCRIPTS_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPTS_DIR.parent
 NEWSLETTERS_DIR = REPO_ROOT / "newsletters"
 TEMPLATE_PATH = SCRIPTS_DIR / "template.html"
-CONFIG_DIR = REPO_ROOT / "config"
 
 
 def load_config(repo_root: Path) -> dict:
