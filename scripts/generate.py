@@ -89,10 +89,11 @@ def parse_claude_output(json_str: str) -> Optional[str]:
         return None
     if data.get("is_error") or not data.get("result"):
         return None
-    result = data["result"].strip()
-    if not result.startswith("<"):
+    result = data["result"]
+    html_start = result.find("<")
+    if html_start == -1:
         return None
-    return result
+    return result[html_start:]
 
 
 def build_prompt(template_html: str, issue_date: date, issue_num: int) -> str:
