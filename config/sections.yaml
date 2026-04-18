@@ -60,7 +60,7 @@ sections:
 
   kpop_corner:
     title: "🎤 K-pop Corner"
-    goal: "Share current Katseye and BLACKPINK news, releases, and fun facts"
+    goal: "Share current K-pop news, artist releases, performances, and fun facts"
     block_type: interest_feature
     link_style: link-rose
     content_rules:
@@ -104,7 +104,7 @@ sections:
       - Financial literacy sites for kids
 
   sophies_challenge:
-    title: "🧩 Sophie's Challenge"
+    title: "🧩 Weekly Challenge"
     goal: "Present a maths or reasoning puzzle tied to World Watch content this week"
     block_type: challenge
     link_style: link-orange
