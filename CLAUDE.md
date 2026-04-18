@@ -25,7 +25,7 @@ A weekly HTML email newsletter for Sophie (Shaun's daughter), generated with Cla
 |---|---|
 | **Weird But True** | 2–3 wild fun facts (animals, science, nature) |
 | **World Watch** | 2 real, material current events explained for a 4th grader — include serious topics (conflicts, economics) with kid-friendly analogies |
-| **Singapore Spotlight** | Something happening in Singapore — culture, food, animals, tech, events |
+| **Singapore Spotlight** | A fun fact about Singapore — cultural, historical, economic, nature, food, or quirky. Timeless facts are great; does not need to be current news. |
 | **USA Corner** | California/Fremont angle, or US sports/science/culture |
 | **K-pop Corner** | BLACKPINK / Katseye news, releases, fun facts |
 | **Money Moves** | One saving/entrepreneurship concept + a real kid entrepreneur story |
@@ -43,15 +43,29 @@ A weekly HTML email newsletter for Sophie (Shaun's daughter), generated with Cla
 ```
 sophies-world/
   CLAUDE.md                        # this file
+  .env                             # credentials (gitignored)
+  .env.example                     # template for credentials
   newsletters/
     sophies-world-YYYY-MM-DD.html  # one file per issue
   scripts/
-    generate.py                    # Claude API generation script (TODO)
-    send.py                        # Gmail send script (TODO)
+    generate.py                    # generates newsletter via claude CLI with web search
+    send.py                        # sends newsletter via Gmail SMTP
+    run.sh                         # wrapper: runs generate + send, logs to logs/run.log
+    template.html                  # HTML skeleton with placeholder comments
+  tests/
+    test_generate.py               # unit tests for generate.py
+    test_send.py                   # unit tests for send.py
+  logs/
+    run.log                        # execution log (gitignored)
 ```
 
-## Automation plan (TODO)
-- Weekly cron job on Mac Mini
-- `generate.py` calls Claude API to research + render HTML newsletter
-- `send.py` sends via Gmail SMTP to Sophie's email address
-- Triggered every Wednesday or Thursday so it arrives by the weekend
+## Automation
+- Cron job on Mac Mini: every Saturday at 6am Pacific
+- `run.sh` sets PATH, runs `generate.py && send.py`, appends output to `logs/run.log`
+- `generate.py` shells out to `claude -p ... --allowedTools WebSearch,WebFetch --output-format json`
+- `send.py` reads `.env` for Gmail credentials and sends via `smtp.gmail.com:587`
+- Both scripts are idempotent: `generate.py` skips if today's file exists; `send.py` always sends today's file
+
+## Gmail CSS notes
+- Use `display: block` + `margin-bottom` for vertically stacked items — Gmail ignores `flex-direction: column`
+- `display: flex; flex-wrap: wrap` is fine for horizontal pill-link rows
