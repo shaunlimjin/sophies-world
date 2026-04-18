@@ -1,0 +1,24 @@
+id: sophie
+name: Sophie
+age_band: 4th-grade
+location: Fremont, California
+cultural_context:
+  - Singaporean family in the USA
+interests:
+  active:
+    - gymnastics
+    - skiing
+    - fun facts
+    - saving money
+  inactive:
+    - k-pop
+newsletter:
+  active_sections:
+    - weird_but_true
+    - world_watch
+    - singapore_spotlight
+    - usa_corner
+    - gymnastics_corner
+    - money_moves
+    - sophies_challenge
+  theme: default

@@ -1,0 +1,3 @@
+theme_id: default
+template_path: scripts/template.html
+section_order_mode: profile_driven
