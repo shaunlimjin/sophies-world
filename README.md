@@ -47,6 +47,16 @@ Writes to:
 
 This is the safest way to test changes to sections, template structure, or prompt logic.
 
+Quick test workflow:
+
+```bash
+cd /Users/hobbes/dev/sophies-world
+python3 scripts/generate.py --test
+open newsletters/test/sophies-world-$(date +%F).html
+```
+
+If a test file for today already exists, `--test` will still regenerate it in the test folder. Use this flow when changing active sections, editing the template, or tuning prompt/config behavior.
+
 ### Send
 `python3 scripts/send.py`
 
