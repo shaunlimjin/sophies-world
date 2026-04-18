@@ -60,7 +60,9 @@ A working backlog for improving the newsletter generator and delivery flow.
 
 If we want the highest leverage next steps, I’d start here:
 
-1. Add a dry-run + preview workflow.
-2. Add failure alerts and better structured logs.
-3. Move the content spec into its own editable file.
-4. Add a stable issue metadata/state file instead of deriving everything from file counts.
+1. **Add a dry-run + preview workflow.** Make it easy to test a newsletter before sending.
+2. **Add failure alerts and better structured logs.** Know immediately when something breaks.
+3. **Leverage config-driven architecture for content rules.** Move section-specific prompts and content guidelines into `config/sections.yaml` so they can be tuned without editing Python.
+4. **Add a stable issue metadata/state file.** Replace file-count-based issue numbering with a `state.json` that tracks generated/sent status.
+5. **Support multiple child profiles.** The config structure now allows easy addition of new children (e.g., another daughter) by adding a new YAML file to `config/children/`.
+6. **Add section template validation.** Ensure all active sections in `config/children/sophie.yaml` are defined in `config/sections.yaml` before attempting generation.

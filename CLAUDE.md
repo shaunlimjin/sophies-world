@@ -27,7 +27,7 @@ A weekly HTML email newsletter for Sophie (Shaun's daughter), generated with Cla
 | **World Watch** | 2 real, material current events explained for a 4th grader — include serious topics (conflicts, economics) with kid-friendly analogies |
 | **Singapore Spotlight** | A fun fact about Singapore — cultural, historical, economic, nature, food, or quirky. Timeless facts are great; does not need to be current news. |
 | **USA Corner** | California/Fremont angle, or US sports/science/culture |
-| **K-pop Corner** | BLACKPINK / Katseye news, releases, fun facts |
+| **Gymnastics Corner** | Gymnastics news, athlete stories, fun facts, beginner-safe tips |
 | **Money Moves** | One saving/entrepreneurship concept + a real kid entrepreneur story |
 | **Sophie's Challenge** | A maths or reasoning puzzle tied to that week's World Watch content |
 
@@ -45,6 +45,12 @@ sophies-world/
   CLAUDE.md                        # this file
   .env                             # credentials (gitignored)
   .env.example                     # template for credentials
+  config/
+    children/
+      sophie.yaml                  # child profile: interests, active sections, theme
+    sections.yaml                  # section catalog: all reusable section definitions
+    themes/
+      default.yaml                 # theme metadata
   newsletters/
     sophies-world-YYYY-MM-DD.html  # one file per issue
   scripts/
@@ -65,6 +71,16 @@ sophies-world/
 - `generate.py` shells out to `claude -p ... --allowedTools WebSearch,WebFetch --output-format json`
 - `send.py` reads `.env` for Gmail credentials and sends via `smtp.gmail.com:587`
 - Both scripts are idempotent: `generate.py` skips if today's file exists; `send.py` always sends today's file
+
+## Switching sections
+
+To swap newsletter sections (e.g. replace Gymnastics Corner with K-pop Corner):
+
+1. Edit `config/children/sophie.yaml` → `newsletter.active_sections`
+2. Add or remove section IDs (must match keys in `config/sections.yaml`)
+3. To add a new section type, add its definition to `config/sections.yaml` first
+
+Active sections for Sophie are currently: weird_but_true, world_watch, singapore_spotlight, usa_corner, gymnastics_corner, money_moves, sophies_challenge
 
 ## Gmail CSS notes
 - Use `display: block` + `margin-bottom` for vertically stacked items — Gmail ignores `flex-direction: column`
