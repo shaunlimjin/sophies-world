@@ -52,6 +52,32 @@ def test_parse_claude_output_non_html():
     assert generate.parse_claude_output(payload) is None
 
 
+def test_get_recent_headlines_no_previous(tmp_path):
+    assert generate.get_recent_headlines(tmp_path, date(2026, 4, 18)) == []
+
+
+def test_get_recent_headlines_excludes_today(tmp_path):
+    (tmp_path / "sophies-world-2026-04-18.html").write_text(
+        "<h3>Today's Story</h3>"
+    )
+    assert generate.get_recent_headlines(tmp_path, date(2026, 4, 18)) == []
+
+
+def test_get_recent_headlines_returns_previous_h3s(tmp_path):
+    (tmp_path / "sophies-world-2026-04-11.html").write_text(
+        "<h3>🌍 Big Story One</h3><h3>🎤 K-pop News</h3>"
+    )
+    result = generate.get_recent_headlines(tmp_path, date(2026, 4, 18))
+    assert result == ["🌍 Big Story One", "🎤 K-pop News"]
+
+
+def test_get_recent_headlines_uses_most_recent(tmp_path):
+    (tmp_path / "sophies-world-2026-04-04.html").write_text("<h3>Old Story</h3>")
+    (tmp_path / "sophies-world-2026-04-11.html").write_text("<h3>Recent Story</h3>")
+    result = generate.get_recent_headlines(tmp_path, date(2026, 4, 18))
+    assert result == ["Recent Story"]
+
+
 def test_idempotent_skips_existing(tmp_path, capsys):
     existing = tmp_path / "sophies-world-2026-04-23.html"
     existing.write_text("<html/>")

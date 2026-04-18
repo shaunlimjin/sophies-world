@@ -2,11 +2,12 @@
 """Generate a Sophie's World newsletter issue using the claude CLI."""
 
 import json
+import re
 import subprocess
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 SCRIPTS_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPTS_DIR.parent
@@ -70,6 +71,17 @@ def get_next_issue_number(newsletters_dir: Path) -> int:
     return len(existing) + 1
 
 
+def get_recent_headlines(newsletters_dir: Path, today: date) -> List[str]:
+    today_name = f"sophies-world-{today.strftime('%Y-%m-%d')}.html"
+    files = sorted(newsletters_dir.glob("sophies-world-*.html"))
+    previous = [f for f in files if f.name != today_name]
+    if not previous:
+        return []
+    content = previous[-1].read_text(encoding="utf-8")
+    raw = re.findall(r"<h3[^>]*>(.*?)</h3>", content, re.DOTALL)
+    return [re.sub(r"<[^>]+>", "", h).strip() for h in raw if h.strip()]
+
+
 def get_output_path(newsletters_dir: Path, issue_date: date) -> Path:
     filename = f"sophies-world-{issue_date.strftime('%Y-%m-%d')}.html"
     return newsletters_dir / filename
@@ -96,8 +108,17 @@ def parse_claude_output(json_str: str) -> Optional[str]:
     return result[html_start:]
 
 
-def build_prompt(template_html: str, issue_date: date, issue_num: int) -> str:
+def build_prompt(template_html: str, issue_date: date, issue_num: int, recent_headlines: List[str] = []) -> str:
     formatted_date = f"{issue_date.strftime('%B')} {issue_date.day}, {issue_date.strftime('%Y')}"
+    avoid_section = ""
+    if recent_headlines:
+        headlines_list = "\n".join(f"- {h}" for h in recent_headlines)
+        avoid_section = f"""
+## Topics already covered — do NOT repeat these
+The previous issue covered the following stories and facts. Choose entirely different topics:
+{headlines_list}
+
+"""
     return f"""You are generating Issue #{issue_num} of Sophie's World newsletter, dated {formatted_date}.
 
 ## About Sophie
@@ -107,7 +128,7 @@ def build_prompt(template_html: str, issue_date: date, issue_num: int) -> str:
 Fill in the HTML template below. Replace every <!-- PLACEHOLDER --> comment with the correct HTML content.
 Search the web for current events and news happening THIS WEEK ({formatted_date}).
 Return ONLY the completed HTML — no explanation, no markdown fences, no commentary. Just the raw HTML.
-
+{avoid_section}
 ## Section Rules
 {SECTION_RULES}
 
@@ -143,7 +164,8 @@ def main():
         return
 
     template_html = TEMPLATE_PATH.read_text(encoding="utf-8")
-    prompt = build_prompt(template_html, today, issue_num)
+    recent_headlines = get_recent_headlines(NEWSLETTERS_DIR, today)
+    prompt = build_prompt(template_html, today, issue_num, recent_headlines)
 
     print(f"Generating Issue #{issue_num} for {today}...")
     raw_output = run_claude(prompt)
