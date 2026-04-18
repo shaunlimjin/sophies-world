@@ -19,7 +19,6 @@ except ImportError:
 SCRIPTS_DIR = Path(__file__).parent
 REPO_ROOT = SCRIPTS_DIR.parent
 NEWSLETTERS_DIR = REPO_ROOT / "newsletters"
-TEMPLATE_PATH = SCRIPTS_DIR / "template.html"
 
 
 def load_config(repo_root: Path) -> dict:
@@ -52,6 +51,18 @@ def load_config(repo_root: Path) -> dict:
         sys.exit(1)
 
     return {"profile": profile, "sections": sections, "theme": theme}
+
+
+def get_template_path(repo_root: Path, theme: dict) -> Path:
+    template_rel = theme.get("template_path")
+    if not template_rel:
+        print("Error: theme config missing required field: template_path", file=sys.stderr)
+        sys.exit(1)
+    template_path = repo_root / template_rel
+    if not template_path.exists():
+        print(f"Error: template file not found: {template_path}", file=sys.stderr)
+        sys.exit(1)
+    return template_path
 
 
 def get_next_issue_number(newsletters_dir: Path) -> int:
@@ -229,7 +240,8 @@ def main():
         return
 
     config = load_config(REPO_ROOT)
-    template_html = TEMPLATE_PATH.read_text(encoding="utf-8")
+    template_path = get_template_path(REPO_ROOT, config["theme"])
+    template_html = template_path.read_text(encoding="utf-8")
     prompt = build_prompt(template_html, today, issue_num, config, recent_headlines)
 
     label = "TEST" if args.test else f"Issue #{issue_num}"

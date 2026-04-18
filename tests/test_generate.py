@@ -218,6 +218,26 @@ newsletter:
         generate.load_config(tmp_path)
 
 
+def test_get_template_path_success(tmp_path):
+    template = tmp_path / "scripts" / "template.html"
+    template.parent.mkdir(parents=True)
+    template.write_text("<html/>")
+    result = generate.get_template_path(tmp_path, {"template_path": "scripts/template.html"})
+    assert result == template
+
+
+
+def test_get_template_path_missing_field(tmp_path):
+    with pytest.raises(SystemExit):
+        generate.get_template_path(tmp_path, {})
+
+
+
+def test_get_template_path_missing_file(tmp_path):
+    with pytest.raises(SystemExit):
+        generate.get_template_path(tmp_path, {"template_path": "scripts/missing.html"})
+
+
 # ---------------------------------------------------------------------------
 # build_profile_description tests
 # ---------------------------------------------------------------------------

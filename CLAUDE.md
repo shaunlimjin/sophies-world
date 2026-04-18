@@ -3,6 +3,10 @@
 ## What this is
 A weekly HTML email newsletter for Sophie (Shaun's daughter), generated with Claude and sent automatically each week.
 
+## Setup
+- Install Python dependencies with `pip3 install -r requirements.txt`
+- Current dependency list is intentionally tiny; right now the main extra dependency is `PyYAML` for config loading
+
 ## Sophie's profile
 - **Age:** 4th grade (~9–10 years old)
 - **Lives:** Fremont, California
@@ -72,6 +76,7 @@ sophies-world/
 - `send.py` reads `.env` for Gmail credentials and sends via `smtp.gmail.com:587`
 - Both scripts are idempotent: `generate.py` skips if today's file exists; `send.py` always sends today's file
 - The HTML template now uses a generic interest-feature slot rather than a hardcoded K-pop slot, so interest sections like Gymnastics Corner and K-pop Corner can swap without changing the template structure
+- `generate.py` now resolves the newsletter template from `config/themes/default.yaml` via `template_path`, instead of hardcoding the template file in Python
 
 ## Switching sections
 
@@ -82,6 +87,10 @@ To swap newsletter sections (e.g. replace Gymnastics Corner with K-pop Corner):
 3. To add a new section type, add its definition to `config/sections.yaml` first
 
 Active sections for Sophie are currently: weird_but_true, world_watch, singapore_spotlight, usa_corner, gymnastics_corner, money_moves, sophies_challenge
+
+## Current limitation
+- The architecture is shaped for multiple child profiles, but the current implementation still loads `config/children/sophie.yaml` directly.
+- A future enhancement should add explicit child selection, for example a `--child` flag.
 
 ## Gmail CSS notes
 - Use `display: block` + `margin-bottom` for vertically stacked items — Gmail ignores `flex-direction: column`
