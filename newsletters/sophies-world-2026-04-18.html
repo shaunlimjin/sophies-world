@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sophie's World · April 18, 2026 · Issue #3</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', Arial, sans-serif;
+    background: #f0f4ff;
+    color: #2d2d2d;
+    padding: 20px;
+  }
+
+  .wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #ff6eb4 0%, #ff9a3c 50%, #ffda47 100%);
+    border-radius: 24px 24px 0 0;
+    padding: 36px 32px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: "✨🌍✨";
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 6px;
+  }
+  .header h1 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.92);
+    margin-top: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 50px;
+    padding: 5px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── GREETING BAND ── */
+  .greeting {
+    background: #fff;
+    border-left: 5px solid #ff6eb4;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1.6;
+  }
+  .greeting span { color: #ff6eb4; }
+
+  /* ── SECTION CARDS ── */
+  .card {
+    background: #fff;
+    padding: 24px 28px;
+    margin-top: 3px;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-wbt   { border-top: 4px solid #a78bfa; }
+  .label-wbt  { background: #ede9fe; color: #6d28d9; }
+
+  .card-world { border-top: 4px solid #34d399; }
+  .label-world{ background: #d1fae5; color: #065f46; }
+
+  .card-sg    { border-top: 4px solid #f472b6; }
+  .label-sg   { background: #fce7f3; color: #9d174d; }
+
+  .card-usa   { border-top: 4px solid #60a5fa; }
+  .label-usa  { background: #dbeafe; color: #1e40af; }
+
+  .card-kpop  { border-top: 4px solid #f9a8d4; }
+  .label-kpop { background: #fdf2f8; color: #be185d; }
+
+  .card-money { border-top: 4px solid #fbbf24; }
+  .label-money{ background: #fef3c7; color: #92400e; }
+
+  .card-challenge { border-top: 4px solid #fb923c; background: #fff7ed; }
+  .label-challenge{ background: #ffedd5; color: #9a3412; }
+
+  .card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.2;
+    color: #1a1a2e;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #3d3d3d;
+    margin-bottom: 10px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ── LEARN MORE LINKS ── */
+  .learn-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .learn-more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 5px 13px;
+    border-radius: 50px;
+    border: 2px solid;
+    transition: opacity 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .learn-more a:hover { opacity: 0.8; }
+  .link-green  { color: #065f46; border-color: #34d399; background: #d1fae5; }
+  .link-purple { color: #5b21b6; border-color: #a78bfa; background: #ede9fe; }
+  .link-pink   { color: #9d174d; border-color: #f472b6; background: #fce7f3; }
+  .link-blue   { color: #1e40af; border-color: #60a5fa; background: #dbeafe; }
+  .link-rose   { color: #be185d; border-color: #f9a8d4; background: #fdf2f8; }
+  .link-amber  { color: #92400e; border-color: #fbbf24; background: #fef3c7; }
+  .link-orange { color: #9a3412; border-color: #fb923c; background: #ffedd5; }
+
+  /* ── FACT PILLS ── */
+  .fact-list { display: block; margin-top: 4px; }
+  .fact-item {
+    display: block;
+    background: #f5f3ff;
+    border-left: 4px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #3d3d3d;
+    margin-bottom: 12px;
+  }
+  .fact-item:last-child { margin-bottom: 0; }
+  .fact-item strong { color: #6d28d9; }
+
+  /* ── WORLD WATCH STORIES ── */
+  .world-stories { display: block; margin-top: 4px; }
+  .world-story {
+    display: block;
+    background: #f0fdf4;
+    border-left: 4px solid #34d399;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .world-story:last-child { margin-bottom: 0; }
+  .world-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #065f46;
+    margin-bottom: 6px;
+  }
+  .world-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .world-story p:last-of-type { margin-bottom: 0; }
+  .world-story .analogy {
+    background: #dcfce7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: #166534;
+    margin-top: 8px;
+  }
+  .world-story .story-links { margin-top: 10px; }
+
+  /* ── SG SPOTS ── */
+  .sg-spots { display: block; margin-top: 4px; }
+  .sg-spot {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f472b6;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .sg-spot:last-child { margin-bottom: 0; }
+  .sg-spot h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .sg-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
+
+  /* ── KPOP BANDS ── */
+  .kpop-grid { display: block; margin-top: 4px; }
+  .kpop-item {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f9a8d4;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .kpop-item:last-child { margin-bottom: 0; }
+  .kpop-item h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .kpop-item p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0; }
+
+  /* ── MONEY HIGHLIGHT ── */
+  .money-highlight {
+    background: #fffbeb;
+    border: 2px dashed #fbbf24;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .money-highlight strong { color: #b45309; }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-q {
+    background: #fff;
+    border: 3px solid #fb923c;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .challenge-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #9a6a3e;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .footer .hearts {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+  .footer strong { color: #ff6eb4; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #ff6eb4, #ff9a3c, #ffda47, #34d399, #60a5fa, #a78bfa);
+    border-radius: 3px;
+    margin: 3px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Sophie's World</h1>
+    <div class="subtitle">Your weekly dose of wow, fun &amp; big ideas</div>
+    <div class="date-badge">📅 April 18, 2026 · Issue #3</div>
+  </div>
+
+  <!-- GREETING -->
+  <div class="greeting">Hey Sophie! 👋 Welcome to Issue #3 of <span>Sophie's World</span>! This week is HUGE — Katseye just made their Coachella debut right here in California, astronauts splashed down in the Pacific Ocean after flying around the moon, and the world is watching a very important waterway called the Strait of Hormuz. So much happening — let's dive in! 🌊🚀🎤
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WEIRD BUT TRUE -->
+  <div class="card card-wbt">
+    <div class="section-label label-wbt">🤯 Weird But True</div>
+    <h2>Nature Is SO Strange! 😲</h2>
+    <div class="fact-list">
+      <div class="fact-item">
+        <strong>🐟 The Parrotfish Sleeps in a Slime Bubble!</strong> Every single night, the parrotfish wraps itself inside a big bubble of its own mucus (yes, like snot!) to sleep. Within 30 minutes, it's tucked inside a slimy sleeping bag that keeps hungry predators away. Scientists think the smell confuses sharks and moray eels. Sweet slime dreams! 😴
+      </div>
+      <div class="fact-item">
+        <strong>♾️ This Jellyfish Can Live Forever!</strong> The immortal jellyfish is the only known animal that can reverse its own aging. When it gets old or sick, it transforms back into a tiny baby jellyfish and starts life all over again — like hitting the rewind button! Scientists are studying it to understand aging in all animals, including humans.
+      </div>
+      <div class="fact-item">
+        <strong>🟫 Wombats Poop in Cubes!</strong> Wombats are the only animals in the world that make cube-shaped poop. Scientists figured out that their intestines have stretchy sections that squeeze droppings into little squares. Wombats stack these cube-poops on rocks to mark their territory. Nature's weirdest building blocks! 🏗️
+      </div>
+    </div>
+    <div class="learn-more">
+      <a href="https://kids.nationalgeographic.com/animals" class="link-purple">🔬 Nat Geo Kids Animals</a>
+      <a href="https://www.britannica.com/animal/immortal-jellyfish" class="link-purple">🪼 Immortal Jellyfish</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WORLD WATCH -->
+  <div class="card card-world">
+    <div class="section-label label-world">🌍 World Watch</div>
+    <h2>Big Stories From Around the World 🗺️</h2>
+    <div class="world-stories">
+
+      <div class="world-story">
+        <h3>🚢 The World's Most Important Doorway Opens Again</h3>
+        <p>The Strait of Hormuz is a narrow strip of ocean between Iran and Oman — only about 33 miles wide at its thinnest point. But it's one of the most important places on Earth: about 20% of all the world's oil passes through it every single day. In early 2026, Iran closed this waterway to ships during a conflict with the United States and Israel. Oil prices spiked and countries around the world started worrying about energy and food costs.</p>
+        <p>This week, on April 17, Iran announced the strait was open again as part of a two-week ceasefire agreement. Oil prices dropped by 11% in just one day — one of the biggest drops in years! World leaders from 40 countries met virtually to talk about keeping the peace.</p>
+        <div class="analogy">🤔 Think of it like this: Imagine if someone put a giant padlock on the entrance to the biggest supermarket in town. Suddenly, fewer trucks can bring in food, prices go up, and everyone panics. When the lock comes off — whew! — everything starts flowing again. The Strait of Hormuz is that supermarket door, but for the whole world's energy supply.</div>
+        <div class="story-links learn-more">
+          <a href="https://www.newsforkids.net" class="link-green">📰 NewsForKids.net</a>
+          <a href="https://www.bbcnewsround.com" class="link-green">🌍 BBC Newsround</a>
+        </div>
+      </div>
+
+      <div class="world-story">
+        <h3>🕊️ The Fight in Ukraine Continues — Russia Launches Massive Attack</h3>
+        <p>On April 16, Russia launched hundreds of drones and dozens of missiles at cities across Ukraine. The attacks lasted for hours through the night and hit neighborhoods and homes, killing at least 16 people. Ukraine's air defenses worked hard to shoot many of them down, but it's been one of the biggest attacks of the war so far this year.</p>
+        <p>The conflict between Russia and Ukraine has been going on since February 2022. Many world leaders, including the United States and countries in Europe, are working to find ways to bring peace to Ukraine. It's a reminder that while some parts of the world are finding ceasefires, other conflicts are still ongoing.</p>
+        <div class="analogy">🤔 Imagine two neighbors who got into a really serious argument that turned into a long, painful fight. Other neighbors keep trying to help stop it, but it's very hard when both sides are angry. Countries around the world are like those neighbors, trying to find a way to make the fighting stop for good.</div>
+        <div class="story-links learn-more">
+          <a href="https://www.timeforkids.com" class="link-green">⏰ Time for Kids</a>
+          <a href="https://www.bbcnewsround.com" class="link-green">🌍 BBC Newsround</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SINGAPORE SPOTLIGHT -->
+  <div class="card card-sg">
+    <div class="section-label label-sg">🇸🇬 Singapore Spotlight</div>
+    <h2>Amazing Things About Your Heritage! 🌺</h2>
+    <div class="sg-spots">
+
+      <div class="sg-spot">
+        <h3>🌊 The World's Tallest Indoor Waterfall Is in Singapore!</h3>
+        <p>Inside Changi Airport, there's a jaw-dropping waterfall called the HSBC Rain Vortex — it's 40 meters tall, which is like a 13-story building of falling water, completely INDOORS! It's inside a place called Jewel Changi, which also has a trampoline park, a giant slide, an indoor forest, a movie theater, and a swimming pool. Changi Airport has been voted the world's best airport many years in a row. It's not just an airport — it's an adventure! ✈️</p>
+      </div>
+
+      <div class="sg-spot">
+        <h3>🦁 The "Lion City" That Never Had Lions!</h3>
+        <p>Singapore's name "Singapura" means "Lion City" in Sanskrit — but here's the twist: wild lions have never lived in Singapore! Hundreds of years ago, a prince named Sang Nila Utama spotted a mysterious creature and thought it was a lion. He was so impressed he named the island after it. But historians think what he actually saw was a Malayan tiger! The name stuck forever, and today Singapore proudly wears its lion symbol everywhere — even on its national flag's crest, the Merlion (half lion, half fish). 🐯</p>
+      </div>
+
+    </div>
+    <div class="learn-more">
+      <a href="https://www.britannica.com/place/Singapore" class="link-pink">📚 Singapore on Britannica</a>
+      <a href="https://kids.nationalgeographic.com/geography/countries/article/singapore" class="link-pink">🌏 Nat Geo Kids: Singapore</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- USA CORNER -->
+  <div class="card card-usa">
+    <div class="section-label label-usa">🇺🇸 USA Corner</div>
+    <h2>Big News From California &amp; Beyond! 🌉</h2>
+    <p>🚀 <strong>Astronauts Splash Down Near San Diego!</strong> Just last week, four brave astronauts from NASA's Artemis II mission returned from flying around the moon and splashed down in the Pacific Ocean, right off the coast of San Diego, California! Reid Wiseman, Victor Glover, Christina Koch, and Canadian astronaut Jeremy Hansen had just completed a 10-day journey — traveling 252,756 miles from Earth, the farthest any humans have been from our planet in over 50 years! After their capsule landed in the ocean, they were picked up by a Navy ship and cheered as heroes. 🎉</p>
+    <p>🛸 <strong>California's New Space Museum Is OPEN!</strong> The California Science Center in Los Angeles just unveiled its incredible new Samuel Oschin Air and Space Center. The star attraction? A full-sized Space Shuttle standing UPRIGHT in a 200-foot-tall tower — you can see it from miles away! If you're ever in LA, this is a must-visit for any space lover. Maybe a field trip is in order? 😉</p>
+    <div class="learn-more">
+      <a href="https://www.nasa.gov/mission/artemis-ii/" class="link-blue">🚀 NASA Artemis II</a>
+      <a href="https://www.californiasciencecenter.org" class="link-blue">🛸 California Science Center</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- K-POP CORNER -->
+  <div class="card card-kpop">
+    <div class="section-label label-kpop">🎤 K-pop Corner</div>
+    <h2>Your Faves Are Making Headlines! 💜</h2>
+    <div class="kpop-grid">
+
+      <div class="kpop-item">
+        <h3>🐱 Katseye SLAYS Coachella! #KATSCHELLA</h3>
+        <p>Sophie, this one's for you! 🎉 Katseye just made their massive Coachella debut — performing at the famous Sahara Stage in the California desert! They join an elite group of female K-pop groups who have performed on that stage, alongside BLACKPINK, LE SSERAFIM, and XG. The girls performed a full set including the live debut of their brand-new song "PINKY UP," brought out a surprise guest for the hit "Golden," and brought the crowd to its feet for both weekends of the festival. And the hype isn't over — Katseye has already announced a new EP is coming soon! 🔥</p>
+      </div>
+
+      <div class="kpop-item">
+        <h3>💗 BLACKPINK's Jennie Gets Award Nomination!</h3>
+        <p>BLACKPINK's Jennie is having a huge year! She's been nominated for "Song of the Summer" at the American Music Awards for her remix of "Dracula" with the band Tame Impala. Voting is open now through May 8 — BLINKs are rallying to get her the win! On top of that, there are exciting rumors swirling that BLACKPINK may be gearing up for a full group comeback in 2026. BLINKs everywhere are keeping their eyes peeled for any announcements! 👀</p>
+      </div>
+
+    </div>
+    <div class="learn-more">
+      <a href="https://www.youtube.com/watch?v=7F1ET2XHQfk" class="link-rose">▶️ KATSEYE "PINKY UP" MV</a>
+      <a href="https://www.youtube.com/watch?v=T-dsdy_gs1k" class="link-rose">▶️ Katseye Live at Coachella</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MONEY MOVES -->
+  <div class="card card-money">
+    <div class="section-label label-money">💰 Money Moves</div>
+    <h2>Let's Talk About PROFIT! 📈</h2>
+    <p>Here's a word every business person needs to know: <strong>PROFIT</strong>. Profit is the money you have left over after paying for everything it cost you to make or get what you sold.</p>
+    <p>Say you make lemonade 🍋. You spend $3 on lemons and sugar. Then you sell 10 cups at $1 each, earning $10. Your <strong>profit = $10 − $3 = $7</strong>. That $7 is yours! The more you sell without spending more, the bigger your profit. That's how businesses grow — and it's how kids your age are already making real money!</p>
+    <div class="money-highlight">
+      <strong>💡 Sophie's Money Tip:</strong> Before starting any business, make a simple plan: What will I sell? What will it cost me? How much will I charge? If your price is higher than your cost, you're on track to earn a profit. Try it with lemonade, bracelets, art, or whatever you love making!
+    </div>
+    <p style="margin-top:12px;">🌟 <strong>Kid Entrepreneur Spotlight:</strong> At Children's Entrepreneur Markets happening in over 350 cities across the USA, kids just like you are running their own booths! One girl sewed wool bunnies by hand and sold them all. Another kid sold organic strawberries from her family's garden. It only costs about $25 to rent a booth — and most kids walk away with a profit! One young vendor said: "I learned how to make change and talk to strangers. That's real life!" The next business fair could be YOUR moment, Sophie. 🚀</p>
+    <div class="learn-more">
+      <a href="https://www.kidpreneurs.org" class="link-amber">💡 Kidpreneurs</a>
+      <a href="https://www.tuttletwins.com/blogs/blog/fun-and-creative-kids-entrepreneur-ideas" class="link-amber">🛍️ Kids Business Ideas</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SOPHIE'S CHALLENGE -->
+  <div class="card card-challenge">
+    <div class="section-label label-challenge">🧠 Sophie's Challenge</div>
+    <h2>Can You Figure This Out? 🔢</h2>
+    <p>This week's puzzle is inspired by the <strong>Strait of Hormuz</strong> story from World Watch! When Iran announced the strait was open again, oil prices dropped by <strong>11%</strong> in a single day — one of the biggest price drops in years!</p>
+    <div class="challenge-q">
+      🛢️ If a barrel of oil cost <strong>$100</strong> before the Strait of Hormuz opened...<br><br>
+      ...and the price dropped by <strong>11%</strong>...<br><br>
+      What is the <strong>new price</strong> of a barrel of oil? 💭
+    </div>
+    <p class="challenge-hint">💡 Hint: First find 10% of $100 (easy!), then find 1% of $100, then add them together to get 11%. Subtract that from $100!</p>
+    <div class="learn-more">
+      <a href="https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-ratios-prop-topic/cc-6th-percent/v/finding-a-percentage" class="link-orange">📐 Learn Percentages</a>
+      <a href="https://www.timeforkids.com/g56/categories/world/" class="link-orange">🌍 More World News for Kids</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;">
+    <span class="hearts">💖 🌏 💖</span>
+    <strong>Sophie's World</strong> · Issue #3 · April 18, 2026<br>
+    Made with love by Dad &amp; Claude 🤖❤️<br>
+    <span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span>
+  </div>
+
+</div>
+</body>
+</html>
