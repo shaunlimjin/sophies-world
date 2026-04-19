@@ -1,0 +1,335 @@
+You are generating structured newsletter content for Sophie's World.
+
+Return valid JSON only. Do not return HTML. Do not use markdown fences. Do not include commentary.
+
+Issue metadata:
+- issue_date: 2026-04-19
+- issue_number: 4
+- child_id: sophie
+- formatted_date: April 19, 2026
+
+Child summary:
+{
+  "id": "sophie",
+  "name": "Sophie",
+  "age_band": "4th-grade",
+  "location": "Fremont, California",
+  "cultural_context": [
+    "Singaporean family in the USA"
+  ],
+  "active_interests": [
+    "gymnastics",
+    "skiing",
+    "fun facts",
+    "saving money"
+  ],
+  "reading_level": "4th grade",
+  "tone": [
+    "warm",
+    "fun",
+    "curious"
+  ],
+  "use_emojis": true
+}
+
+Editorial defaults:
+{
+  "reading_level": "4th grade",
+  "tone": [
+    "warm",
+    "fun",
+    "curious"
+  ],
+  "use_emojis": true,
+  "global_source_preferences": [
+    "Time for Kids",
+    "NewsForKids.net",
+    "Britannica",
+    "BBC Newsround",
+    "Nat Geo Kids"
+  ]
+}
+
+Active section summaries:
+[
+  {
+    "id": "weird_but_true",
+    "title": "🤔 Weird But True",
+    "goal": "Share 2–3 wild fun facts to spark curiosity about animals, science, and nature",
+    "block_type": "fact_list",
+    "rules": [
+      "Search for recent or timeless fascinating facts",
+      "Facts should be surprising and age-appropriate",
+      "Include sources for each fact"
+    ],
+    "preferred_sources": [
+      "Nat Geo Kids",
+      "Britannica",
+      "NewsForKids.net"
+    ],
+    "link_style": "link-purple"
+  },
+  {
+    "id": "world_watch",
+    "title": "🌍 World Watch",
+    "goal": "Explain 2 real, material current events happening this week in kid-friendly language",
+    "block_type": "story_list",
+    "rules": [
+      "MUST include serious topics if relevant (conflicts, economy, tariffs)",
+      "Explain each story for a 4th grader with an analogy using .analogy div",
+      "Use real events happening this week"
+    ],
+    "preferred_sources": [
+      "Time for Kids",
+      "NewsForKids.net",
+      "Britannica"
+    ],
+    "link_style": "link-green"
+  },
+  {
+    "id": "singapore_spotlight",
+    "title": "🇸🇬 Singapore Spotlight",
+    "goal": "Share a fun fact about Singapore—cultural, historical, economic, nature, food, or quirky",
+    "block_type": "spotlight",
+    "rules": [
+      "Does not need to be current news",
+      "Timeless or surprising facts are great",
+      "Build affinity for Singapore culture and heritage"
+    ],
+    "preferred_sources": [
+      "Britannica",
+      "BBC Newsround",
+      "Singapore Tourism Board"
+    ],
+    "link_style": "link-pink"
+  },
+  {
+    "id": "usa_corner",
+    "title": "🇺🇸 USA Corner",
+    "goal": "Share California/Fremont angle, or US sports/science/culture happening this week",
+    "block_type": "spotlight",
+    "rules": [
+      "Content should be current this week",
+      "Prefer California or Fremont local angles",
+      "Include 1–2 \"Learn More\" links"
+    ],
+    "preferred_sources": [
+      "Time for Kids",
+      "Britannica",
+      "Local Fremont/California news"
+    ],
+    "link_style": "link-blue"
+  },
+  {
+    "id": "gymnastics_corner",
+    "title": "🤸 Gymnastics Corner",
+    "goal": "Share interesting gymnastics news, athlete stories, fun facts, or beginner-safe tips",
+    "block_type": "interest_feature",
+    "rules": [
+      "Keep it age-appropriate and encouraging",
+      "Prefer athlete stories, fun facts, competition highlights, or safe basic technique explanations",
+      "Use .interest-item structure for each item"
+    ],
+    "preferred_sources": [
+      "Olympics",
+      "USA Gymnastics",
+      "Britannica Kids"
+    ],
+    "link_style": "link-rose"
+  },
+  {
+    "id": "money_moves",
+    "title": "💰 Money Moves",
+    "goal": "Share one saving/entrepreneurship concept + a real kid entrepreneur story",
+    "block_type": "story_list",
+    "rules": [
+      "Include a .money-highlight tip box with the core concept",
+      "Feature a real kid entrepreneur story",
+      "Make it relatable and actionable"
+    ],
+    "preferred_sources": [
+      "Kid entrepreneur news",
+      "Financial literacy sites for kids"
+    ],
+    "link_style": "link-amber"
+  },
+  {
+    "id": "sophies_challenge",
+    "title": "🧩 Weekly Challenge",
+    "goal": "Present a maths or reasoning puzzle tied to World Watch content this week",
+    "block_type": "challenge",
+    "rules": [
+      "Include percentages, fractions, or basic reasoning",
+      "Reference the World Watch story by name",
+      "Add a .challenge-hint for guidance"
+    ],
+    "preferred_sources": [
+      "Derives from World Watch content"
+    ],
+    "link_style": "link-orange"
+  }
+]
+
+Block-type item contracts:
+{
+  "fact_list": {
+    "section_fields": [
+      "title",
+      "render_title",
+      "section_intro(optional)"
+    ],
+    "item_shape": {
+      "title": "...",
+      "body": "..."
+    },
+    "quality_notes": [
+      "render_title should be more vivid than the section label, not a copy of it",
+      "section_intro is optional and should only be used when it adds warmth or context"
+    ]
+  },
+  "story_list": {
+    "section_fields": [
+      "title",
+      "render_title",
+      "section_intro(optional)"
+    ],
+    "item_shape": {
+      "headline": "...",
+      "body": [
+        "paragraph 1",
+        "paragraph 2"
+      ],
+      "analogy": "optional",
+      "links": [
+        {
+          "label": "...",
+          "url": "..."
+        }
+      ]
+    },
+    "quality_notes": [
+      "render_title should feel like a real magazine sub-head, not just the label repeated",
+      "use section_intro sparingly to tee up the stories"
+    ]
+  },
+  "spotlight": {
+    "section_fields": [
+      "title",
+      "render_title",
+      "section_intro(optional)"
+    ],
+    "item_shape": {
+      "headline": "...",
+      "body": [
+        "paragraph 1",
+        "paragraph 2"
+      ],
+      "links": [
+        {
+          "label": "...",
+          "url": "..."
+        }
+      ]
+    },
+    "quality_notes": [
+      "one strong spotlight item is better than several thin ones",
+      "headline should be specific and exciting"
+    ]
+  },
+  "interest_feature": {
+    "section_fields": [
+      "title",
+      "render_title",
+      "section_intro(optional)"
+    ],
+    "item_shape": {
+      "headline": "...",
+      "body": [
+        "paragraph 1",
+        "paragraph 2"
+      ],
+      "links": [
+        {
+          "label": "...",
+          "url": "..."
+        }
+      ]
+    },
+    "quality_notes": [
+      "lean into the child's active interest and make it feel personal",
+      "avoid generic headlines"
+    ]
+  },
+  "challenge": {
+    "section_fields": [
+      "title",
+      "render_title",
+      "section_intro(optional)"
+    ],
+    "item_shape": {
+      "prompt_intro": "short setup paragraph",
+      "prompt": "main challenge question",
+      "bonus": "optional bonus question or extension",
+      "hint": "helpful hint",
+      "links": [
+        {
+          "label": "...",
+          "url": "..."
+        }
+      ]
+    },
+    "quality_notes": [
+      "format for readability in a card, not as one giant blob",
+      "main prompt should be concise after the setup"
+    ]
+  }
+}
+
+Previously covered headlines to avoid repeating:
+- 🚢 The World's Most Important Doorway Opens Again
+- 🕊️ The Fight in Ukraine Continues — Russia Launches Massive Attack
+- 🌊 The World's Tallest Indoor Waterfall Is in Singapore!
+- 🦁 The "Lion City" That Never Had Lions!
+- 🐱 Katseye SLAYS Coachella! #KATSCHELLA
+- 💗 BLACKPINK's Jennie Gets Award Nomination!
+
+Return JSON with this top-level structure:
+{
+  "issue_date": "YYYY-MM-DD",
+  "issue_number": number,
+  "child_id": "...",
+  "child_name": "...",
+  "theme_id": "...",
+  "editorial": { ... },
+  "greeting_text": "one warm sentence fragment for after 'Hey Sophie! 👋', without repeating the child's name or adding weekday labels, and it may include <span>Sophie's World</span>",
+  "sections": [
+    {
+      "id": "...",
+      "title": "canonical section label from config",
+      "render_title": "more vivid magazine-style heading, not just the same label copied",
+      "section_intro": "optional short intro line for the section",
+      "block_type": "...",
+      "link_style": "...",
+      "items": [...],
+      "links": [...]
+    }
+  ],
+  "footer": {
+    "issue_number": number,
+    "issue_date_display": "Month DD, YYYY",
+    "tagline": "...",
+    "location_line": "..."
+  }
+}
+
+Rules:
+- Every active section must appear exactly once and in the same order.
+- Keep `title` aligned to config, but make `render_title` richer and more editorial.
+- Use block-type-appropriate item shapes from the contracts above.
+- Links must be structured objects with label and url.
+- Prefer 1-2 strong items over many weak ones.
+- Write for a smart 4th grader: warm, energetic, easy to follow, but not babyish.
+- For `challenge`, split the content cleanly across `prompt_intro`, `prompt`, optional `bonus`, and `hint` so the renderer can avoid one squished text blob.
+- `greeting_text` must NOT start with another greeting like "Hi Sophie" or include day-of-week phrasing like "Happy Saturday".
+- `bonus` must contain only the bonus question text, with no "Bonus" or emoji prefix.
+- Do not use markdown emphasis markers like `*word*` or `**word**` anywhere in output text.

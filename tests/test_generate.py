@@ -255,11 +255,55 @@ def test_get_template_path_missing_file(tmp_path):
         generate.get_template_path(tmp_path, {"template_path": "scripts/missing.html"})
 
 
+def test_build_profile_summary():
+    summary = content_stage.build_profile_summary({
+        "id": "sophie",
+        "name": "Sophie",
+        "age_band": "4th-grade",
+        "location": "Fremont, California",
+        "cultural_context": ["Singaporean family in the USA"],
+        "interests": {"active": ["gymnastics", "fun facts"]},
+        "newsletter": {
+            "editorial": {
+                "reading_level": "4th grade",
+                "tone": ["warm", "fun", "curious"],
+                "use_emojis": True,
+            }
+        },
+    })
+    assert summary["name"] == "Sophie"
+    assert summary["reading_level"] == "4th grade"
+    assert "gymnastics" in summary["active_interests"]
+
+
+
+def test_build_section_summaries_limits_rules_and_sources():
+    profile = {"newsletter": {"active_sections": ["weird_but_true"]}}
+    sections = {
+        "weird_but_true": {
+            "title": "🤔 Weird But True",
+            "goal": "Share wild facts",
+            "block_type": "fact_list",
+            "content_rules": ["r1", "r2", "r3", "r4"],
+            "source_preferences": ["s1", "s2", "s3", "s4"],
+            "link_style": "link-purple",
+        }
+    }
+    summaries = content_stage.build_section_summaries(profile, sections)
+    assert summaries[0]["rules"] == ["r1", "r2", "r3"]
+    assert summaries[0]["preferred_sources"] == ["s1", "s2", "s3"]
+
+
+
 def test_build_content_prompt_contains_editorial_defaults():
     config = {
         "profile": {
             "id": "sophie",
             "name": "Sophie",
+            "age_band": "4th-grade",
+            "location": "Fremont, California",
+            "cultural_context": ["Singaporean family in the USA"],
+            "interests": {"active": ["gymnastics"]},
             "newsletter": {
                 "active_sections": ["weird_but_true"],
                 "editorial": {
@@ -282,11 +326,17 @@ def test_build_content_prompt_contains_editorial_defaults():
     }
     prompt = content_stage.build_content_prompt(date(2026, 4, 18), 4, config, ["Old Headline"])
     assert '"reading_level": "4th grade"' in prompt
+    assert '"active_interests": [' in prompt
     assert "Old Headline" in prompt
     assert '"block_type": "fact_list"' in prompt
+    assert "Child summary:" in prompt
+    assert "Active section summaries:" in prompt
+    assert "Block-type item contracts:" in prompt
+    assert '"greeting_text"' in prompt
+    assert '"section_intro"' in prompt
 
 
-def test_parse_content_output_success():
+def test_parse_content_output_success(tmp_path):
     payload = json.dumps({
         "is_error": False,
         "result": json.dumps({
@@ -295,14 +345,13 @@ def test_parse_content_output_success():
             "child_id": "sophie",
             "theme_id": "default",
             "editorial": {},
-            "page_title": "Sophie's World · April 18, 2026 · Issue #4",
-            "date_badge_html": '<div class="date-badge">📅 April 18, 2026 · Issue #4</div>',
-            "greeting_html": '<div class="greeting">Hello Sophie</div>',
+            "child_name": "Sophie",
+            "greeting_text": "Welcome back to <span>Sophie's World</span>!",
             "sections": [{"id": "weird_but_true", "title": "A", "render_title": "A", "block_type": "fact_list", "items": [{"title": "x", "body": "y"}], "links": [], "link_style": "link-purple"}],
             "footer": {"issue_number": 4, "issue_date_display": "April 18, 2026", "tagline": "x", "location_line": "y"}
         })
     })
-    parsed = content_stage.parse_content_output(payload)
+    parsed = content_stage.parse_content_output(payload, tmp_path)
     assert parsed["child_id"] == "sophie"
 
 
@@ -319,6 +368,8 @@ def test_issue_artifact_round_trip(tmp_path):
         "child_id": "sophie",
         "theme_id": "default",
         "editorial": {},
+        "child_name": "Sophie",
+        "greeting_text": "Welcome back to <span>Sophie's World</span>!",
         "sections": [{"id": "weird_but_true", "title": "A", "render_title": "A", "block_type": "fact_list", "items": [{"title": "x", "body": "y"}], "links": [], "link_style": "link-purple"}],
         "footer": {"issue_number": 4, "issue_date_display": "April 18, 2026", "tagline": "x", "location_line": "y"}
     }
@@ -339,9 +390,9 @@ def test_render_links_empty():
 def test_render_issue_html_fact_section():
     template = (Path(__file__).parent.parent / "scripts" / "template.html").read_text(encoding="utf-8")
     issue = {
-        "page_title": "Sophie's World · April 18, 2026 · Issue #4",
-        "date_badge_html": '<div class="date-badge">📅 April 18, 2026 · Issue #4</div>',
-        "greeting_html": '<div class="greeting">Hello Sophie</div>',
+        "issue_number": 4,
+        "child_name": "Sophie",
+        "greeting_text": "Welcome back to <span>Sophie's World</span>!",
         "sections": [
             {
                 "id": "weird_but_true",
@@ -384,21 +435,59 @@ def test_render_section_body_story_list():
 def test_render_section_body_interest_feature():
     html = render_stage.render_section_body({
         "block_type": "interest_feature",
-        "items": [{"headline": "Gym News", "body": ["A great meet happened."]}],
+        "items": [{"headline": "Gym News", "body": ["A great meet happened."], "links": [{"label": "Read", "url": "https://example.com"}]}],
         "link_style": "link-rose",
     })
     assert "Gym News" in html
     assert "interest-item" in html
+    assert "Read" in html
 
 
 def test_render_section_body_challenge():
     html = render_stage.render_section_body({
         "block_type": "challenge",
-        "items": [{"prompt": "What is half of 10?", "hint": "Think division", "links": []}],
+        "items": [{"prompt_intro": "You just learned about tariffs.", "prompt": "What is half of 10?", "bonus": "What is double 10?", "hint": "Think division", "links": []}],
         "link_style": "link-orange",
     })
+    assert "You just learned about tariffs." in html
     assert "What is half of 10?" in html
+    assert "What is double 10?" in html
     assert "Think division" in html
+
+
+def test_render_section_body_spotlight_uses_variant_classes():
+    html = render_stage.render_section_body({
+        "id": "usa_corner",
+        "block_type": "spotlight",
+        "items": [{"headline": "Solar Boom", "body": ["California is cooking with sunshine."]}],
+        "link_style": "link-blue",
+    })
+    assert "usa-spot" in html
+    assert "Solar Boom" in html
+
+
+def test_render_section_body_money_story_list_uses_money_variant():
+    html = render_stage.render_section_body({
+        "id": "money_moves",
+        "block_type": "story_list",
+        "items": [{"headline": "Pay Yourself First", "body": ["Save before you spend."], "links": []}],
+        "link_style": "link-amber",
+    })
+    assert "money-story" in html
+    assert "Pay Yourself First" in html
+
+
+def test_build_page_title_and_greeting_helpers():
+    issue = {
+        "issue_number": 4,
+        "child_name": "Sophie",
+        "greeting_text": "Welcome back to <span>Sophie's World</span>!",
+        "footer": {"issue_date_display": "April 18, 2026", "tagline": "x", "location_line": "y"},
+    }
+    assert "Issue #4" in render_stage.build_page_title(issue)
+    assert "April 18, 2026" in render_stage.build_date_badge_html(issue)
+    assert "Hey Sophie!" in render_stage.build_greeting_html(issue)
+    assert "Welcome back" in render_stage.build_greeting_html(issue)
 
 
 def test_template_uses_generic_interest_slot():

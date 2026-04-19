@@ -121,8 +121,8 @@ def main():
 
     print(f"Generating structured content for Issue #{issue_num}...")
     prompt = build_content_prompt(today, issue_num, config, recent_headlines)
-    raw_output = run_content_provider(prompt)
-    issue = parse_content_output(raw_output)
+    raw_output = run_content_provider(prompt, REPO_ROOT)
+    issue = parse_content_output(raw_output, REPO_ROOT)
     validate_issue_artifact(issue)
     artifact_path = write_issue_artifact(REPO_ROOT, issue)
 
