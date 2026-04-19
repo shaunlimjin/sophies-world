@@ -62,7 +62,7 @@ def test_build_message():
         subject="Sophie's World · April 17, 2026 · Issue #2",
         html_body="<html><body>Hello</body></html>",
     )
-    assert msg["From"] == "sender@gmail.com"
+    assert msg["From"] == "Daddy <sender@gmail.com>"
     assert msg["To"] == "sophie@gmail.com"
     assert msg["Subject"] == "Sophie's World · April 17, 2026 · Issue #2"
     payload = msg.get_payload()

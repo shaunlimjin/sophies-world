@@ -4,6 +4,7 @@
 import smtplib
 import sys
 from datetime import date
+from email.headerregistry import Address
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -48,9 +49,10 @@ def build_subject(issue_date: date, issue_num: int) -> str:
     return f"Sophie's World · {formatted} · Issue #{issue_num}"
 
 
-def build_message(from_addr: str, to_addr: str, subject: str, html_body: str) -> MIMEMultipart:
+def build_message(from_addr: str, to_addr: str, subject: str, html_body: str, display_name: str = "Daddy") -> MIMEMultipart:
     msg = MIMEMultipart("alternative")
-    msg["From"] = from_addr
+    local_part, domain = from_addr.split("@", 1)
+    msg["From"] = str(Address(display_name, local_part, domain))
     msg["To"] = to_addr
     msg["Subject"] = subject
     msg.attach(MIMEText(html_body, "html", "utf-8"))
