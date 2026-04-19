@@ -11,6 +11,7 @@ This repo is now config-driven in the important places:
 - section catalog lives in `config/sections.yaml`
 - theme metadata lives in `config/themes/default.yaml`
 - the interest section is generic, so sections like Gymnastics Corner and K-pop Corner can swap without changing the HTML template structure
+- generation is now moving to a two-stage pipeline: structured content artifact first, deterministic local HTML rendering second
 
 It is still a single-child implementation in practice, because `generate.py` currently loads `config/children/sophie.yaml` directly.
 
@@ -35,8 +36,10 @@ The target audience is roughly 4th-grade reading level, with a warm, curious ton
 - loads child/profile config
 - loads section catalog config
 - loads theme config and resolves `template_path`
-- builds a prompt for Claude
-- asks Claude to fill the HTML template
+- builds a structured-content prompt for Claude
+- parses and validates the returned issue artifact JSON
+- writes the structured issue artifact to `artifacts/issues/`
+- renders final HTML locally in Python
 - writes the issue to `newsletters/sophies-world-YYYY-MM-DD.html`
 
 ### Generate a test issue
@@ -110,6 +113,8 @@ sophies-world/
     sections.yaml
     themes/
       default.yaml
+  artifacts/
+    issues/
   newsletters/
     sophies-world-YYYY-MM-DD.html
     test/
@@ -194,8 +199,9 @@ python3 -m pytest -q tests
 Current coverage includes:
 - config loading
 - missing/invalid config handling
-- prompt assembly
-- section swap behavior
+- structured content prompt assembly
+- issue artifact validation and persistence
+- local renderer basics
 - generic interest-slot template checks
 - theme template path validation
 - send script basics
@@ -204,7 +210,7 @@ Current coverage includes:
 
 - `generate.py` still loads `config/children/sophie.yaml` directly, so multi-child support is not yet exposed through a flag like `--child`
 - issue numbering is still derived from file counts, which is good enough for now but not fully robust
-- Claude still returns final HTML directly, rather than structured section data rendered locally
+- the new two-stage pipeline is in progress, so renderer and schema coverage are still relatively early and will need more hardening as block types get fully enforced
 
 ## Docs worth reading
 

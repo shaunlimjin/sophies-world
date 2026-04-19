@@ -58,7 +58,10 @@ sophies-world/
   newsletters/
     sophies-world-YYYY-MM-DD.html  # one file per issue
   scripts/
-    generate.py                    # generates newsletter via claude CLI with web search
+    generate.py                    # orchestrates content stage + local render stage
+    content_stage.py               # content provider orchestration (currently Claude)
+    render_stage.py                # deterministic local HTML renderer
+    issue_schema.py                # structured issue artifact helpers
     send.py                        # sends newsletter via Gmail SMTP
     run.sh                         # wrapper: runs generate + send, logs to logs/run.log
     template.html                  # HTML skeleton with placeholder comments
@@ -72,11 +75,12 @@ sophies-world/
 ## Automation
 - Cron job on Mac Mini: every Saturday at 6am Pacific
 - `run.sh` sets PATH, runs `generate.py && send.py`, appends output to `logs/run.log`
-- `generate.py` shells out to `claude -p ... --allowedTools WebSearch,WebFetch --output-format json`
+- `generate.py` now orchestrates a two-stage flow: Claude returns structured newsletter content, then local Python renders final HTML
+- structured issue artifacts are written under `artifacts/issues/`
 - `send.py` reads `.env` for Gmail credentials and sends via `smtp.gmail.com:587`
-- Both scripts are idempotent: `generate.py` skips if today's file exists; `send.py` always sends today's file
+- Both scripts are idempotent from the operator point of view: `generate.py` skips if today's live file exists; `send.py` always sends today's file
 - The HTML template now uses a generic interest-feature slot rather than a hardcoded K-pop slot, so interest sections like Gymnastics Corner and K-pop Corner can swap without changing the template structure
-- `generate.py` now resolves the newsletter template from `config/themes/default.yaml` via `template_path`, instead of hardcoding the template file in Python
+- `generate.py` resolves the newsletter template from `config/themes/default.yaml` via `template_path`
 - Prompt-wide editorial defaults like reading level, tone, emoji usage, and global preferred sources now come from `config/children/sophie.yaml` under `newsletter.editorial`
 
 ## Switching sections

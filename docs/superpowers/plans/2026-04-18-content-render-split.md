@@ -1,7 +1,7 @@
 # Plan: Split Newsletter Generation into Content Stage + Render Stage
 
 **Date:** 2026-04-18  
-**Status:** Draft
+**Status:** Approved
 **Spec:** `docs/superpowers/specs/2026-04-18-content-render-split-design.md`
 
 ---

@@ -6,6 +6,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 import generate
+import content_stage
+import issue_schema
+import render_stage
 
 
 def test_get_next_issue_number_no_files(tmp_path):
@@ -21,36 +24,6 @@ def test_get_next_issue_number_with_existing(tmp_path):
 def test_get_output_path(tmp_path):
     result = generate.get_output_path(tmp_path, date(2026, 4, 23))
     assert result == tmp_path / "sophies-world-2026-04-23.html"
-
-
-def test_parse_claude_output_success():
-    payload = json.dumps({
-        "type": "result",
-        "subtype": "success",
-        "is_error": False,
-        "result": "<html><body>Hello</body></html>",
-    })
-    assert generate.parse_claude_output(payload) == "<html><body>Hello</body></html>"
-
-
-def test_parse_claude_output_error():
-    payload = json.dumps({
-        "type": "result",
-        "subtype": "error",
-        "is_error": True,
-        "result": "",
-    })
-    assert generate.parse_claude_output(payload) is None
-
-
-def test_parse_claude_output_non_html():
-    payload = json.dumps({
-        "type": "result",
-        "subtype": "success",
-        "is_error": False,
-        "result": "Here is your newsletter:",
-    })
-    assert generate.parse_claude_output(payload) is None
 
 
 def test_get_recent_headlines_no_previous(tmp_path):
@@ -93,36 +66,72 @@ def test_idempotent_proceeds_when_missing(tmp_path):
     assert generate.check_output_exists(path) is False
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 MINIMAL_SECTIONS_YAML = """\
 sections:
   weird_but_true:
     title: "🤔 Weird But True"
     goal: "Share 2–3 wild fun facts"
+    block_type: fact_list
     content_rules:
       - Facts should be surprising
     link_style: link-purple
     source_preferences:
       - Nat Geo Kids
+  world_watch:
+    title: "🌍 World Watch"
+    goal: "Explain 2 real current events"
+    block_type: story_list
+    content_rules:
+      - Include an analogy
+    link_style: link-green
+    source_preferences:
+      - BBC Newsround
+  singapore_spotlight:
+    title: "🇸🇬 Singapore Spotlight"
+    goal: "Share a Singapore fact"
+    block_type: spotlight
+    content_rules:
+      - Timeless or surprising facts are great
+    link_style: link-pink
+    source_preferences:
+      - Britannica
+  usa_corner:
+    title: "🇺🇸 USA Corner"
+    goal: "Share something about the USA"
+    block_type: spotlight
+    content_rules:
+      - Keep it current
+    link_style: link-blue
+    source_preferences:
+      - Time for Kids
   gymnastics_corner:
     title: "🤸 Gymnastics Corner"
     goal: "Share gymnastics news"
+    block_type: interest_feature
     content_rules:
       - Keep it age-appropriate
+      - Use .interest-item structure for each item
     link_style: link-rose
     source_preferences:
       - USA Gymnastics
-  kpop_corner:
-    title: "🎤 K-pop Corner"
-    goal: "Share K-pop news"
+  money_moves:
+    title: "💰 Money Moves"
+    goal: "Share one money lesson"
+    block_type: story_list
     content_rules:
-      - Keep content age-appropriate
-    link_style: link-rose
+      - Include a money highlight
+    link_style: link-amber
     source_preferences:
-      - YouTube
+      - Financial literacy sites for kids
+  sophies_challenge:
+    title: "🧠 Sophie's Challenge"
+    goal: "Present a challenge"
+    block_type: challenge
+    content_rules:
+      - Tie it to World Watch
+    link_style: link-orange
+    source_preferences:
+      - Derived from World Watch
 """
 
 MINIMAL_THEME_YAML = """\
@@ -155,13 +164,25 @@ interests:
 newsletter:
   active_sections:
     - weird_but_true
+    - world_watch
+    - singapore_spotlight
+    - usa_corner
+    - gymnastics_corner
+    - money_moves
+    - sophies_challenge
   theme: default
+  editorial:
+    reading_level: 4th grade
+    tone:
+      - warm
+      - fun
+      - curious
+    use_emojis: true
+    global_source_preferences:
+      - Time for Kids
+      - Britannica
 """
 
-
-# ---------------------------------------------------------------------------
-# load_config tests
-# ---------------------------------------------------------------------------
 
 def test_load_config_success(tmp_path):
     make_config(tmp_path, VALID_SOPHIE_YAML)
@@ -173,7 +194,6 @@ def test_load_config_success(tmp_path):
 
 
 def test_load_config_missing_child(tmp_path):
-    # No config files created at all — missing children/sophie.yaml
     (tmp_path / "config").mkdir(parents=True)
     with pytest.raises(SystemExit):
         generate.load_config(tmp_path)
@@ -212,7 +232,6 @@ newsletter:
     - weird_but_true
   theme: missing_theme
 """
-    # Create config but with no themes/missing_theme.yaml
     make_config(tmp_path, sophie_missing_theme, theme_yaml=None)
     with pytest.raises(SystemExit):
         generate.load_config(tmp_path)
@@ -226,11 +245,9 @@ def test_get_template_path_success(tmp_path):
     assert result == template
 
 
-
 def test_get_template_path_missing_field(tmp_path):
     with pytest.raises(SystemExit):
         generate.get_template_path(tmp_path, {})
-
 
 
 def test_get_template_path_missing_file(tmp_path):
@@ -238,94 +255,150 @@ def test_get_template_path_missing_file(tmp_path):
         generate.get_template_path(tmp_path, {"template_path": "scripts/missing.html"})
 
 
-# ---------------------------------------------------------------------------
-# build_profile_description tests
-# ---------------------------------------------------------------------------
-
-def test_build_profile_description():
-    profile = {
-        "name": "Sophie",
-        "age_band": "4th-grade",
-        "location": "Fremont, California",
-        "cultural_context": ["Singaporean family in the USA"],
-        "interests": {"active": ["gymnastics", "fun facts"]},
-    }
-    result = generate.build_profile_description(profile)
-    assert "Sophie" in result
-    assert "Fremont, California" in result
-    assert "gymnastics" in result
-
-
-def test_build_editorial_defaults():
-    profile = {
-        "newsletter": {
-            "editorial": {
-                "reading_level": "4th grade",
-                "tone": ["warm", "fun", "curious"],
-                "use_emojis": True,
-                "global_source_preferences": ["Time for Kids", "Britannica"],
+def test_build_content_prompt_contains_editorial_defaults():
+    config = {
+        "profile": {
+            "id": "sophie",
+            "name": "Sophie",
+            "newsletter": {
+                "active_sections": ["weird_but_true"],
+                "editorial": {
+                    "reading_level": "4th grade",
+                    "tone": ["warm", "fun", "curious"],
+                    "use_emojis": True,
+                },
+            },
+        },
+        "sections": {
+            "weird_but_true": {
+                "title": "🤔 Weird But True",
+                "goal": "Share wild facts",
+                "block_type": "fact_list",
+                "content_rules": [],
+                "source_preferences": [],
+                "link_style": "link-purple",
             }
-        }
-    }
-    result = generate.build_editorial_defaults(profile)
-    assert "Reading level: 4th grade." in result
-    assert "Tone: warm, fun, curious." in result
-    assert "Use emojis naturally." in result
-    assert "Links: prefer Time for Kids, Britannica." in result
-
-
-
-def test_build_editorial_defaults_empty():
-    result = generate.build_editorial_defaults({})
-    assert result == ""
-
-
-# ---------------------------------------------------------------------------
-# build_section_rules tests
-# ---------------------------------------------------------------------------
-
-def test_build_section_rules_includes_active_sections():
-    profile = {
-        "newsletter": {
-            "active_sections": ["weird_but_true"],
-        }
-    }
-    sections = {
-        "weird_but_true": {
-            "goal": "Share wild fun facts",
-            "content_rules": ["Facts should be surprising"],
-            "link_style": "link-purple",
-            "source_preferences": ["Nat Geo Kids"],
-        }
-    }
-    result = generate.build_section_rules(profile, sections)
-    assert "WEIRD_BUT_TRUE" in result
-
-
-def test_build_section_rules_section_swap():
-    profile = {
-        "newsletter": {
-            "active_sections": ["gymnastics_corner"],
-        }
-    }
-    sections = {
-        "gymnastics_corner": {
-            "goal": "Share gymnastics news",
-            "content_rules": ["Keep it age-appropriate", "Use .interest-item structure for each item"],
-            "link_style": "link-rose",
-            "source_preferences": ["USA Gymnastics"],
-        },
-        "kpop_corner": {
-            "goal": "Share K-pop news",
-            "content_rules": ["Keep content age-appropriate", "Use .interest-item structure for each item"],
-            "link_style": "link-rose",
-            "source_preferences": ["YouTube"],
         },
     }
-    result = generate.build_section_rules(profile, sections)
-    assert "GYMNASTICS_CORNER" in result
-    assert "KPOP_CORNER" not in result
-    assert ".interest-item" in result
+    prompt = content_stage.build_content_prompt(date(2026, 4, 18), 4, config, ["Old Headline"])
+    assert '"reading_level": "4th grade"' in prompt
+    assert "Old Headline" in prompt
+    assert '"block_type": "fact_list"' in prompt
+
+
+def test_parse_content_output_success():
+    payload = json.dumps({
+        "is_error": False,
+        "result": json.dumps({
+            "issue_date": "2026-04-18",
+            "issue_number": 4,
+            "child_id": "sophie",
+            "theme_id": "default",
+            "editorial": {},
+            "page_title": "Sophie's World · April 18, 2026 · Issue #4",
+            "date_badge_html": '<div class="date-badge">📅 April 18, 2026 · Issue #4</div>',
+            "greeting_html": '<div class="greeting">Hello Sophie</div>',
+            "sections": [{"id": "weird_but_true", "title": "A", "render_title": "A", "block_type": "fact_list", "items": [{"title": "x", "body": "y"}], "links": [], "link_style": "link-purple"}],
+            "footer": {"issue_number": 4, "issue_date_display": "April 18, 2026", "tagline": "x", "location_line": "y"}
+        })
+    })
+    parsed = content_stage.parse_content_output(payload)
+    assert parsed["child_id"] == "sophie"
+
+
+def test_parse_content_output_error():
+    payload = json.dumps({"is_error": True, "result": ""})
+    with pytest.raises(ValueError):
+        content_stage.parse_content_output(payload)
+
+
+def test_issue_artifact_round_trip(tmp_path):
+    issue = {
+        "issue_date": "2026-04-18",
+        "issue_number": 4,
+        "child_id": "sophie",
+        "theme_id": "default",
+        "editorial": {},
+        "sections": [{"id": "weird_but_true", "title": "A", "render_title": "A", "block_type": "fact_list", "items": [{"title": "x", "body": "y"}], "links": [], "link_style": "link-purple"}],
+        "footer": {"issue_number": 4, "issue_date_display": "April 18, 2026", "tagline": "x", "location_line": "y"}
+    }
+    out_path = issue_schema.write_issue_artifact(tmp_path, issue)
+    loaded = issue_schema.load_issue_artifact(out_path)
+    assert loaded["issue_date"] == "2026-04-18"
+
+
+def test_validate_issue_artifact_missing_fields():
+    with pytest.raises(ValueError):
+        issue_schema.validate_issue_artifact({"issue_date": "2026-04-18"})
+
+
+def test_render_links_empty():
+    assert render_stage.render_links([], "link-blue") == ""
+
+
+def test_render_issue_html_fact_section():
+    template = (Path(__file__).parent.parent / "scripts" / "template.html").read_text(encoding="utf-8")
+    issue = {
+        "page_title": "Sophie's World · April 18, 2026 · Issue #4",
+        "date_badge_html": '<div class="date-badge">📅 April 18, 2026 · Issue #4</div>',
+        "greeting_html": '<div class="greeting">Hello Sophie</div>',
+        "sections": [
+            {
+                "id": "weird_but_true",
+                "render_title": "Nature Is Wild!",
+                "block_type": "fact_list",
+                "items": [{"title": "🐝 Fact", "body": "Bees are amazing."}],
+                "links": [{"label": "Nat Geo Kids", "url": "https://example.com"}],
+                "link_style": "link-purple",
+            }
+        ],
+        "footer": {
+            "issue_number": 4,
+            "issue_date_display": "April 18, 2026",
+            "tagline": "Made with love by Dad & Claude 🤖❤️",
+            "location_line": "Fremont, California ↔ Singapore",
+        },
+    }
+    html = render_stage.render_issue_html(template, issue)
+    assert "Nature Is Wild!" in html
+    assert "🐝 Fact" in html
+    assert "Nat Geo Kids" in html
+
+
+def test_render_section_body_story_list():
+    html = render_stage.render_section_body({
+        "block_type": "story_list",
+        "items": [{
+            "headline": "Big Story",
+            "body": ["Paragraph one", "Paragraph two"],
+            "analogy": "Like a timeout",
+            "links": [{"label": "BBC", "url": "https://example.com"}],
+        }],
+        "link_style": "link-green",
+    })
+    assert "Big Story" in html
+    assert "Like a timeout" in html
+    assert "BBC" in html
+
+
+def test_render_section_body_interest_feature():
+    html = render_stage.render_section_body({
+        "block_type": "interest_feature",
+        "items": [{"headline": "Gym News", "body": ["A great meet happened."]}],
+        "link_style": "link-rose",
+    })
+    assert "Gym News" in html
+    assert "interest-item" in html
+
+
+def test_render_section_body_challenge():
+    html = render_stage.render_section_body({
+        "block_type": "challenge",
+        "items": [{"prompt": "What is half of 10?", "hint": "Think division", "links": []}],
+        "link_style": "link-orange",
+    })
+    assert "What is half of 10?" in html
+    assert "Think division" in html
 
 
 def test_template_uses_generic_interest_slot():
@@ -336,77 +409,3 @@ def test_template_uses_generic_interest_slot():
     assert ".interest-item" in template
     assert "K-pop Corner" not in template
     assert "KPOP_CORNER" not in template
-
-
-# ---------------------------------------------------------------------------
-# build_prompt tests
-# ---------------------------------------------------------------------------
-
-def _minimal_config(name="TestChild"):
-    return {
-        "profile": {
-            "name": name,
-            "age_band": "4th-grade",
-            "location": "Fremont, California",
-            "cultural_context": ["Singaporean family in the USA"],
-            "interests": {"active": ["gymnastics"]},
-            "newsletter": {
-                "active_sections": ["weird_but_true"],
-                "editorial": {
-                    "reading_level": "4th grade",
-                    "tone": ["warm", "fun", "curious"],
-                    "use_emojis": True,
-                    "global_source_preferences": ["Time for Kids", "Britannica"],
-                },
-            },
-        },
-        "sections": {
-            "weird_but_true": {
-                "goal": "Share wild fun facts",
-                "content_rules": [],
-                "link_style": "link-purple",
-                "source_preferences": [],
-            }
-        },
-        "theme": {"theme_id": "default"},
-    }
-
-
-def test_build_prompt_contains_profile_info():
-    config = _minimal_config("TestChild")
-    result = generate.build_prompt(
-        template_html="<html/>",
-        issue_date=date(2026, 4, 23),
-        issue_num=5,
-        config=config,
-    )
-    assert "TestChild" in result
-    assert "Reading level: 4th grade." in result
-    assert "Tone: warm, fun, curious." in result
-    assert "Links: prefer Time for Kids, Britannica." in result
-
-
-def test_build_prompt_with_headlines():
-    config = _minimal_config()
-    result = generate.build_prompt(
-        template_html="<html/>",
-        issue_date=date(2026, 4, 23),
-        issue_num=5,
-        config=config,
-        recent_headlines=["Big Story One", "K-pop News"],
-    )
-    assert "do NOT repeat" in result
-    assert "Big Story One" in result
-    assert "K-pop News" in result
-
-
-def test_build_prompt_without_headlines():
-    config = _minimal_config()
-    result = generate.build_prompt(
-        template_html="<html/>",
-        issue_date=date(2026, 4, 23),
-        issue_num=5,
-        config=config,
-        recent_headlines=[],
-    )
-    assert "do NOT repeat" not in result
