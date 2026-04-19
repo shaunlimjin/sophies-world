@@ -77,7 +77,8 @@ def build_section_item_contracts() -> Dict[str, Dict[str, Any]]:
                 "links": [{"label": "...", "url": "..."}],
             },
             "quality_notes": [
-                "one strong spotlight item is better than several thin ones",
+                "return 1-2 spotlight items; prefer 2 when you have two distinct strong ideas",
+                "if the second item would feel weak or repetitive, return 1 strong item instead",
                 "headline should be specific and exciting",
             ],
         },
@@ -182,6 +183,7 @@ Rules:
 - Use block-type-appropriate item shapes from the contracts above.
 - Links must be structured objects with label and url.
 - Prefer 1-2 strong items over many weak ones.
+- For `spotlight`, usually return 2 items when there are two clearly distinct good ideas; fall back to 1 only when the second would be weak or repetitive.
 - Write for a smart 4th grader: warm, energetic, easy to follow, but not babyish.
 - For `challenge`, split the content cleanly across `prompt_intro`, `prompt`, optional `bonus`, and `hint` so the renderer can avoid one squished text blob.
 - `greeting_text` must NOT start with another greeting like "Hi Sophie" or include day-of-week phrasing like "Happy Saturday".
@@ -222,6 +224,37 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
     return result.stdout
 
 
+def extract_first_json_object(text: str) -> str:
+    start = text.find("{")
+    if start == -1:
+        raise ValueError("content provider result did not contain JSON object")
+
+    depth = 0
+    in_string = False
+    escape = False
+    for index in range(start, len(text)):
+        char = text[index]
+        if in_string:
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+        elif char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:index + 1]
+
+    raise ValueError("content provider result did not contain a complete JSON object")
+
+
 def parse_content_output(json_str: str, repo_root: Path | None = None) -> Dict[str, Any]:
     if repo_root is not None:
         get_debug_dir(repo_root).joinpath("last-parse-input.txt").write_text(json_str or "", encoding="utf-8")
@@ -232,10 +265,9 @@ def parse_content_output(json_str: str, repo_root: Path | None = None) -> Dict[s
     if outer.get("is_error") or not outer.get("result"):
         raise ValueError("content provider returned empty or error result")
     result = outer["result"].strip()
-    start = result.find("{")
-    if start == -1:
-        raise ValueError("content provider result did not contain JSON object")
+    result = result.removeprefix("```json").removeprefix("```").strip()
+    result = result.removesuffix("```").strip()
     try:
-        return json.loads(result[start:])
+        return json.loads(extract_first_json_object(result))
     except json.JSONDecodeError as exc:
         raise ValueError(f"content provider returned invalid content JSON: {exc}") from exc

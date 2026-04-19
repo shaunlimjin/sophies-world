@@ -20,240 +20,262 @@
       "Nat Geo Kids"
     ]
   },
-  "greeting_text": "Issue #4 of <span>Sophie's World</span> is here — packed with wild facts, big news from around the globe, and your trickiest challenge yet! 🌟",
+  "greeting_text": "Issue #4 of <span>Sophie's World</span> is here — packed with wild facts, big news, and a brain-bending challenge just for you! 🌟",
   "sections": [
     {
       "id": "weird_but_true",
       "title": "🤔 Weird But True",
-      "render_title": "You Won't Believe These Are Real!",
-      "section_intro": "Nature is seriously weird — and seriously awesome. 🌿",
+      "render_title": "Your Brain Is About to Explode 🤯",
       "block_type": "fact_list",
       "link_style": "link-purple",
       "items": [
         {
-          "title": "🐙 Octopuses Have Three Hearts — And Blue Blood!",
-          "body": "An octopus has three hearts pumping blue blood through its body. Two hearts push blood through its gills, and one heart pumps it everywhere else. Here's the wildest part: when an octopus swims, its main heart actually stops beating — which is why they prefer to crawl!"
+          "title": "🐙 Octopuses Have THREE Hearts — and Blue Blood!",
+          "body": "An octopus has three hearts: two pump blood to its gills, and one pumps it to the rest of its body. And here's the wild part — their blood is blue! Instead of iron (like humans use), octopuses use copper to carry oxygen through their blood. Copper turns blood blue. How cool is that?"
         },
         {
-          "title": "🌳 Trees Talk to Each Other Underground",
-          "body": "Forests have a secret internet! Trees send nutrients and warning signals to each other through a huge underground network of tiny fungi called the 'Wood Wide Web.' Big trees can even send food to baby trees through these hidden pathways."
+          "title": "🍯 3,000-Year-Old Honey Is Still Perfectly Edible",
+          "body": "Honey never spoils. Archaeologists found pots of honey sealed in ancient Egyptian tombs that were over 3,000 years old — and the honey was still safe to eat! Honey's special chemistry creates an environment where bacteria simply cannot survive. It's basically nature's forever food."
         },
         {
-          "title": "🦦 Sea Otters Hold Hands While They Sleep",
-          "body": "So they don't drift away from each other, sea otters hold hands — or paws! — while snoozing on the water. A group of resting otters is called a 'raft.' Now you know why!"
+          "title": "🌳 Forests Have a Secret Underground Internet",
+          "body": "Trees in forests can send food and chemical messages to each other through a network of underground fungi — tiny thread-like organisms in the soil. Scientists call it the 'Wood Wide Web.' Older trees even share nutrients with baby trees that aren't getting enough sunlight. Forests are one giant community looking after each other!"
         }
       ],
       "links": [
         {
-          "label": "More Wild Facts — Nat Geo Kids",
+          "label": "Amazing Animal Facts on Nat Geo Kids",
           "url": "https://kids.nationalgeographic.com/animals"
         },
         {
-          "label": "Animal Wonders — Britannica Kids",
-          "url": "https://kids.britannica.com/kids/browse/animals"
+          "label": "Weird Science on Britannica Kids",
+          "url": "https://kids.britannica.com/kids/browse/science-and-technology"
         }
       ]
     },
     {
       "id": "world_watch",
       "title": "🌍 World Watch",
-      "render_title": "Big Stories From Around the Globe",
-      "section_intro": "Two major things are happening in the world right now — here's what you need to know!",
+      "render_title": "Big Stories, Explained Just for You",
+      "section_intro": "Two important things happening in the world right now — and why they matter to everyone.",
       "block_type": "story_list",
       "link_style": "link-green",
       "items": [
         {
-          "headline": "💸 The Trade War Heats Up: What Are Tariffs and Why Do They Matter?",
+          "headline": "💸 The US–China Trade War Heats Up",
           "body": [
-            "The United States and China are in a major disagreement about trade — the buying and selling of goods between countries. The US has added high taxes called tariffs on things it buys from China, like electronics, clothing, and toys. China has fired back with its own tariffs on American goods like farm products.",
-            "These extra taxes make products more expensive for regular families in both countries. Leaders are meeting to try to work out a deal, but so far it remains a tense standoff — and prices at stores are feeling it."
+            "The United States and China are in a big disagreement about trade — the buying and selling of goods between countries. The US has added tariffs, which are extra taxes on things coming in from China. This makes products like electronics, toys, and clothing cost more in American stores. China responded by adding its own tariffs on American goods.",
+            "This back-and-forth has been going on for a while, and in April 2026 both sides raised the stakes again. Shoppers in the US are starting to notice higher prices on some items. World leaders are watching closely, because when the two biggest economies fight, it affects people everywhere — including here in Fremont."
           ],
-          "analogy": "Imagine two kids in a trading-card game who both decide to charge each other double for every swap. Pretty soon nobody wants to trade, both kids end up with fewer cool cards, and everyone loses!",
+          "analogy": "Imagine two kids who trade snacks at lunch. One says, 'If you want my cookies, you have to give me two things instead of one.' The other fires back, 'Fine — if you want my chips, you have to give me three things!' Pretty soon neither kid wants to trade at all. That's basically what's happening between the US and China.",
           "links": [
             {
-              "label": "What Are Tariffs? — Time for Kids",
-              "url": "https://www.timeforkids.com/g56/tariffs/"
+              "label": "What Are Tariffs? (BBC Newsround)",
+              "url": "https://www.bbc.co.uk/newsround/newsround"
             },
             {
-              "label": "Trade Wars Explained — NewsForKids",
-              "url": "https://newsforkids.net"
+              "label": "Trade News on Time for Kids",
+              "url": "https://www.timeforkids.com/g56/world/"
             }
           ]
         },
         {
-          "headline": "🌡️ Scientists Confirm: Earth Just Had Its Hottest Year Ever",
+          "headline": "🌊 Scientists Sound the Alarm on Coral Reefs",
           "body": [
-            "Scientists have confirmed that the past year was the hottest ever recorded on Earth. That is a big deal — it means our planet is warming up faster than expected. Heatwaves, wildfires, and rising sea levels are becoming more common all over the world.",
-            "Countries are working together on plans to use more clean energy like solar and wind power. Young people everywhere are speaking up about climate action, and scientists say the choices made in the next few years will really matter for everyone's future."
+            "Scientists around the world are raising urgent warnings about coral reefs. These colorful underwater ecosystems — home to about 25% of all ocean species — are bleaching and dying at record rates because ocean temperatures are rising. The Great Barrier Reef in Australia and reefs off the coast of Florida are among the hardest hit.",
+            "When water gets too warm, coral kicks out the tiny colorful algae living inside it and turns ghostly white — a process called bleaching. If the water stays hot too long, the coral dies. The hopeful news: many countries are now creating new ocean protected zones and working on coral restoration projects to give reefs a fighting chance."
           ],
-          "analogy": "Think of Earth like a cozy blanket fort. Too many greenhouse gases are like adding too many extra blankets — it gets way too hot inside, and it's really hard to cool back down.",
+          "analogy": "Think of a coral reef like a busy apartment building for sea creatures. When the ocean heats up, it's like the air conditioning in the building breaks during a heatwave — everyone is forced to leave, and if it stays hot too long, the building itself starts to crumble.",
           "links": [
             {
-              "label": "Climate Change — BBC Newsround",
-              "url": "https://www.bbc.co.uk/newsround/51204456"
+              "label": "Coral Reefs on Nat Geo Kids",
+              "url": "https://kids.nationalgeographic.com/nature/habitats/article/coral-reef"
             },
             {
-              "label": "What Can Kids Do? — Time for Kids",
-              "url": "https://www.timeforkids.com/g56/climate-action/"
+              "label": "Ocean News on NewsForKids",
+              "url": "https://www.newsforkids.net/articles/category/environment/"
             }
           ]
         }
-      ],
-      "links": []
+      ]
     },
     {
       "id": "singapore_spotlight",
       "title": "🇸🇬 Singapore Spotlight",
-      "render_title": "The Greenest Little City on Earth",
+      "render_title": "Little Island, Huge Wonders 🌺",
       "block_type": "spotlight",
       "link_style": "link-pink",
       "items": [
         {
-          "headline": "🌿 Half of Singapore Is Covered in Green — Here's How",
+          "headline": "🍜 Singapore's Hawker Centers Are a UNESCO World Treasure",
           "body": [
-            "Even though Singapore is one of the world's busiest and most crowded cities, almost half of it is covered in greenery! The country plants trees along every road, builds parks everywhere, and even grows gardens on the sides of skyscrapers. It's proudly nicknamed a 'City in a Garden.'",
-            "The famous Gardens by the Bay has giant Supertrees — tall metal structures completely covered in real living plants that glow and light up at night. Some Supertrees are taller than a 16-story building! Singapore proves that a city can be super modern and super green at the same time."
+            "In 2020, UNESCO — the global organization that protects important world cultures — officially added Singapore's hawker culture to its Intangible Cultural Heritage list. That means Singapore's famous open-air food markets, where you can get chicken rice, laksa, and char kway teow for just a few dollars, are recognized as one of humanity's special treasures.",
+            "There are over 100 hawker centers across Singapore, and some stalls have been run by the same family for three or four generations. Hawker centers aren't just about food — they're where neighbors gather, friendships form, and stories get shared. It's the heartbeat of Singapore life."
           ],
           "links": [
             {
-              "label": "Singapore — Britannica Kids",
-              "url": "https://kids.britannica.com/kids/article/Singapore/345853"
+              "label": "Singapore Culture on Britannica Kids",
+              "url": "https://kids.britannica.com/kids/article/Singapore/345926"
             },
             {
-              "label": "Gardens by the Bay",
-              "url": "https://www.gardensbythebay.com.sg"
+              "label": "UNESCO Hawker Culture",
+              "url": "https://ich.unesco.org/en/RL/hawker-culture-in-singapore-01551"
+            }
+          ]
+        },
+        {
+          "headline": "🌿 Singapore: The City That Grows Gardens Between Skyscrapers",
+          "body": [
+            "Singapore is nicknamed the Garden City because it has woven parks, nature trails, and green spaces into almost every part of its urban landscape. Even skyscrapers have gardens growing on their walls and rooftops! The government deliberately plants trees along every major road, so that no street ever feels bare or grey.",
+            "This wasn't an accident — Singapore's founders decided early on that greenery was essential to making people feel happy and healthy in a dense city. Today, over 47% of Singapore's land is covered in some form of green space. That's remarkable for one of the most built-up places on Earth."
+          ],
+          "links": [
+            {
+              "label": "Gardens by the Bay on Britannica",
+              "url": "https://www.britannica.com/place/Gardens-by-the-Bay"
             }
           ]
         }
-      ],
-      "links": []
+      ]
     },
     {
       "id": "usa_corner",
       "title": "🇺🇸 USA Corner",
-      "render_title": "California Is Soaking Up the Sun — Literally",
+      "render_title": "From Fremont to the Future 🚀",
       "block_type": "spotlight",
       "link_style": "link-blue",
       "items": [
         {
-          "headline": "☀️ California's Solar Power Is Breaking Records!",
+          "headline": "🌍 Earth Day Is This Week — and California Is Leading the Charge",
           "body": [
-            "California is leading the entire country in solar energy! On sunny days, the state generates so much electricity from solar panels that it can power millions of homes — including homes right here in the Bay Area near Fremont. In fact, some days California makes more solar power than it can use!",
-            "Solar panels keep getting cheaper, and more families across the state are putting them on their rooftops. California has set a bold goal to run on 100% clean energy by 2045. Scientists say the state is making great progress, and the sunny weather definitely helps!"
+            "Earth Day falls on April 22nd — just days away! California is one of the biggest leaders in fighting climate change anywhere in the country. The state has pledged to run on 90% clean electricity by 2035, and more electric cars are sold here than in any other US state.",
+            "All around the Bay Area this week, schools and community groups are hosting park clean-ups, tree-planting events, and art projects made entirely from recycled materials. Even small things — picking up one piece of litter, turning off lights when you leave a room — add up into something powerful when millions of people do them together."
           ],
           "links": [
             {
-              "label": "Solar Energy — Britannica Kids",
-              "url": "https://kids.britannica.com/kids/article/solar-energy/390766"
+              "label": "Earth Day Facts on Nat Geo Kids",
+              "url": "https://kids.nationalgeographic.com/nature/earth-day"
             },
             {
-              "label": "California Clean Energy — Time for Kids",
-              "url": "https://www.timeforkids.com/g56/solar-energy/"
+              "label": "California Climate News",
+              "url": "https://www.timeforkids.com/g56/environment/"
+            }
+          ]
+        },
+        {
+          "headline": "⚡ Fremont's Own Factory Is Changing How We Drive",
+          "body": [
+            "Right here in your city, Tesla's massive factory builds thousands of electric vehicles every single week — making it one of the largest car factories in the whole world. It's helped California become the undisputed leader in electric vehicles in the US: about 1 in every 4 new cars sold in California is now electric.",
+            "Electric cars run on batteries instead of gasoline, which means far less pollution going into the air. The factory employs thousands of people in the Bay Area, and it's living proof that the future of driving is being built right where you live."
+          ],
+          "links": [
+            {
+              "label": "Electric Vehicles Explained for Kids",
+              "url": "https://kids.britannica.com/kids/article/electric-vehicle/632909"
             }
           ]
         }
-      ],
-      "links": []
+      ]
     },
     {
       "id": "gymnastics_corner",
       "title": "🤸 Gymnastics Corner",
-      "render_title": "Flips, Champions, and Skills to Try",
-      "section_intro": "Whether you're working on your cartwheel or dreaming big, this section is all yours! 🌟",
+      "render_title": "Flip, Fly, and Inspire! 🌟",
       "block_type": "interest_feature",
       "link_style": "link-rose",
       "items": [
         {
-          "headline": "🏅 Simone Biles: The Gymnast Who Changed Everything",
+          "headline": "⭐ Simone Biles: The Greatest of All Time — and Why She's So Inspiring",
           "body": [
-            "Simone Biles is not just the most decorated gymnast in US history — she's widely considered the greatest gymnast who has ever lived. She has invented four skills so difficult that they were officially named after her. These moves are rated among the hardest in the entire sport.",
-            "What makes Simone extra amazing is that she also spoke openly about taking care of her mental health. She showed gymnasts everywhere that being truly brave means knowing when to rest and take care of yourself, not just landing the hardest flip. She is a champion inside and out."
+            "Simone Biles is widely considered the greatest gymnast in history. She has won more World Championship medals than any gymnast ever, and at the 2024 Paris Olympics she came back from a difficult few years to win multiple gold medals — including in the team competition and the individual all-around. Several skills in gymnastics have been officially named after her because she performs moves so dangerous no one else had ever tried them in competition.",
+            "What makes Simone truly special goes beyond the trophies. At the 2020 Tokyo Olympics, she stepped back from several events to protect her mental health — and in doing so, she showed the whole world that being brave sometimes means knowing when to pause. She came back stronger than ever. That's a lesson for every gymnast, at every level."
           ],
           "links": [
             {
-              "label": "Simone Biles — Britannica Kids",
-              "url": "https://kids.britannica.com/kids/article/Simone-Biles/476524"
+              "label": "Simone Biles on Britannica Kids",
+              "url": "https://kids.britannica.com/kids/article/Simone-Biles/631325"
             },
             {
-              "label": "USA Gymnastics",
-              "url": "https://usagym.org"
+              "label": "USA Gymnastics News",
+              "url": "https://usagym.org/news/"
             }
           ]
         },
         {
-          "headline": "💡 Skill Tip: Build a Beautiful Cartwheel",
+          "headline": "🤸 The Kip: The Skill Every Bar Gymnast Wants to Conquer",
           "body": [
-            "A great cartwheel starts with your arms — reach one hand to the floor, then the other, keeping both arms straight like a sturdy bridge. Your legs should make a big star shape at the top.",
-            "Practice slowly at first, even against a wall for balance. Focus on straight arms and pointed toes, and your cartwheel will start to look (and feel!) much more powerful over time."
+            "In women's gymnastics, one of the most important bar skills is called the kip. It's the move where a gymnast swings from hanging below the bar all the way up until their hips are resting on top of it — and it is much harder than it looks! Most gymnasts work on kips for months or even years before they get them consistently.",
+            "If you're training gymnastics right now, every pull-up you do, every hollow hold, every core exercise is building the exact strength you need for skills like the kip. Progress in gymnastics is measured in tiny steps — and every single practice gets you closer. 💪"
           ],
           "links": [
             {
-              "label": "Artistic Gymnastics — Olympics.com",
-              "url": "https://olympics.com/en/sports/artistic-gymnastics/"
+              "label": "Gymnastics Skills on Britannica",
+              "url": "https://kids.britannica.com/students/article/gymnastics/274693"
             }
           ]
         }
-      ],
-      "links": []
+      ]
     },
     {
       "id": "money_moves",
       "title": "💰 Money Moves",
-      "render_title": "How Money Grows While You Sleep",
+      "render_title": "Smart Money, Smart Kids 💡",
       "block_type": "story_list",
       "link_style": "link-amber",
       "items": [
         {
-          "headline": "💡 Concept of the Week: The Magic of Compound Interest",
+          "headline": "💡 The Power Move: Pay Yourself First",
           "body": [
-            "Here's a money secret that most adults wish they learned when they were young: money can make more money while you sleep! It's called compound interest. When you put money in a savings account, the bank pays you a little extra called interest. Then next month, that interest earns even more interest. The amounts keep growing on top of each other.",
-            "If you saved just $5 a week starting right now, by the time you turn 18 you could have well over $2,600 — and that's before the interest is even added in. The earlier you start, the more powerful this gets!"
+            "Most people spend their money first and try to save whatever's left — but there's often nothing left! The secret is a strategy called Pay Yourself First: the moment you get any money — allowance, birthday cash, a gift — put a portion straight into savings before you spend a single dollar.",
+            "Even saving just 10% every time builds up faster than you'd think. Get $10? Save $1. Get $50 in birthday money? Save $5. Over a year, those small amounts grow into something real — money you can actually use for a big goal you're working toward."
           ],
-          "analogy": "It's like a snowball rolling down a snowy hill — the longer it rolls, the bigger it gets all on its own. Your savings work the same way!",
+          "analogy": "It's like filling your water bottle before sharing drinks with friends. If you share first, your bottle might be empty when you need it most. Fill yours first, and you'll always have enough.",
           "links": [
             {
-              "label": "Compound Interest for Kids — Britannica",
-              "url": "https://kids.britannica.com/students/article/interest/275042"
+              "label": "Saving Money Tips for Kids",
+              "url": "https://www.britannica.com/money/saving-money-tips-for-kids"
+            },
+            {
+              "label": "Money Skills on Time for Kids",
+              "url": "https://www.timeforkids.com/g56/money/"
             }
           ]
         },
         {
-          "headline": "🧁 Kid Entrepreneur Spotlight: Cory Nieves, the Cookie CEO",
+          "headline": "🌟 Kid Entrepreneur: Moziah Bridges Built a Bow Tie Empire at Age 9",
           "body": [
-            "When Cory Nieves was just 6 years old, he started selling hot cocoa outside his apartment building to help his mom save up for a car. His little business grew so fast that by age 10, he launched his own cookie brand called Mr. Cory's Cookies. Big stores and TV shows soon came knocking!",
-            "Cory always says: 'The key to success is to never give up and to enjoy what you do.' He now helps other young kids learn about starting their own businesses. Not bad for someone who started with a thermos and a dream!"
+            "When Moziah Bridges was just 9 years old, he started making bow ties by hand because he loved stylish accessories but couldn't find ones he liked. He called his company Mo's Bows, and within two years he had made over $30,000 in sales — all from a hobby that started at his grandmother's sewing machine.",
+            "Moziah appeared on Shark Tank as a young teen, where fashion legend Daymond John became his mentor. Mo's Bows went on to sell in stores across the US, and Moziah donated part of his profits to send kids to summer camp. He's living proof that passion plus action — at any age — can become something remarkable."
           ],
           "links": [
             {
-              "label": "Kid Entrepreneurs — Time for Kids",
-              "url": "https://www.timeforkids.com/g56/kid-entrepreneurs/"
+              "label": "Young Entrepreneurs on Time for Kids",
+              "url": "https://www.timeforkids.com/g56/kids-who-lead/"
             }
           ]
         }
-      ],
-      "links": []
+      ]
     },
     {
       "id": "sophies_challenge",
       "title": "🧩 Weekly Challenge",
-      "render_title": "Can You Crack This Week's Puzzle?",
+      "render_title": "Trade War Math Attack 🧠",
       "block_type": "challenge",
       "link_style": "link-orange",
       "items": [
         {
-          "prompt_intro": "This week in World Watch, we learned that the US and China are adding tariffs — extra taxes that make products more expensive. Let's see if you can figure out what that means for real shoppers at the store!",
-          "prompt": "A toy normally costs $20. The US adds a 25% tariff, which means the price goes up by 25%. What is the new price of the toy? If a family buys 3 of these toys at the new price, how much extra money do they spend compared to if there were no tariff?",
-          "bonus": "China adds a 15% tariff on American apples that normally cost $4 each. What is the new price of one apple?",
-          "hint": "To find 25% of $20, divide 20 by 4 — that gives you one quarter of the amount. Add that to the original $20 to get the new price. Then multiply to find the extra cost for 3 toys!",
+          "prompt_intro": "This week in World Watch, you learned about tariffs — the extra taxes countries charge on each other's goods. When tariffs go up, prices go up. Let's figure out exactly how much!",
+          "prompt": "A pair of sneakers made in China costs $40 in a US store. The US adds a 25% tariff. How much do the sneakers cost now?\n\nMeanwhile, China puts a 20% tariff on American almonds that cost $15 per bag. How much do those almonds cost now in China?",
+          "bonus": "If the US raises its tariff on the sneakers from 25% all the way to 50%, how much more expensive are the sneakers compared to the original $40 price with no tariff at all?",
+          "hint": "To find a percentage of a number, turn the percentage into a decimal by dividing by 100, then multiply. For example: 25% of $40 = 0.25 × $40 = $10. Then add that amount to the original price to get the new total.",
           "links": [
             {
-              "label": "What Are Tariffs? — Time for Kids",
-              "url": "https://www.timeforkids.com/g56/tariffs/"
+              "label": "What Are Tariffs? (BBC Newsround)",
+              "url": "https://www.bbc.co.uk/newsround/newsround"
             }
           ]
         }
-      ],
-      "links": []
+      ]
     }
   ],
   "footer": {

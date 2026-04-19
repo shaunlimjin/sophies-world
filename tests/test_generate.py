@@ -361,6 +361,15 @@ def test_parse_content_output_error():
         content_stage.parse_content_output(payload)
 
 
+def test_parse_content_output_handles_fenced_json_with_trailing_text(tmp_path):
+    payload = json.dumps({
+        "is_error": False,
+        "result": "```json\n{\n  \"issue_date\": \"2026-04-18\",\n  \"issue_number\": 4,\n  \"child_id\": \"sophie\",\n  \"theme_id\": \"default\",\n  \"editorial\": {},\n  \"child_name\": \"Sophie\",\n  \"greeting_text\": \"Issue #4 of <span>Sophie's World</span> is here!\",\n  \"sections\": [],\n  \"footer\": {\"issue_number\": 4, \"issue_date_display\": \"April 18, 2026\", \"tagline\": \"x\", \"location_line\": \"y\"}\n}\n```\nextra"
+    })
+    parsed = content_stage.parse_content_output(payload, tmp_path)
+    assert parsed["child_name"] == "Sophie"
+
+
 def test_issue_artifact_round_trip(tmp_path):
     issue = {
         "issue_date": "2026-04-18",
