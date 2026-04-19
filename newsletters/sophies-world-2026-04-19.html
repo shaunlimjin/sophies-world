@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sophie's World · April 19, 2026 · Issue #4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', Arial, sans-serif;
+    background: #f0f4ff;
+    color: #2d2d2d;
+    padding: 20px;
+  }
+
+  .wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #ff6eb4 0%, #ff9a3c 50%, #ffda47 100%);
+    border-radius: 24px 24px 0 0;
+    padding: 36px 32px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: "✨🌍✨";
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 6px;
+  }
+  .header h1 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.92);
+    margin-top: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 50px;
+    padding: 5px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── GREETING BAND ── */
+  .greeting {
+    background: #fff;
+    border-left: 5px solid #ff6eb4;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1.6;
+  }
+  .greeting span { color: #ff6eb4; }
+
+  /* ── SECTION CARDS ── */
+  .card {
+    background: #fff;
+    padding: 24px 28px;
+    margin-top: 3px;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-wbt   { border-top: 4px solid #a78bfa; }
+  .label-wbt  { background: #ede9fe; color: #6d28d9; }
+
+  .card-world { border-top: 4px solid #34d399; }
+  .label-world{ background: #d1fae5; color: #065f46; }
+
+  .card-sg    { border-top: 4px solid #f472b6; }
+  .label-sg   { background: #fce7f3; color: #9d174d; }
+
+  .card-usa   { border-top: 4px solid #60a5fa; }
+  .label-usa  { background: #dbeafe; color: #1e40af; }
+
+  .card-interest  { border-top: 4px solid #f9a8d4; }
+  .label-interest { background: #fdf2f8; color: #be185d; }
+
+  .card-money { border-top: 4px solid #fbbf24; }
+  .label-money{ background: #fef3c7; color: #92400e; }
+
+  .card-challenge { border-top: 4px solid #fb923c; background: #fff7ed; }
+  .label-challenge{ background: #ffedd5; color: #9a3412; }
+
+  .card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.2;
+    color: #1a1a2e;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #3d3d3d;
+    margin-bottom: 10px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+  .section-intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #5b5563;
+    margin: -2px 0 14px;
+  }
+
+  /* ── LEARN MORE LINKS ── */
+  .learn-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .learn-more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 5px 13px;
+    border-radius: 50px;
+    border: 2px solid;
+    transition: opacity 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .learn-more a:hover { opacity: 0.8; }
+  .link-green  { color: #065f46; border-color: #34d399; background: #d1fae5; }
+  .link-purple { color: #5b21b6; border-color: #a78bfa; background: #ede9fe; }
+  .link-pink   { color: #9d174d; border-color: #f472b6; background: #fce7f3; }
+  .link-blue   { color: #1e40af; border-color: #60a5fa; background: #dbeafe; }
+  .link-rose   { color: #be185d; border-color: #f9a8d4; background: #fdf2f8; }
+  .link-amber  { color: #92400e; border-color: #fbbf24; background: #fef3c7; }
+  .link-orange { color: #9a3412; border-color: #fb923c; background: #ffedd5; }
+
+  /* ── FACT PILLS ── */
+  .fact-list { display: block; margin-top: 4px; }
+  .fact-item {
+    display: block;
+    background: #f5f3ff;
+    border-left: 4px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #3d3d3d;
+    margin-bottom: 12px;
+  }
+  .fact-item:last-child { margin-bottom: 0; }
+  .fact-item strong { color: #6d28d9; }
+
+  /* ── WORLD WATCH STORIES ── */
+  .world-stories { display: block; margin-top: 4px; }
+  .world-story {
+    display: block;
+    background: #f0fdf4;
+    border-left: 4px solid #34d399;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .world-story:last-child { margin-bottom: 0; }
+  .world-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #065f46;
+    margin-bottom: 6px;
+  }
+  .world-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .world-story p:last-of-type { margin-bottom: 0; }
+  .world-story .analogy {
+    background: #dcfce7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: #166534;
+    margin-top: 8px;
+  }
+  .world-story .story-links { margin-top: 10px; }
+
+  /* ── SG SPOTS ── */
+  .sg-spots { display: block; margin-top: 4px; }
+  .sg-spot {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f472b6;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .sg-spot:last-child { margin-bottom: 0; }
+  .sg-spot h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .sg-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  .usa-spots { display: block; margin-top: 4px; }
+  .usa-spot {
+    display: block;
+    background: #eff6ff;
+    border-left: 4px solid #60a5fa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .usa-spot:last-child { margin-bottom: 0; }
+  .usa-spot h3 { font-size: 15px; font-weight: 800; color: #1d4ed8; margin-bottom: 4px; }
+  .usa-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  /* ── INTEREST FEATURE ── */
+  .interest-grid { display: block; margin-top: 4px; }
+  .interest-item {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f9a8d4;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .interest-item:last-child { margin-bottom: 0; }
+  .interest-item h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .interest-item p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  .money-stories { display: block; margin-top: 4px; }
+  .money-story {
+    display: block;
+    background: #fffbeb;
+    border-left: 4px solid #fbbf24;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .money-story:last-child { margin-bottom: 0; }
+  .money-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #b45309;
+    margin-bottom: 6px;
+  }
+  .money-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .money-story p:last-of-type { margin-bottom: 0; }
+
+  /* ── MONEY HIGHLIGHT ── */
+  .money-highlight {
+    background: #fffbeb;
+    border: 2px dashed #fbbf24;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .money-highlight strong { color: #b45309; }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-q {
+    background: #fff;
+    border: 3px solid #fb923c;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .challenge-intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #7c5a35;
+    margin-bottom: 12px;
+  }
+  .challenge-q {
+    white-space: pre-line;
+  }
+  .challenge-bonus {
+    background: #fff;
+    border: 2px dashed #fdba74;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #9a3412;
+    font-weight: 700;
+  }
+  .challenge-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #9a6a3e;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .footer .hearts {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+  .footer strong { color: #ff6eb4; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #ff6eb4, #ff9a3c, #ffda47, #34d399, #60a5fa, #a78bfa);
+    border-radius: 3px;
+    margin: 3px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Sophie's World</h1>
+    <div class="subtitle">Your weekly dose of wow, fun &amp; big ideas</div>
+    <div class="date-badge">📅 April 19, 2026 · Issue #4</div>
+  </div>
+
+  <!-- GREETING -->
+  <div class="greeting">Hey Sophie! 👋 Issue #4 of <span>Sophie's World</span> is here — packed with wild facts, big news, and a brain-bending challenge just for you! 🌟</div>
+
+  <div class="divider"></div>
+
+  <!-- WEIRD BUT TRUE -->
+  <div class="card card-wbt">
+    <div class="section-label label-wbt">🤯 Weird But True</div>
+    <h2>Your Brain Is About to Explode 🤯</h2><div class="fact-list"><div class="fact-item"><strong>🐙 Octopuses Have THREE Hearts — and Blue Blood!</strong> An octopus has three hearts: two pump blood to its gills, and one pumps it to the rest of its body. And here's the wild part — their blood is blue! Instead of iron (like humans use), octopuses use copper to carry oxygen through their blood. Copper turns blood blue. How cool is that?</div><div class="fact-item"><strong>🍯 3,000-Year-Old Honey Is Still Perfectly Edible</strong> Honey never spoils. Archaeologists found pots of honey sealed in ancient Egyptian tombs that were over 3,000 years old — and the honey was still safe to eat! Honey's special chemistry creates an environment where bacteria simply cannot survive. It's basically nature's forever food.</div><div class="fact-item"><strong>🌳 Forests Have a Secret Underground Internet</strong> Trees in forests can send food and chemical messages to each other through a network of underground fungi — tiny thread-like organisms in the soil. Scientists call it the 'Wood Wide Web.' Older trees even share nutrients with baby trees that aren't getting enough sunlight. Forests are one giant community looking after each other!</div></div><div class="learn-more"><a href="https://kids.nationalgeographic.com/animals" class="link-purple">Amazing Animal Facts on Nat Geo Kids</a><a href="https://kids.britannica.com/kids/browse/science-and-technology" class="link-purple">Weird Science on Britannica Kids</a></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WORLD WATCH -->
+  <div class="card card-world">
+    <div class="section-label label-world">🌍 World Watch</div>
+    <h2>Big Stories, Explained Just for You</h2><p class="section-intro">Two important things happening in the world right now — and why they matter to everyone.</p><div class="world-stories"><div class="world-story"><h3>💸 The US–China Trade War Heats Up</h3><p>The United States and China are in a big disagreement about trade — the buying and selling of goods between countries. The US has added tariffs, which are extra taxes on things coming in from China. This makes products like electronics, toys, and clothing cost more in American stores. China responded by adding its own tariffs on American goods.</p><p>This back-and-forth has been going on for a while, and in April 2026 both sides raised the stakes again. Shoppers in the US are starting to notice higher prices on some items. World leaders are watching closely, because when the two biggest economies fight, it affects people everywhere — including here in Fremont.</p><div class="analogy">Imagine two kids who trade snacks at lunch. One says, 'If you want my cookies, you have to give me two things instead of one.' The other fires back, 'Fine — if you want my chips, you have to give me three things!' Pretty soon neither kid wants to trade at all. That's basically what's happening between the US and China.</div><div class="story-links learn-more"><a href="https://www.bbc.co.uk/newsround/newsround" class="link-green">What Are Tariffs? (BBC Newsround)</a><a href="https://www.timeforkids.com/g56/world/" class="link-green">Trade News on Time for Kids</a></div></div><div class="world-story"><h3>🌊 Scientists Sound the Alarm on Coral Reefs</h3><p>Scientists around the world are raising urgent warnings about coral reefs. These colorful underwater ecosystems — home to about 25% of all ocean species — are bleaching and dying at record rates because ocean temperatures are rising. The Great Barrier Reef in Australia and reefs off the coast of Florida are among the hardest hit.</p><p>When water gets too warm, coral kicks out the tiny colorful algae living inside it and turns ghostly white — a process called bleaching. If the water stays hot too long, the coral dies. The hopeful news: many countries are now creating new ocean protected zones and working on coral restoration projects to give reefs a fighting chance.</p><div class="analogy">Think of a coral reef like a busy apartment building for sea creatures. When the ocean heats up, it's like the air conditioning in the building breaks during a heatwave — everyone is forced to leave, and if it stays hot too long, the building itself starts to crumble.</div><div class="story-links learn-more"><a href="https://kids.nationalgeographic.com/nature/habitats/article/coral-reef" class="link-green">Coral Reefs on Nat Geo Kids</a><a href="https://www.newsforkids.net/articles/category/environment/" class="link-green">Ocean News on NewsForKids</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SINGAPORE SPOTLIGHT -->
+  <div class="card card-sg">
+    <div class="section-label label-sg">🇸🇬 Singapore Spotlight</div>
+    <h2>Little Island, Huge Wonders 🌺</h2><div class="sg-spots"><div class="sg-spot"><h3>🍜 Singapore's Hawker Centers Are a UNESCO World Treasure</h3><p>In 2020, UNESCO — the global organization that protects important world cultures — officially added Singapore's hawker culture to its Intangible Cultural Heritage list. That means Singapore's famous open-air food markets, where you can get chicken rice, laksa, and char kway teow for just a few dollars, are recognized as one of humanity's special treasures.</p><p>There are over 100 hawker centers across Singapore, and some stalls have been run by the same family for three or four generations. Hawker centers aren't just about food — they're where neighbors gather, friendships form, and stories get shared. It's the heartbeat of Singapore life.</p></div><div class="sg-spot"><h3>🌿 Singapore: The City That Grows Gardens Between Skyscrapers</h3><p>Singapore is nicknamed the Garden City because it has woven parks, nature trails, and green spaces into almost every part of its urban landscape. Even skyscrapers have gardens growing on their walls and rooftops! The government deliberately plants trees along every major road, so that no street ever feels bare or grey.</p><p>This wasn't an accident — Singapore's founders decided early on that greenery was essential to making people feel happy and healthy in a dense city. Today, over 47% of Singapore's land is covered in some form of green space. That's remarkable for one of the most built-up places on Earth.</p></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- USA CORNER -->
+  <div class="card card-usa">
+    <div class="section-label label-usa">🇺🇸 USA Corner</div>
+    <h2>From Fremont to the Future 🚀</h2><div class="usa-spots"><div class="usa-spot"><h3>🌍 Earth Day Is This Week — and California Is Leading the Charge</h3><p>Earth Day falls on April 22nd — just days away! California is one of the biggest leaders in fighting climate change anywhere in the country. The state has pledged to run on 90% clean electricity by 2035, and more electric cars are sold here than in any other US state.</p><p>All around the Bay Area this week, schools and community groups are hosting park clean-ups, tree-planting events, and art projects made entirely from recycled materials. Even small things — picking up one piece of litter, turning off lights when you leave a room — add up into something powerful when millions of people do them together.</p></div><div class="usa-spot"><h3>⚡ Fremont's Own Factory Is Changing How We Drive</h3><p>Right here in your city, Tesla's massive factory builds thousands of electric vehicles every single week — making it one of the largest car factories in the whole world. It's helped California become the undisputed leader in electric vehicles in the US: about 1 in every 4 new cars sold in California is now electric.</p><p>Electric cars run on batteries instead of gasoline, which means far less pollution going into the air. The factory employs thousands of people in the Bay Area, and it's living proof that the future of driving is being built right where you live.</p></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INTEREST FEATURE -->
+  <div class="card card-interest">
+    <div class="section-label label-interest">⭐ Interest Corner</div>
+    <h2>Flip, Fly, and Inspire! 🌟</h2><div class="interest-grid"><div class="interest-item"><h3>⭐ Simone Biles: The Greatest of All Time — and Why She's So Inspiring</h3><p>Simone Biles is widely considered the greatest gymnast in history. She has won more World Championship medals than any gymnast ever, and at the 2024 Paris Olympics she came back from a difficult few years to win multiple gold medals — including in the team competition and the individual all-around. Several skills in gymnastics have been officially named after her because she performs moves so dangerous no one else had ever tried them in competition.</p><p>What makes Simone truly special goes beyond the trophies. At the 2020 Tokyo Olympics, she stepped back from several events to protect her mental health — and in doing so, she showed the whole world that being brave sometimes means knowing when to pause. She came back stronger than ever. That's a lesson for every gymnast, at every level.</p><div class="story-links learn-more"><a href="https://kids.britannica.com/kids/article/Simone-Biles/631325" class="link-rose">Simone Biles on Britannica Kids</a><a href="https://usagym.org/news/" class="link-rose">USA Gymnastics News</a></div></div><div class="interest-item"><h3>🤸 The Kip: The Skill Every Bar Gymnast Wants to Conquer</h3><p>In women's gymnastics, one of the most important bar skills is called the kip. It's the move where a gymnast swings from hanging below the bar all the way up until their hips are resting on top of it — and it is much harder than it looks! Most gymnasts work on kips for months or even years before they get them consistently.</p><p>If you're training gymnastics right now, every pull-up you do, every hollow hold, every core exercise is building the exact strength you need for skills like the kip. Progress in gymnastics is measured in tiny steps — and every single practice gets you closer. 💪</p><div class="story-links learn-more"><a href="https://kids.britannica.com/students/article/gymnastics/274693" class="link-rose">Gymnastics Skills on Britannica</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MONEY MOVES -->
+  <div class="card card-money">
+    <div class="section-label label-money">💰 Money Moves</div>
+    <h2>Smart Money, Smart Kids 💡</h2><div class="money-stories"><div class="money-story"><h3>💡 The Power Move: Pay Yourself First</h3><p>Most people spend their money first and try to save whatever's left — but there's often nothing left! The secret is a strategy called Pay Yourself First: the moment you get any money — allowance, birthday cash, a gift — put a portion straight into savings before you spend a single dollar.</p><p>Even saving just 10% every time builds up faster than you'd think. Get $10? Save $1. Get $50 in birthday money? Save $5. Over a year, those small amounts grow into something real — money you can actually use for a big goal you're working toward.</p><div class="analogy">It's like filling your water bottle before sharing drinks with friends. If you share first, your bottle might be empty when you need it most. Fill yours first, and you'll always have enough.</div><div class="story-links learn-more"><a href="https://www.britannica.com/money/saving-money-tips-for-kids" class="link-amber">Saving Money Tips for Kids</a><a href="https://www.timeforkids.com/g56/money/" class="link-amber">Money Skills on Time for Kids</a></div></div><div class="money-story"><h3>🌟 Kid Entrepreneur: Moziah Bridges Built a Bow Tie Empire at Age 9</h3><p>When Moziah Bridges was just 9 years old, he started making bow ties by hand because he loved stylish accessories but couldn't find ones he liked. He called his company Mo's Bows, and within two years he had made over $30,000 in sales — all from a hobby that started at his grandmother's sewing machine.</p><p>Moziah appeared on Shark Tank as a young teen, where fashion legend Daymond John became his mentor. Mo's Bows went on to sell in stores across the US, and Moziah donated part of his profits to send kids to summer camp. He's living proof that passion plus action — at any age — can become something remarkable.</p><div class="story-links learn-more"><a href="https://www.timeforkids.com/g56/kids-who-lead/" class="link-amber">Young Entrepreneurs on Time for Kids</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SOPHIE'S CHALLENGE -->
+  <div class="card card-challenge">
+    <div class="section-label label-challenge">🧠 Sophie's Challenge</div>
+    <h2>Trade War Math Attack 🧠</h2><p class="challenge-intro">This week in World Watch, you learned about tariffs — the extra taxes countries charge on each other's goods. When tariffs go up, prices go up. Let's figure out exactly how much!</p><div class="challenge-q">A pair of sneakers made in China costs $40 in a US store. The US adds a 25% tariff. How much do the sneakers cost now?
+
+Meanwhile, China puts a 20% tariff on American almonds that cost $15 per bag. How much do those almonds cost now in China?</div><div class="challenge-bonus">⭐ Bonus: If the US raises its tariff on the sneakers from 25% all the way to 50%, how much more expensive are the sneakers compared to the original $40 price with no tariff at all?</div><div class="challenge-hint">To find a percentage of a number, turn the percentage into a decimal by dividing by 100, then multiply. For example: 25% of $40 = 0.25 × $40 = $10. Then add that amount to the original price to get the new total.</div><div class="learn-more"><a href="https://www.bbc.co.uk/newsround/newsround" class="link-orange">What Are Tariffs? (BBC Newsround)</a></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;"><span class="hearts">💖 🌏 💖</span><strong>Sophie's World</strong> · Issue #4 · April 19, 2026<br>Made with love by Dad & Claude 🤖❤️<br><span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span></div>
+
+</div>
+</body>
+</html>
