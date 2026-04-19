@@ -1,7 +1,7 @@
 # Design: Split Newsletter Generation into Content Stage + Render Stage
 
 **Date:** 2026-04-18  
-**Status:** Draft
+**Status:** Approved
 
 ---
 
