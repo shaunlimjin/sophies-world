@@ -1,0 +1,203 @@
+# Research configuration: query templates, budgets, ranking profiles, and heuristic weights
+
+# ---------------------------------------------------------------------------
+# Heuristic ranking configuration
+# ---------------------------------------------------------------------------
+ranking:
+  # Global defaults (overrideable per section)
+  defaults:
+    # Source boost: awarded when the result domain matches a preferred source
+    source_boost: 20
+    # Freshness boost: awarded when published_at is within the section's freshness window
+    freshness_boost: 15
+    # Keyword boost: awarded per matching section keyword found in title/snippet
+    keyword_match_boost: 5
+    # Geography boost: awarded when content mentions configured geo terms
+    geography_boost: 8
+    # Kid-safe source boost: awarded for explicitly known child-safe publishers
+    kid_safe_boost: 10
+    # Novelty penalty: deducted when result is too similar to recent headlines
+    novelty_penalty: 30
+    # Low-quality/junk penalty: deducted for low-quality or unsafe-looking domains
+    junk_penalty: 40
+    # Minimum score to survive into ranked_candidates
+    min_score: 0
+    # Maximum ranked candidates to keep per section
+    max_ranked: 5
+
+  # Per-section overrides (any key from defaults can be overridden here)
+  sections:
+    world_watch:
+      freshness_boost: 25
+      keyword_match_boost: 8
+      max_ranked: 4
+      keywords:
+        - war
+        - climate
+        - economy
+        - tariffs
+        - politics
+        - election
+        - science
+        - news
+        - world
+
+    weird_but_true:
+      freshness_boost: 0
+      kid_safe_boost: 15
+      max_ranked: 5
+      keywords:
+        - weird
+        - amazing
+        - surprising
+        - animal
+        - science
+        - facts
+        - record
+
+    singapore_spotlight:
+      freshness_boost: 5
+      geography_boost: 15
+      max_ranked: 3
+      keywords:
+        - singapore
+        - culture
+        - history
+        - food
+        - hawker
+        - heritage
+        - marina bay
+
+    usa_corner:
+      freshness_boost: 20
+      geography_boost: 15
+      max_ranked: 3
+      keywords:
+        - california
+        - fremont
+        - bay area
+        - usa
+        - american
+        - national
+
+    gymnastics_corner:
+      freshness_boost: 10
+      kid_safe_boost: 12
+      max_ranked: 4
+      keywords:
+        - gymnastics
+        - gymnast
+        - olympics
+        - vault
+        - floor
+        - balance beam
+        - uneven bars
+        - competition
+
+    money_moves:
+      freshness_boost: 5
+      kid_safe_boost: 15
+      max_ranked: 4
+      keywords:
+        - entrepreneur
+        - business
+        - saving
+        - money
+        - kids
+        - startup
+        - invest
+
+# ---------------------------------------------------------------------------
+# Novelty comparison settings
+# ---------------------------------------------------------------------------
+novelty:
+  # Number of recent issue artifacts to compare against
+  history_window: 3
+  # Jaccard similarity threshold above which a result is penalised for novelty
+  similarity_threshold: 0.4
+  # How many tokens to use from title for comparison
+  title_token_limit: 12
+
+# ---------------------------------------------------------------------------
+# Domain lists
+# ---------------------------------------------------------------------------
+domains:
+  # Preferred kid-safe publishers (used for kid_safe_boost)
+  kid_safe:
+    - kids.nationalgeographic.com
+    - kids.britannica.com
+    - britannica.com
+    - newsforkids.net
+    - timeforkids.com
+    - bbc.co.uk
+    - newsela.com
+    - dkfindout.com
+    - natgeokids.com
+    - olympics.com
+    - usagym.org
+    - pbskids.org
+    - sciencenews.org
+
+  # Domains that should never appear in output
+  blocked:
+    - reddit.com
+    - quora.com
+    - pinterest.com
+    - facebook.com
+    - twitter.com
+    - x.com
+    - tiktok.com
+
+# ---------------------------------------------------------------------------
+# Per-section query overrides (list of query strings; {date} is substituted)
+# If omitted for a section, defaults in research_stage.py are used
+# ---------------------------------------------------------------------------
+sections:
+  world_watch:
+    freshness: pw
+    count: 15
+    queries:
+      - "world news for kids {date}"
+      - "site:bbc.co.uk/newsround current events"
+      - "site:timeforkids.com current events"
+      - "site:newsforkids.net world news"
+
+  weird_but_true:
+    freshness: null
+    count: 10
+    queries:
+      - "site:kids.nationalgeographic.com weird animal facts"
+      - "site:kids.britannica.com surprising science facts"
+      - "amazing weird animal facts for kids"
+
+  singapore_spotlight:
+    freshness: null
+    count: 8
+    queries:
+      - "singapore interesting facts kids"
+      - "site:kids.britannica.com singapore"
+      - "singapore culture food history fun facts"
+
+  usa_corner:
+    freshness: pw
+    count: 10
+    queries:
+      - "california kids news {date}"
+      - "USA science culture kids {date}"
+      - "site:timeforkids.com usa news"
+
+  gymnastics_corner:
+    freshness: pm
+    count: 10
+    queries:
+      - "gymnastics news athletes {date}"
+      - "site:olympics.com gymnastics"
+      - "gymnastics competition highlights {date}"
+
+  money_moves:
+    freshness: null
+    count: 8
+    queries:
+      - "kid entrepreneur story saving money"
+      - "kids business ideas entrepreneurship"
+      - "financial literacy kids saving"

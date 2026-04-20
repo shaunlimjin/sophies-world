@@ -51,23 +51,37 @@ sophies-world/
   .env.example                     # template for credentials
   config/
     children/
-      sophie.yaml                  # child profile: interests, active sections, theme, editorial defaults
+      sophie.yaml                  # child profile: interests, active sections, theme, editorial defaults, generation mode
     sections.yaml                  # section catalog: all reusable section definitions
     themes/
       default.yaml                 # theme metadata
+    research.yaml                  # query templates, ranking weights, domain lists, novelty window
   newsletters/
     sophies-world-YYYY-MM-DD.html  # one file per issue
   scripts/
-    generate.py                    # orchestrates content stage + local render stage
-    content_stage.py               # content provider orchestration (currently Claude)
-    render_stage.py                # deterministic local HTML renderer
+    generate.py                    # orchestrates pipeline: mode selection, research, ranking, content, render
+    content_stage.py               # Mode A (integrated search) and Mode B (packet synthesis) content providers
+    research_stage.py              # deterministic Brave retrieval stage + artifact persistence
+    ranking_stage.py               # deterministic prefilter + pluggable ranker dispatch
+    render_stage.py                # deterministic local HTML renderer (unchanged)
     issue_schema.py                # structured issue artifact helpers
     send.py                        # sends newsletter via Gmail SMTP
     run.sh                         # wrapper: runs generate + send, logs to logs/run.log
     template.html                  # HTML skeleton with placeholder comments
+    providers/
+      brave_search.py              # Brave Web Search API client with retry/backoff
+      heuristic_ranker.py          # (unused directly; heuristic ranking lives in ranking_stage.py)
+      hosted_llm_provider.py       # hosted model-ranker for Mode B2
+  artifacts/
+    research/
+      sophie-YYYY-MM-DD.json       # persisted research packets (reusable without re-querying Brave)
+    issues/
+      sophie-YYYY-MM-DD.json       # persisted structured issue artifacts
+    debug/                         # debug artifacts from content provider calls
   tests/
     test_generate.py               # unit tests for generate.py
     test_send.py                   # unit tests for send.py
+    test_research_pipeline.py      # tests for research/ranking pipeline
   logs/
     run.log                        # execution log (gitignored)
 ```
@@ -75,13 +89,56 @@ sophies-world/
 ## Automation
 - Cron job on Mac Mini: every Saturday at 6am Pacific
 - `run.sh` sets PATH, runs `generate.py && send.py`, appends output to `logs/run.log`
-- `generate.py` now orchestrates a two-stage flow: Claude returns structured newsletter content, then local Python renders final HTML
-- structured issue artifacts are written under `artifacts/issues/`
+- `generate.py` orchestrates a four-stage pipeline: research → ranking → content synthesis → local render
+- Structured issue artifacts are written under `artifacts/issues/`
+- Research packets are persisted under `artifacts/research/` — synthesis can be re-run without re-querying Brave
 - `send.py` reads `.env` for Gmail credentials and sends via `smtp.gmail.com:587`
-- Both scripts are idempotent from the operator point of view: `generate.py` skips if today's live file exists; `send.py` always sends today's file
-- The HTML template now uses a generic interest-feature slot rather than a hardcoded K-pop slot, so interest sections like Gymnastics Corner and K-pop Corner can swap without changing the template structure
+- Both scripts are idempotent: `generate.py` skips if today's live file exists; `send.py` always sends today's file
 - `generate.py` resolves the newsletter template from `config/themes/default.yaml` via `template_path`
-- Prompt-wide editorial defaults like reading level, tone, emoji usage, and global preferred sources now come from `config/children/sophie.yaml` under `newsletter.editorial`
+- Prompt-wide editorial defaults (reading level, tone, emoji usage, global sources) come from `config/children/sophie.yaml` under `newsletter.editorial`
+
+## Generation modes
+
+`generate.py` supports three modes, controlled by `newsletter.generation.content_provider` in `config/children/sophie.yaml` or via `--mode`:
+
+| Mode | `content_provider` value | Description |
+|---|---|---|
+| **Mode A** | `hosted_integrated_search` | Current baseline: Claude with integrated web search |
+| **Mode B1** | `hosted_packet_synthesis` | Deterministic Brave retrieval + heuristic ranking + Claude synthesis |
+| **Mode B2** | `hosted_model_ranker` | Deterministic Brave retrieval + model reranking + Claude synthesis |
+
+### Running a specific mode
+
+`content_provider` and `ranker_provider` are separate controls:
+
+```sh
+# Mode A (baseline — default):
+python3 scripts/generate.py --test
+
+# Mode B1 (deterministic retrieval + heuristic ranking):
+python3 scripts/generate.py --test --content-provider hosted_packet_synthesis
+
+# Mode B2 (deterministic retrieval + model reranking):
+python3 scripts/generate.py --test --content-provider hosted_packet_synthesis --ranker hosted_model_ranker
+
+# Mode B1 with forced refresh of the research packet:
+python3 scripts/generate.py --test --content-provider hosted_packet_synthesis --refresh-research
+```
+
+### Replaying synthesis from a cached research packet
+
+If `artifacts/research/sophie-YYYY-MM-DD.json` already exists, Mode B will reuse it.
+This lets you iterate on synthesis or ranking without spending Brave API quota.
+
+### Ranking config
+
+Heuristic ranking weights, domain lists, novelty window, and per-section query overrides
+are all in `config/research.yaml`. Edit that file to tune ranking without touching code.
+
+### Required credentials
+
+- `BRAVE_API_KEY` — in `.env` — needed for Modes B1 and B2
+- Gmail credentials — in `.env` — needed for `send.py`
 
 ## Switching sections
 

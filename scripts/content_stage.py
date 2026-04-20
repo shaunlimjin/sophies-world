@@ -255,6 +255,195 @@ def extract_first_json_object(text: str) -> str:
     raise ValueError("content provider result did not contain a complete JSON object")
 
 
+def build_packet_synthesis_prompt(
+    issue_date: date,
+    issue_num: int,
+    config: Dict[str, Any],
+    research_packet: Dict[str, Any],
+) -> str:
+    """Build the prompt for packet-driven synthesis (Mode B1/B2).
+
+    The model receives pre-ranked candidates per section and must synthesize
+    newsletter content from them without performing any web search.
+    """
+    profile = config["profile"]
+    sections = config["sections"]
+    formatted_date = f"{issue_date.strftime('%B')} {issue_date.day}, {issue_date.strftime('%Y')}"
+    child_id = profile.get("id", "sophie")
+    editorial = profile.get("newsletter", {}).get("editorial", {})
+    profile_summary = build_profile_summary(profile)
+    section_summaries = build_section_summaries(profile, sections)
+    section_item_contracts = build_section_item_contracts()
+
+    # Build a compact per-section candidate summary for the prompt.
+    # For derived sections (sophies_challenge), include the source section's ranked
+    # candidates directly so synthesis has explicit material to derive from.
+    sections_by_id = {s["section_id"]: s for s in research_packet.get("sections", [])}
+
+    section_packets = []
+    for section in research_packet.get("sections", []):
+        section_id = section["section_id"]
+        derived_from = section.get("derived_from")
+
+        if derived_from:
+            # Use the source section's ranked candidates as the challenge's material
+            source_section = sections_by_id.get(derived_from, {})
+            source_candidates = source_section.get("ranked_candidates") or source_section.get("filtered_candidates") or []
+            compact_candidates = [
+                {
+                    "title": c.get("title", ""),
+                    "url": c.get("url", ""),
+                    "source": c.get("source", ""),
+                    "snippet": c.get("snippet", ""),
+                }
+                for c in source_candidates[:4]
+            ]
+            section_packets.append({
+                "section_id": section_id,
+                "derived_from": derived_from,
+                "note": f"Create this section from the {derived_from} stories above — do not add unrelated material",
+                "source_candidates": compact_candidates,
+            })
+            continue
+
+        candidates = section.get("ranked_candidates") or section.get("filtered_candidates") or []
+        compact_candidates = [
+            {
+                "title": c.get("title", ""),
+                "url": c.get("url", ""),
+                "source": c.get("source", ""),
+                "snippet": c.get("snippet", ""),
+                "published_at": c.get("published_at"),
+            }
+            for c in candidates[:6]  # cap per section to keep prompt bounded
+        ]
+        if compact_candidates:
+            section_packets.append({
+                "section_id": section_id,
+                "candidates": compact_candidates,
+            })
+
+    return f"""You are generating structured newsletter content for Sophie's World.
+
+You have been given pre-researched, ranked candidate articles for each section.
+Use these candidates as your primary source material. Do NOT search the web.
+Select from the candidates, synthesize their content into engaging newsletter sections,
+and produce valid JSON only. Do not return HTML. Do not use markdown fences. Do not include commentary.
+
+Issue metadata:
+- issue_date: {issue_date.isoformat()}
+- issue_number: {issue_num}
+- child_id: {child_id}
+- formatted_date: {formatted_date}
+
+Child summary:
+{json.dumps(profile_summary, ensure_ascii=False, indent=2)}
+
+Editorial defaults:
+{json.dumps(editorial, ensure_ascii=False, indent=2)}
+
+Active section summaries:
+{json.dumps(section_summaries, ensure_ascii=False, indent=2)}
+
+Block-type item contracts:
+{json.dumps(section_item_contracts, ensure_ascii=False, indent=2)}
+
+Pre-researched candidates per section (select and synthesize from these):
+{json.dumps(section_packets, ensure_ascii=False, indent=2)}
+
+For sections marked "derived_from", the source_candidates field contains the stories
+to derive from. Do not invent other material for those sections.
+
+Return JSON with this top-level structure:
+{{
+  "issue_date": "YYYY-MM-DD",
+  "issue_number": number,
+  "child_id": "...",
+  "child_name": "...",
+  "theme_id": "...",
+  "editorial": {{ ... }},
+  "greeting_text": "one warm sentence fragment for after 'Hey Sophie! 👋', without repeating the child's name or adding weekday labels, and it may include <span>Sophie's World</span>",
+  "sections": [
+    {{
+      "id": "...",
+      "title": "canonical section label from config",
+      "render_title": "more vivid magazine-style heading, not just the same label copied",
+      "section_intro": "optional short intro line for the section",
+      "block_type": "...",
+      "link_style": "...",
+      "items": [...],
+      "links": [...]
+    }}
+  ],
+  "footer": {{
+    "issue_number": number,
+    "issue_date_display": "Month DD, YYYY",
+    "tagline": "...",
+    "location_line": "..."
+  }}
+}}
+
+Rules:
+- Every active section must appear exactly once and in the same order as section summaries.
+- Keep `title` aligned to config, but make `render_title` richer and more editorial.
+- Use block-type-appropriate item shapes from the contracts above.
+- Links must be structured objects with label and url — use URLs from the provided candidates.
+- Prefer 1-2 strong items over many weak ones.
+- For `spotlight`, usually return 2 items when there are two clearly distinct good ideas; fall back to 1 only when the second would be weak or repetitive.
+- Write for a smart 4th grader: warm, energetic, easy to follow, but not babyish.
+- For `challenge`, split the content cleanly across `prompt_intro`, `prompt`, optional `bonus`, and `hint`.
+- `greeting_text` must NOT start with another greeting like "Hi Sophie" or include day-of-week phrasing like "Happy Saturday".
+- `bonus` must contain only the bonus question text, with no "Bonus" or emoji prefix.
+- Do not use markdown emphasis markers like `*word*` or `**word**` anywhere in output text.
+"""
+
+
+def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds: int = 300, max_retries: int = 2) -> str:
+    """Call Claude without web tools (packet-driven synthesis mode)."""
+    debug_dir = get_debug_dir(repo_root)
+    (debug_dir / "last-packet-prompt.txt").write_text(prompt, encoding="utf-8")
+
+    for attempt in range(max_retries + 1):
+        try:
+            result = subprocess.run(
+                [
+                    "claude", "-p", prompt,
+                    "--output-format", "json",
+                    "--max-turns", "3",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=timeout_seconds,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise TimeoutError(f"packet synthesis provider timed out after {timeout_seconds}s") from exc
+
+        stdout = result.stdout or ""
+        stderr = result.stderr or ""
+        (debug_dir / f"last-packet-stdout-attempt{attempt}.txt").write_text(stdout, encoding="utf-8")
+        (debug_dir / f"last-packet-stderr-attempt{attempt}.txt").write_text(stderr, encoding="utf-8")
+
+        if result.returncode != 0:
+            if attempt < max_retries:
+                print(f"packet synthesis attempt {attempt + 1} failed (exit {result.returncode}), retrying...", file=sys.stderr)
+                continue
+            print(f"claude exited with code {result.returncode}", file=sys.stderr)
+            print(stderr, file=sys.stderr)
+            sys.exit(1)
+
+        # Validate JSON parse before returning — retry on invalid output
+        try:
+            parse_content_output(stdout)
+            return stdout
+        except ValueError as exc:
+            if attempt < max_retries:
+                print(f"packet synthesis attempt {attempt + 1} returned invalid JSON ({exc}), retrying...", file=sys.stderr)
+                continue
+            raise
+
+    raise RuntimeError("packet synthesis provider failed all attempts")  # unreachable
+
+
 def parse_content_output(json_str: str, repo_root: Path | None = None) -> Dict[str, Any]:
     if repo_root is not None:
         get_debug_dir(repo_root).joinpath("last-parse-input.txt").write_text(json_str or "", encoding="utf-8")
