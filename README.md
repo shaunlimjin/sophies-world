@@ -2,11 +2,12 @@
 
 A weekly HTML email newsletter generator for Sophie, with kid-friendly world news, fun facts, Singapore/USA cultural links, money lessons, and interest-based sections like Gymnastics Corner.
 
-The app currently uses a two-stage pipeline:
+The app now supports two content-generation modes:
 
-1. generate structured newsletter content as a JSON issue artifact
-2. render final HTML locally from that artifact
-3. optionally send the finished issue via Gmail SMTP
+1. **Mode A, hosted integrated search**: Claude generates the issue JSON directly with search enabled
+2. **Mode B, deterministic research packet synthesis**: Brave retrieval + deterministic prefiltering + configurable ranking + hosted synthesis from a cached research packet
+
+In both modes, the final HTML is rendered locally from a structured issue artifact, and the finished issue can optionally be sent via Gmail SMTP.
 
 ---
 
@@ -17,8 +18,12 @@ This repo is now meaningfully config-driven and split into clean generation stag
 - child profile lives in `config/children/sophie.yaml`
 - section catalog lives in `config/sections.yaml`
 - theme metadata lives in `config/themes/default.yaml`
+- research configuration lives in `config/research.yaml`
 - the interest section is generic, so sections like Gymnastics Corner and K-pop Corner can swap without changing the HTML template structure
-- content generation happens in `scripts/content_stage.py`
+- deterministic retrieval planning and artifact management live in `scripts/research_stage.py`
+- deterministic prefiltering and ranking live in `scripts/ranking_stage.py`
+- external provider adapters live in `scripts/providers/`
+- content generation and packet synthesis prompting live in `scripts/content_stage.py`
 - issue artifact validation/persistence happens in `scripts/issue_schema.py`
 - final HTML rendering happens in `scripts/render_stage.py`
 - orchestration lives in `scripts/generate.py`
@@ -49,8 +54,9 @@ The target audience is roughly 4th-grade reading level, with a warm, curious ton
 
 ```text
 config + recent issue history
--> content_stage.py
--> structured issue artifact (JSON)
+-> Mode A: content_stage.py -> issue artifact
+or
+-> Mode B: research_stage.py -> ranking_stage.py -> research packet -> content_stage.py -> issue artifact
 -> issue_schema.py validation/persistence
 -> render_stage.py
 -> final HTML newsletter
@@ -66,9 +72,12 @@ This command:
 - loads child/profile config
 - loads section catalog config
 - loads theme config and resolves `template_path`
+- loads research config if present
 - gathers recent issue headlines to avoid repetition
-- builds a structured content prompt in `scripts/content_stage.py`
-- calls the content provider and parses the returned JSON issue artifact
+- resolves `content_provider` and `ranker_provider`
+- runs either:
+  - **Mode A**: integrated hosted generation, or
+  - **Mode B**: deterministic research, ranking, packet synthesis, and packet caching
 - validates and writes the issue artifact to `artifacts/issues/`
 - loads the HTML template
 - renders final HTML locally in `scripts/render_stage.py`
@@ -89,6 +98,7 @@ This is the safest way to test changes to:
 - renderer behavior
 - template/layout updates
 - content quality tuning
+- research/ranking behavior
 
 Quick test workflow:
 
@@ -99,6 +109,49 @@ open newsletters/test/sophies-world-$(date +%F).html
 ```
 
 If a test file for today already exists, `--test` will still regenerate it in the test folder.
+
+### Provider selection
+
+By default, generation behavior comes from `config/children/sophie.yaml` under:
+
+- `newsletter.generation.content_provider`
+- `newsletter.generation.ranker_provider`
+
+CLI overrides are also available:
+
+```bash
+python3 scripts/generate.py --content-provider hosted_integrated_search
+python3 scripts/generate.py --content-provider hosted_packet_synthesis --ranker heuristic_ranker
+python3 scripts/generate.py --content-provider hosted_packet_synthesis --ranker hosted_model_ranker
+```
+
+Valid content providers:
+
+- `hosted_integrated_search`
+- `hosted_packet_synthesis`
+
+Valid rankers:
+
+- `heuristic_ranker`
+- `hosted_model_ranker`
+
+### Research packet caching
+
+Mode B writes cached research packets to:
+
+- `artifacts/research/`
+
+Cache behavior is now deterministic:
+
+- cached packet + matching `config_hash` → reuse cached packet
+- cached packet + mismatched `config_hash` → rerun research/ranking automatically and overwrite the artifact
+- `--refresh-research` → always rerun research/ranking even if the hash matches
+
+Useful command:
+
+```bash
+python3 scripts/generate.py --content-provider hosted_packet_synthesis --ranker heuristic_ranker --refresh-research
+```
 
 ### Send
 
@@ -132,10 +185,44 @@ Responsibilities:
 - load config
 - determine issue number
 - collect recent headlines
-- invoke content stage
+- resolve content and ranker providers
+- run Mode A or Mode B
 - validate/persist artifact
 - invoke render stage
 - write final HTML
+
+### `scripts/research_stage.py`
+Deterministic retrieval planning and research packet persistence.
+
+Responsibilities:
+- build per-section research plans
+- define derived-section behavior such as `sophies_challenge <- world_watch`
+- execute Brave retrieval
+- shape and persist research packets
+- compute config fingerprints for safe cache reuse
+
+### `scripts/ranking_stage.py`
+Deterministic prefiltering and configurable candidate ranking.
+
+Responsibilities:
+- filter blocked domains and malformed items
+- deduplicate by URL and near-duplicate title
+- apply heuristic ranking with freshness, novelty, keyword, geography, kid-safe, and junk signals
+- dispatch to heuristic or hosted-model rankers
+
+### `scripts/providers/brave_search.py`
+Brave Search adapter.
+
+Responsibilities:
+- call Brave Search API
+- normalize result fields into candidate objects used by the research pipeline
+
+### `scripts/providers/hosted_llm_provider.py`
+Hosted model reranker.
+
+Responsibilities:
+- rerank filtered candidates for Mode B2
+- fall back to filtered ordering if model ranking fails or returns empty
 
 ### `scripts/content_stage.py`
 Structured content generation orchestration.
@@ -143,8 +230,8 @@ Structured content generation orchestration.
 Responsibilities:
 - summarize child/profile config for prompt use
 - summarize active sections and block-type contracts
-- build the content prompt
-- call the content provider (currently Claude CLI)
+- build the integrated-search prompt for Mode A
+- build the research-packet synthesis prompt for Mode B
 - capture debug artifacts in `artifacts/debug/`
 - parse the provider envelope safely into structured JSON
 
@@ -182,6 +269,7 @@ Responsibilities:
 
 - Python 3
 - Claude CLI installed and authenticated
+- Brave Search API key for Mode B retrieval
 - Gmail account with app password for sending
 
 ### Python dependencies
@@ -201,6 +289,7 @@ Current Python dependency:
 Create `.env` from `.env.example` and fill in:
 
 ```env
+BRAVE_API_KEY=your_brave_api_key
 GMAIL_USER=your.gmail@gmail.com
 GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
 RECIPIENT_EMAIL=recipient@example.com
@@ -220,11 +309,13 @@ sophies-world/
   config/
     children/
       sophie.yaml
+    research.yaml
     sections.yaml
     themes/
       default.yaml
   artifacts/
     issues/
+    research/
     debug/
   newsletters/
     sophies-world-YYYY-MM-DD.html
@@ -233,12 +324,20 @@ sophies-world/
     content_stage.py
     generate.py
     issue_schema.py
+    providers/
+      __init__.py
+      brave_search.py
+      hosted_llm_provider.py
+    ranking_stage.py
     render_stage.py
+    research_stage.py
     run.sh
     send.py
     template.html
   tests/
     test_generate.py
+    test_pipeline_integration.py
+    test_research_pipeline.py
     test_send.py
   docs/
     ideas-backlog.md
@@ -263,6 +362,7 @@ Controls:
 - active interests
 - active newsletter sections
 - selected theme
+- generation provider defaults
 - editorial defaults like reading level, tone, emoji usage, and global source preferences
 
 ### Section catalog
@@ -275,6 +375,16 @@ Defines reusable newsletter modules, including:
 - link style
 - content rules
 - preferred sources
+
+### Research config
+`config/research.yaml`
+
+Controls deterministic research behavior, including:
+- per-section query templates
+- per-section freshness windows and result counts
+- ranking defaults and section overrides
+- novelty comparison settings
+- kid-safe and blocked domain lists
 
 ### Theme metadata
 `config/themes/default.yaml`
@@ -307,6 +417,13 @@ Each successful generation writes a JSON issue artifact to:
 
 This artifact is the contract between content generation and local rendering.
 
+### Research packet artifact
+Each successful Mode B research run writes a JSON research packet to:
+
+- `artifacts/research/`
+
+This packet is the contract between retrieval/ranking and packet-driven synthesis.
+
 ### Final HTML newsletter
 Production issues are written to:
 
@@ -337,13 +454,19 @@ Important:
 Run the full test suite:
 
 ```bash
-python3 -m pytest -q tests
+python3 -m pytest -q
 ```
 
 Current coverage includes:
 
 - config loading
 - missing/invalid config handling
+- Mode A / Mode B provider wiring
+- deterministic research plan and packet persistence
+- prefiltering, dedupe, freshness scoring, novelty handling, and junk penalties
+- derived-section packet structure for `sophies_challenge`
+- hosted-model ranker fallback behavior
+- cache reuse vs rerun behavior for research packets
 - structured content prompt assembly
 - parser robustness against fenced/trailing content
 - issue artifact validation and persistence
@@ -359,9 +482,9 @@ Current coverage includes:
 
 - `generate.py` still loads `config/children/sophie.yaml` directly, so multi-child support is not yet exposed through a flag like `--child`
 - issue numbering is still derived from file counts, which is good enough for now but not fully robust
-- content generation still depends on Claude CLI in the current provider path
+- final content generation still depends on Claude CLI in both Mode A and Mode B synthesis paths
+- research caching is keyed to config shape, but not yet to broader external retrieval conditions beyond those configured inputs
 - debug artifacts are local-only and not part of the durable product surface
-- the planned deterministic Brave research stage and local-LLM synthesis path are designed but not implemented yet
 
 ---
 
@@ -371,7 +494,8 @@ Current coverage includes:
 - `docs/ideas-backlog.md` — next improvements and product ideas
 - `docs/superpowers/specs/2026-04-18-modular-sections-design.md` — approved modular-sections spec
 - `docs/superpowers/specs/2026-04-18-content-render-split-design.md` — approved content/render split spec
-- `docs/superpowers/specs/2026-04-19-local-llm-research-stage-design.md` — draft local-LLM + deterministic Brave research design
+- `docs/superpowers/specs/2026-04-19-local-llm-research-stage-design.md` — local-LLM + deterministic research design
+- `docs/superpowers/plans/2026-04-20-deterministic-research-pipeline.md` — deterministic research pipeline implementation plan
 
 ---
 
@@ -379,8 +503,8 @@ Current coverage includes:
 
 If picking up the project fresh, the highest-leverage next steps are probably:
 
-1. add a deterministic Brave-powered research stage
-2. add a local-model content provider behind the existing content-stage abstraction
+1. validate content quality across Mode A vs Mode B1 vs Mode B2 on a few real issues
+2. tighten cache identity further if real-world retrieval drift becomes a problem
 3. replace file-count issue numbering with stable state
 4. add explicit multi-child selection
-5. keep README + specs + plans aligned as the local-provider path lands
+5. keep README + specs + plans aligned as the pipeline evolves
