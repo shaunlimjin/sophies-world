@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 ARTIFACTS_DIRNAME = "artifacts"
@@ -16,18 +16,22 @@ def get_issue_artifacts_dir(repo_root: Path) -> Path:
     return repo_root / ARTIFACTS_DIRNAME / ISSUES_DIRNAME
 
 
-def get_issue_artifact_path(repo_root: Path, child_id: str, issue_date: str) -> Path:
-    return get_issue_artifacts_dir(repo_root) / f"{child_id}-{issue_date}.json"
+def get_issue_artifact_path(repo_root: Path, child_id: str, issue_date: str, run_tag: Optional[str] = None) -> Path:
+    filename = f"{child_id}-{issue_date}"
+    if run_tag:
+        filename += f"-{run_tag}"
+    filename += ".json"
+    return get_issue_artifacts_dir(repo_root) / filename
 
 
-def write_issue_artifact(repo_root: Path, issue: Dict[str, Any]) -> Path:
+def write_issue_artifact(repo_root: Path, issue: Dict[str, Any], run_tag: Optional[str] = None) -> Path:
     child_id = issue.get("child_id")
     issue_date = issue.get("issue_date")
     if not child_id or not issue_date:
         raise ValueError("issue artifact requires child_id and issue_date")
     out_dir = get_issue_artifacts_dir(repo_root)
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = get_issue_artifact_path(repo_root, child_id, issue_date)
+    out_path = get_issue_artifact_path(repo_root, child_id, issue_date, run_tag)
     out_path.write_text(json.dumps(issue, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return out_path
 

@@ -24,6 +24,7 @@ def model_rank_candidates(
     debug_dir = _get_debug_dir(repo_root)
     profile = config["profile"]
     research_cfg = config.get("research", {})
+    recent_headlines = filtered_pool.get("recent_headlines", [])
 
     ranked_sections = []
     for section in filtered_pool["sections"]:
@@ -40,7 +41,7 @@ def model_rank_candidates(
             ranked_sections.append({**section, "ranked_candidates": []})
             continue
 
-        prompt = _build_ranker_prompt(section_id, candidates, profile, max_ranked)
+        prompt = _build_ranker_prompt(section_id, candidates, profile, max_ranked, recent_headlines)
         prompt_file = debug_dir / f"last-ranker-prompt-{section_id}.txt"
         prompt_file.write_text(prompt, encoding="utf-8")
 
@@ -64,6 +65,7 @@ def _build_ranker_prompt(
     candidates: List[Dict[str, Any]],
     profile: Dict[str, Any],
     max_ranked: int,
+    recent_headlines: List[str],
 ) -> str:
     child_name = profile.get("name", "Sophie")
     age_band = profile.get("age_band", "4th-grade")
@@ -74,11 +76,14 @@ def _build_ranker_prompt(
             "index": i,
             "title": c.get("title", ""),
             "source": c.get("source", ""),
+            "domain": c.get("domain", ""),
             "snippet": c.get("snippet", ""),
             "published_at": c.get("published_at"),
         }
         for i, c in enumerate(candidates)
     ]
+    recent_headlines = recent_headlines[:8]
+    recent_block = json.dumps(recent_headlines, ensure_ascii=False, indent=2)
 
     return f"""You are a ranking assistant for a children's newsletter called Sophie's World.
 
@@ -87,14 +92,30 @@ with a Singaporean family background. Active interests: {', '.join(interests)}.
 
 Section: {section_id}
 
-You will receive a list of candidate articles. Rank them by how well they would work as
-newsletter content for this child — considering freshness, educational value, kid-friendliness,
-and fit for the section theme.
+Your job is not just to pick individually good articles. Your job is to pick articles that will help produce a section that is:
+- strong for this specific section
+- easy and exciting for a smart 4th grader to understand
+- meaningfully distinct from very recent issues
+- not just the most obvious or generic headline in the pool
+
+Important ranking priorities, in order:
+1. strong fit for the section's editorial goal
+2. kid-appropriate explanatory value
+3. novelty relative to recent issues and recurring stale themes
+4. freshness when the section is current-events oriented
+5. source quality and specificity
+
+Avoid picking candidates that are too similar to recent issue headlines, even if they look strong in isolation.
+Also avoid obvious-but-generic picks when a more distinctive, teachable, section-appropriate candidate is available.
+Prefer editorial distinctness over headline salience when the tradeoff is close.
+
+Recent issue headlines to avoid repeating too closely:
+{recent_block}
 
 Return ONLY a JSON array of the top {max_ranked} candidates, each with:
 - "index": the original candidate index (integer)
 - "title": the candidate title (string)
-- "reasons": short list of strings explaining why this candidate was selected
+- "reasons": short list of strings explaining why this candidate was selected, explicitly mentioning novelty/distinctness when relevant
 
 Do not include commentary. Do not return prose. Return only valid JSON.
 

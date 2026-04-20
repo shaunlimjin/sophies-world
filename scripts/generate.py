@@ -104,8 +104,11 @@ def get_recent_headlines(newsletters_dir: Path, today: date) -> List[str]:
     return [re.sub(r"<[^>]+>", "", h).strip() for h in raw if h.strip()]
 
 
-def get_output_path(newsletters_dir: Path, issue_date: date) -> Path:
-    filename = f"sophies-world-{issue_date.strftime('%Y-%m-%d')}.html"
+def get_output_path(newsletters_dir: Path, issue_date: date, suffix: Optional[str] = None) -> Path:
+    filename = f"sophies-world-{issue_date.strftime('%Y-%m-%d')}"
+    if suffix:
+        filename += f"-{suffix}"
+    filename += ".html"
     return newsletters_dir / filename
 
 
@@ -142,6 +145,7 @@ def run_mode_b(
     repo_root: Path,
     ranker_provider: str,
     refresh_research: bool,
+    run_tag: Optional[str] = None,
 ) -> dict:
     """Mode B: deterministic retrieval + configurable ranking + hosted packet synthesis."""
     from research_stage import (
@@ -153,7 +157,7 @@ def run_mode_b(
 
     print(f"Mode B: deterministic retrieval + {ranker_provider} + hosted packet synthesis")
 
-    artifact_path = get_research_artifact_path(repo_root, today)
+    artifact_path = get_research_artifact_path(repo_root, today, run_tag)
     config_hash = compute_research_config_hash(config)
 
     needs_research = True
@@ -190,6 +194,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test", action="store_true", help="Write to newsletters/test/ and always regenerate")
     parser.add_argument(
+        "--run-tag",
+        default=None,
+        help="Optional tag appended to HTML, issue artifact, and research packet filenames (for example: mode-a)",
+    )
+    parser.add_argument(
         "--content-provider",
         choices=list(VALID_CONTENT_PROVIDERS),
         default=None,
@@ -219,7 +228,7 @@ def main():
     else:
         output_dir = NEWSLETTERS_DIR
 
-    output_path = get_output_path(output_dir, today)
+    output_path = get_output_path(output_dir, today, args.run_tag)
 
     if not args.test and check_output_exists(output_path):
         return
@@ -234,12 +243,12 @@ def main():
     if content_provider == CONTENT_PROVIDER_INTEGRATED:
         issue = run_mode_a(today, issue_num, config, recent_headlines, REPO_ROOT)
     elif content_provider == CONTENT_PROVIDER_PACKET:
-        issue = run_mode_b(today, issue_num, config, recent_headlines, REPO_ROOT, ranker_provider, args.refresh_research)
+        issue = run_mode_b(today, issue_num, config, recent_headlines, REPO_ROOT, ranker_provider, args.refresh_research, args.run_tag)
     else:
         print(f"Error: unknown content_provider '{content_provider}'", file=sys.stderr)
         sys.exit(1)
 
-    artifact_path = write_issue_artifact(REPO_ROOT, issue)
+    artifact_path = write_issue_artifact(REPO_ROOT, issue, args.run_tag)
 
     print(f"Rendering HTML from artifact: {artifact_path}")
     html = render_issue_html(template_html, issue)

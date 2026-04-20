@@ -161,6 +161,12 @@ def test_get_research_artifact_path(tmp_path):
     assert "research" in str(path)
 
 
+def test_get_research_artifact_path_with_run_tag(tmp_path):
+    path = research_stage.get_research_artifact_path(tmp_path, date(2026, 4, 20), "mode-b1")
+    assert path.name == "sophie-2026-04-20-mode-b1.json"
+    assert "research" in str(path)
+
+
 # ---------------------------------------------------------------------------
 # ranking_stage: tokenize and jaccard
 # ---------------------------------------------------------------------------

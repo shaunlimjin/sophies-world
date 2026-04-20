@@ -26,6 +26,16 @@ def test_get_output_path(tmp_path):
     assert result == tmp_path / "sophies-world-2026-04-23.html"
 
 
+def test_get_output_path_with_suffix(tmp_path):
+    result = generate.get_output_path(tmp_path, date(2026, 4, 23), "mode-a")
+    assert result == tmp_path / "sophies-world-2026-04-23-mode-a.html"
+
+
+def test_issue_artifact_path_with_run_tag(tmp_path):
+    result = issue_schema.get_issue_artifact_path(tmp_path, "sophie", "2026-04-23", "mode-a")
+    assert result == tmp_path / "artifacts" / "issues" / "sophie-2026-04-23-mode-a.json"
+
+
 def test_get_recent_headlines_no_previous(tmp_path):
     assert generate.get_recent_headlines(tmp_path, date(2026, 4, 18)) == []
 
@@ -383,6 +393,24 @@ def test_issue_artifact_round_trip(tmp_path):
         "footer": {"issue_number": 4, "issue_date_display": "April 18, 2026", "tagline": "x", "location_line": "y"}
     }
     out_path = issue_schema.write_issue_artifact(tmp_path, issue)
+    loaded = issue_schema.load_issue_artifact(out_path)
+    assert loaded["issue_date"] == "2026-04-18"
+
+
+def test_issue_artifact_round_trip_with_run_tag(tmp_path):
+    issue = {
+        "issue_date": "2026-04-18",
+        "issue_number": 4,
+        "child_id": "sophie",
+        "theme_id": "default",
+        "editorial": {},
+        "child_name": "Sophie",
+        "greeting_text": "Welcome back to <span>Sophie's World</span>!",
+        "sections": [{"id": "weird_but_true", "title": "A", "render_title": "A", "block_type": "fact_list", "items": [{"title": "x", "body": "y"}], "links": [], "link_style": "link-purple"}],
+        "footer": {"issue_number": 4, "issue_date_display": "April 18, 2026", "tagline": "x", "location_line": "y"}
+    }
+    out_path = issue_schema.write_issue_artifact(tmp_path, issue, "mode-a")
+    assert out_path.name == "sophie-2026-04-18-mode-a.json"
     loaded = issue_schema.load_issue_artifact(out_path)
     assert loaded["issue_date"] == "2026-04-18"
 

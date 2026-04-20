@@ -432,6 +432,27 @@ def test_model_ranker_fallback_preserves_filtered_order(tmp_path):
     assert [r["title"] for r in ranked] == ["Article 0", "Article 1", "Article 2"]
 
 
+def test_model_ranker_prompt_includes_recent_headlines_and_distinctness_guidance():
+    from providers import hosted_llm_provider
+
+    candidates = [
+        {"title": "Moon mission update", "url": "https://example.com/1", "domain": "example.com",
+         "snippet": _long_snippet(1), "source": "Example", "published_at": "2026-04-20", "query_source": None}
+    ]
+    prompt = hosted_llm_provider._build_ranker_prompt(
+        "world_watch",
+        candidates,
+        {"name": "Sophie", "age_band": "4th-grade", "interests": {"active": ["gymnastics"]}},
+        3,
+        ["NASA's Artemis II Crew Splashes Down", "Singapore's Hawker Centers Are a UNESCO World Treasure"],
+    )
+
+    assert "Recent issue headlines to avoid repeating too closely" in prompt
+    assert "editorial distinctness" in prompt
+    assert "not just the most obvious or generic headline" in prompt
+    assert "Artemis II" in prompt
+
+
 # ---------------------------------------------------------------------------
 # Freshness scoring
 # ---------------------------------------------------------------------------

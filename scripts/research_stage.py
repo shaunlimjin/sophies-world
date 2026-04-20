@@ -263,8 +263,12 @@ def _load_brave_api_key(repo_root: Path) -> str:
 # Artifact persistence
 # ---------------------------------------------------------------------------
 
-def get_research_artifact_path(repo_root: Path, issue_date: date) -> Path:
-    return repo_root / ARTIFACTS_DIR_NAME / RESEARCH_DIR_NAME / f"sophie-{issue_date.isoformat()}.json"
+def get_research_artifact_path(repo_root: Path, issue_date: date, run_tag: Optional[str] = None) -> Path:
+    filename = f"sophie-{issue_date.isoformat()}"
+    if run_tag:
+        filename += f"-{run_tag}"
+    filename += ".json"
+    return repo_root / ARTIFACTS_DIR_NAME / RESEARCH_DIR_NAME / filename
 
 
 def compute_research_config_hash(config: dict) -> str:

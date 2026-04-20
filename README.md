@@ -2,12 +2,13 @@
 
 A weekly HTML email newsletter generator for Sophie, with kid-friendly world news, fun facts, Singapore/USA cultural links, money lessons, and interest-based sections like Gymnastics Corner.
 
-The app now supports two content-generation modes:
+The app now supports two content-generation modes and three practical evaluation paths:
 
 1. **Mode A, hosted integrated search**: Claude generates the issue JSON directly with search enabled
-2. **Mode B, deterministic research packet synthesis**: Brave retrieval + deterministic prefiltering + configurable ranking + hosted synthesis from a cached research packet
+2. **Mode B1, deterministic packet + heuristic ranker**: Brave retrieval + deterministic prefiltering + heuristic ranking + hosted synthesis
+3. **Mode B2, deterministic packet + hosted model ranker**: Brave retrieval + deterministic prefiltering + hosted model reranking + hosted synthesis
 
-In both modes, the final HTML is rendered locally from a structured issue artifact, and the finished issue can optionally be sent via Gmail SMTP.
+In all modes, the final HTML is rendered locally from a structured issue artifact, and the finished issue can optionally be sent via Gmail SMTP.
 
 ---
 
@@ -29,6 +30,9 @@ This repo is now meaningfully config-driven and split into clean generation stag
 - orchestration lives in `scripts/generate.py`
 
 It is still a single-child implementation in practice, because `generate.py` currently loads `config/children/sophie.yaml` directly.
+
+Current working recommendation after first-pass evaluation: **Mode B1 is the best default path right now.**
+B2 is promising, but still slightly behind B1 on issue-level coherence and novelty, even after prompt upgrades.
 
 ---
 
@@ -109,6 +113,27 @@ open newsletters/test/sophies-world-$(date +%F).html
 ```
 
 If a test file for today already exists, `--test` will still regenerate it in the test folder.
+
+### Tagged comparison runs
+
+To compare multiple modes on the same day without overwriting outputs, use `--run-tag`.
+This appends the same tag to:
+- final HTML output
+- issue artifact JSON
+- research packet JSON (for Mode B runs)
+
+Examples:
+
+```bash
+python3 scripts/generate.py --test --content-provider hosted_integrated_search --run-tag mode-a
+python3 scripts/generate.py --test --content-provider hosted_packet_synthesis --ranker heuristic_ranker --refresh-research --run-tag mode-b1
+python3 scripts/generate.py --test --content-provider hosted_packet_synthesis --ranker hosted_model_ranker --refresh-research --run-tag mode-b2
+```
+
+This produces separate comparable artifacts such as:
+- `newsletters/test/sophies-world-YYYY-MM-DD-mode-a.html`
+- `artifacts/issues/sophie-YYYY-MM-DD-mode-b1.json`
+- `artifacts/research/sophie-YYYY-MM-DD-mode-b2.json`
 
 ### Provider selection
 
@@ -222,6 +247,8 @@ Hosted model reranker.
 
 Responsibilities:
 - rerank filtered candidates for Mode B2
+- use recent-issue headline context during reranking
+- optimize for section fit, kid readability, novelty, and editorial distinctness
 - fall back to filtered ordering if model ranking fails or returns empty
 
 ### `scripts/content_stage.py`
@@ -417,12 +444,16 @@ Each successful generation writes a JSON issue artifact to:
 
 This artifact is the contract between content generation and local rendering.
 
+When `--run-tag` is used, the issue artifact filename is tagged as well.
+
 ### Research packet artifact
 Each successful Mode B research run writes a JSON research packet to:
 
 - `artifacts/research/`
 
 This packet is the contract between retrieval/ranking and packet-driven synthesis.
+
+When `--run-tag` is used, the research packet filename is tagged as well.
 
 ### Final HTML newsletter
 Production issues are written to:
@@ -432,6 +463,8 @@ Production issues are written to:
 Test issues are written to:
 
 - `newsletters/test/`
+
+When `--run-tag` is used, the final HTML filename is tagged as well.
 
 ---
 
@@ -462,10 +495,12 @@ Current coverage includes:
 - config loading
 - missing/invalid config handling
 - Mode A / Mode B provider wiring
+- tagged output/artifact path handling via `--run-tag`
 - deterministic research plan and packet persistence
 - prefiltering, dedupe, freshness scoring, novelty handling, and junk penalties
 - derived-section packet structure for `sophies_challenge`
 - hosted-model ranker fallback behavior
+- hosted-model ranker prompt guidance for recent-headline novelty and editorial distinctness
 - cache reuse vs rerun behavior for research packets
 - structured content prompt assembly
 - parser robustness against fenced/trailing content
@@ -488,6 +523,21 @@ Current coverage includes:
 
 ---
 
+## Evaluation status so far
+
+A first comparison pass has been completed across Mode A, Mode B1, and Mode B2 using tagged runs and saved artifacts.
+
+Current conclusion:
+- **Mode B1** is the best current default
+- **Mode B2** improved after prompt upgrades, but still does not clearly beat B1
+- the biggest quality risk is **repetition / story collision across nearby issues**
+
+Evaluation docs:
+- `docs/superpowers/evals/2026-04-20-mode-comparison-scorecard.md`
+- `docs/superpowers/evals/2026-04-20-first-pass-mode-comparison-review.md`
+
+---
+
 ## Docs worth reading
 
 - `CLAUDE.md` — operator/developer notes for the repo
@@ -496,6 +546,8 @@ Current coverage includes:
 - `docs/superpowers/specs/2026-04-18-content-render-split-design.md` — approved content/render split spec
 - `docs/superpowers/specs/2026-04-19-local-llm-research-stage-design.md` — local-LLM + deterministic research design
 - `docs/superpowers/plans/2026-04-20-deterministic-research-pipeline.md` — deterministic research pipeline implementation plan
+- `docs/superpowers/evals/2026-04-20-mode-comparison-scorecard.md` — evaluation rubric for mode comparison
+- `docs/superpowers/evals/2026-04-20-first-pass-mode-comparison-review.md` — first-pass mode comparison findings
 
 ---
 
@@ -503,8 +555,8 @@ Current coverage includes:
 
 If picking up the project fresh, the highest-leverage next steps are probably:
 
-1. validate content quality across Mode A vs Mode B1 vs Mode B2 on a few real issues
-2. tighten cache identity further if real-world retrieval drift becomes a problem
-3. replace file-count issue numbering with stable state
-4. add explicit multi-child selection
-5. keep README + specs + plans aligned as the pipeline evolves
+1. harden novelty guards against repeated stories, repeated events, and recurring evergreen factoids across recent issues
+2. continue refining B2 as an experimental path, especially with stronger section-specific anti-repeat guidance
+3. tighten cache identity further if real-world retrieval drift becomes a problem
+4. replace file-count issue numbering with stable state
+5. add explicit multi-child selection
