@@ -1,0 +1,118 @@
+sections:
+  weird_but_true:
+    title: "🤔 Weird But True"
+    goal: "Share 2–3 wild fun facts to spark curiosity about animals, science, and nature"
+    block_type: fact_list
+    link_style: link-purple
+    content_rules:
+      - Search for recent or timeless fascinating facts
+      - Facts should be surprising and age-appropriate
+      - Include sources for each fact
+    source_preferences:
+      - Nat Geo Kids
+      - Britannica
+      - NewsForKids.net
+
+  world_watch:
+    title: "🌍 World Watch"
+    goal: "Explain 2 real, material current events happening this week in kid-friendly language"
+    block_type: story_list
+    link_style: link-green
+    content_rules:
+      - MUST include serious topics if relevant (conflicts, economy, tariffs)
+      - Explain each story for a 4th grader with an analogy using .analogy div
+      - Use real events happening this week
+      - Include 1–2 "Learn More" links per story
+    source_preferences:
+      - Time for Kids
+      - NewsForKids.net
+      - Britannica
+      - BBC Newsround
+
+  singapore_spotlight:
+    title: "🇸🇬 Singapore Spotlight"
+    goal: "Share a fun fact about Singapore—cultural, historical, economic, nature, food, or quirky"
+    block_type: spotlight
+    link_style: link-pink
+    content_rules:
+      - Does not need to be current news
+      - Timeless or surprising facts are great
+      - Build affinity for Singapore culture and heritage
+      - Include 1–2 "Learn More" links
+    source_preferences:
+      - Britannica
+      - BBC Newsround
+      - Singapore Tourism Board
+
+  usa_corner:
+    title: "🇺🇸 USA Corner"
+    goal: "Share California/Fremont angle, or US sports/science/culture happening this week"
+    block_type: spotlight
+    link_style: link-blue
+    content_rules:
+      - Content should be current this week
+      - Prefer California or Fremont local angles
+      - Include 1–2 "Learn More" links
+    source_preferences:
+      - Time for Kids
+      - Britannica
+      - Local Fremont/California news
+
+  kpop_corner:
+    title: "🎤 K-pop Corner"
+    goal: "Share current K-pop news, artist releases, performances, and fun facts"
+    block_type: interest_feature
+    link_style: link-rose
+    content_rules:
+      - Search for their latest releases, performances, or announcements
+      - Use .interest-item structure for each item
+      - Keep content age-appropriate and exciting
+      - Include 1–2 "Learn More" links
+    source_preferences:
+      - YouTube
+      - Official artist channels
+      - K-pop news sites
+
+  gymnastics_corner:
+    title: "🤸 Gymnastics Corner"
+    goal: "Share interesting gymnastics news, athlete stories, fun facts, or beginner-safe tips"
+    block_type: interest_feature
+    link_style: link-rose
+    content_rules:
+      - Keep it age-appropriate and encouraging
+      - Prefer athlete stories, fun facts, competition highlights, or safe basic technique explanations
+      - Use .interest-item structure for each item
+      - Avoid risky coaching advice or unsafe training suggestions
+      - Include 1–2 "Learn More" links
+    source_preferences:
+      - Olympics
+      - USA Gymnastics
+      - Britannica Kids
+      - Kid-friendly sports coverage
+
+  money_moves:
+    title: "💰 Money Moves"
+    goal: "Share one saving/entrepreneurship concept + a real kid entrepreneur story"
+    block_type: story_list
+    link_style: link-amber
+    content_rules:
+      - Include a .money-highlight tip box with the core concept
+      - Feature a real kid entrepreneur story
+      - Make it relatable and actionable
+      - Include 1–2 "Learn More" links
+    source_preferences:
+      - Kid entrepreneur news
+      - Financial literacy sites for kids
+
+  sophies_challenge:
+    title: "🧩 Weekly Challenge"
+    goal: "Present a maths or reasoning puzzle tied to World Watch content this week"
+    block_type: challenge
+    link_style: link-orange
+    content_rules:
+      - Include percentages, fractions, or basic reasoning
+      - Reference the World Watch story by name
+      - Add a .challenge-hint for guidance
+      - Make it fun and achievable for a 4th grader
+    source_preferences:
+      - Derives from World Watch content
