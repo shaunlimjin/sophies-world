@@ -35,16 +35,16 @@ VALID_CONTENT_PROVIDERS = (CONTENT_PROVIDER_INTEGRATED, CONTENT_PROVIDER_PACKET)
 VALID_RANKERS = (RANKER_HEURISTIC, RANKER_HOSTED_MODEL)
 
 
-def load_config(repo_root: Path) -> dict:
-    config_dir = repo_root / "config"
+def load_config(repo_root: Path, env: str = "prod", approach: Optional[str] = None) -> dict:
+    from env_resolver import resolve_config_file
 
-    child_path = config_dir / "children" / "sophie.yaml"
+    child_path = resolve_config_file(repo_root, env, approach, "children/sophie.yaml")
     if not child_path.exists():
         print(f"Error: child config not found: {child_path}", file=sys.stderr)
         sys.exit(1)
     profile = yaml.safe_load(child_path.read_text(encoding="utf-8"))
 
-    sections_path = config_dir / "sections.yaml"
+    sections_path = resolve_config_file(repo_root, env, approach, "sections.yaml")
     if not sections_path.exists():
         print(f"Error: sections config not found: {sections_path}", file=sys.stderr)
         sys.exit(1)
@@ -52,7 +52,7 @@ def load_config(repo_root: Path) -> dict:
     sections = sections_data.get("sections", {})
 
     theme_name = profile.get("newsletter", {}).get("theme", "default")
-    theme_path = config_dir / "themes" / f"{theme_name}.yaml"
+    theme_path = resolve_config_file(repo_root, env, approach, f"themes/{theme_name}.yaml")
     if not theme_path.exists():
         print(f"Error: theme config not found: {theme_path}", file=sys.stderr)
         sys.exit(1)
@@ -64,13 +64,23 @@ def load_config(repo_root: Path) -> dict:
         print(f"Error: active_sections reference unknown section IDs: {missing}", file=sys.stderr)
         sys.exit(1)
 
-    research_config = _load_research_config(config_dir)
+    research_config = _load_research_config_resolved(repo_root, env, approach)
 
     return {"profile": profile, "sections": sections, "theme": theme, "research": research_config}
 
 
 def _load_research_config(config_dir: Path) -> dict:
     research_path = config_dir / "research.yaml"
+    if not research_path.exists():
+        return {}
+    return yaml.safe_load(research_path.read_text(encoding="utf-8")) or {}
+
+
+def _load_research_config_resolved(
+    repo_root: Path, env: str = "prod", approach: Optional[str] = None
+) -> dict:
+    from env_resolver import resolve_config_file
+    research_path = resolve_config_file(repo_root, env, approach, "research.yaml")
     if not research_path.exists():
         return {}
     return yaml.safe_load(research_path.read_text(encoding="utf-8")) or {}
@@ -146,6 +156,7 @@ def run_mode_b(
     ranker_provider: str,
     refresh_research: bool,
     run_tag: Optional[str] = None,
+    artifacts_root: Optional[Path] = None,
 ) -> dict:
     """Mode B: deterministic retrieval + configurable ranking + hosted packet synthesis."""
     from research_stage import (
@@ -157,7 +168,7 @@ def run_mode_b(
 
     print(f"Mode B: deterministic retrieval + {ranker_provider} + hosted packet synthesis")
 
-    artifact_path = get_research_artifact_path(repo_root, today, run_tag)
+    artifact_path = get_research_artifact_path(repo_root, today, run_tag, artifacts_root)
     config_hash = compute_research_config_hash(config)
 
     needs_research = True
@@ -192,11 +203,13 @@ def run_mode_b(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--test", action="store_true", help="Write to newsletters/test/ and always regenerate")
+    parser.add_argument("--test", action="store_true", help="Always regenerate; skip idempotency check")
+    parser.add_argument("--env", choices=["prod", "staging"], default="prod", dest="env")
+    parser.add_argument("--approach", default=None, help="Named approach (requires --env staging)")
     parser.add_argument(
         "--run-tag",
         default=None,
-        help="Optional tag appended to HTML, issue artifact, and research packet filenames (for example: mode-a)",
+        help="Optional tag appended to HTML, issue artifact, and research packet filenames",
     )
     parser.add_argument(
         "--content-provider",
@@ -218,22 +231,35 @@ def main():
     )
     args = parser.parse_args()
 
+    if args.approach and args.env != "staging":
+        parser.error("--approach requires --env staging")
+
+    from env_resolver import get_artifacts_root, get_newsletters_dir
+
+    env = args.env
+    approach = args.approach
+    artifacts_root = get_artifacts_root(REPO_ROOT, env, approach)
+    newsletters_dir = get_newsletters_dir(REPO_ROOT, env, approach)
+
+    # Legacy: prod + --test writes to newsletters/test/ (unchanged behavior)
+    if env == "prod" and args.test:
+        newsletters_dir = REPO_ROOT / "newsletters" / "test"
+
+    newsletters_dir.mkdir(parents=True, exist_ok=True)
+    artifacts_root.mkdir(parents=True, exist_ok=True)
+
     today = date.today()
+    # Issue number and recent headlines always reference prod newsletters
     issue_num = get_next_issue_number(NEWSLETTERS_DIR)
     recent_headlines = get_recent_headlines(NEWSLETTERS_DIR, today)
 
-    if args.test:
-        output_dir = NEWSLETTERS_DIR / "test"
-        output_dir.mkdir(exist_ok=True)
-    else:
-        output_dir = NEWSLETTERS_DIR
-
-    output_path = get_output_path(output_dir, today, args.run_tag)
+    output_path = get_output_path(newsletters_dir, today, args.run_tag)
 
     if not args.test and check_output_exists(output_path):
         return
 
-    config = load_config(REPO_ROOT)
+    print(f"Environment: {env}" + (f" / approach: {approach}" if approach else ""))
+    config = load_config(REPO_ROOT, env, approach)
     template_path = get_template_path(REPO_ROOT, config["theme"])
     template_html = load_template(template_path)
 
@@ -243,12 +269,16 @@ def main():
     if content_provider == CONTENT_PROVIDER_INTEGRATED:
         issue = run_mode_a(today, issue_num, config, recent_headlines, REPO_ROOT)
     elif content_provider == CONTENT_PROVIDER_PACKET:
-        issue = run_mode_b(today, issue_num, config, recent_headlines, REPO_ROOT, ranker_provider, args.refresh_research, args.run_tag)
+        issue = run_mode_b(
+            today, issue_num, config, recent_headlines, REPO_ROOT,
+            ranker_provider, args.refresh_research, args.run_tag,
+            artifacts_root=artifacts_root,
+        )
     else:
         print(f"Error: unknown content_provider '{content_provider}'", file=sys.stderr)
         sys.exit(1)
 
-    artifact_path = write_issue_artifact(REPO_ROOT, issue, args.run_tag)
+    artifact_path = write_issue_artifact(REPO_ROOT, issue, args.run_tag, artifacts_root)
 
     print(f"Rendering HTML from artifact: {artifact_path}")
     html = render_issue_html(template_html, issue)

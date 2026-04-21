@@ -565,3 +565,22 @@ def test_write_issue_artifact_staging(tmp_path):
     out_path = issue_schema.write_issue_artifact(tmp_path, issue, artifacts_root=artifacts_root)
     assert out_path == artifacts_root / "issues" / "sophie-2026-04-23.json"
     assert out_path.exists()
+
+
+def test_load_config_with_staging_overlay(tmp_path):
+    """Staging config overlay takes precedence over prod."""
+    make_config(tmp_path, VALID_SOPHIE_YAML)
+    staging_sophie = VALID_SOPHIE_YAML.replace("4th grade", "5th grade")
+    (tmp_path / "staging" / "config" / "children").mkdir(parents=True)
+    (tmp_path / "staging" / "config" / "children" / "sophie.yaml").write_text(staging_sophie)
+
+    config = generate.load_config(tmp_path, env="staging")
+    editorial = config["profile"]["newsletter"]["editorial"]
+    assert editorial["reading_level"] == "5th grade"
+    assert "weird_but_true" in config["sections"]
+
+
+def test_load_config_default_env_is_prod(tmp_path):
+    make_config(tmp_path, VALID_SOPHIE_YAML)
+    config = generate.load_config(tmp_path)
+    assert config["profile"]["name"] == "Sophie"
