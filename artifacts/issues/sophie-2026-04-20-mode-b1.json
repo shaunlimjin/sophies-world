@@ -1,0 +1,280 @@
+{
+  "issue_date": "2026-04-20",
+  "issue_number": 5,
+  "child_id": "sophie",
+  "child_name": "Sophie",
+  "theme_id": "default",
+  "editorial": {
+    "reading_level": "4th grade",
+    "tone": [
+      "warm",
+      "fun",
+      "curious"
+    ],
+    "use_emojis": true,
+    "global_source_preferences": [
+      "Time for Kids",
+      "NewsForKids.net",
+      "Britannica",
+      "BBC Newsround",
+      "Nat Geo Kids"
+    ]
+  },
+  "greeting_text": "Issue #5 of <span>Sophie's World</span> is here — astronauts just splashed down, Oklahoma gymnasts made history, and Singapore's got the world's cheapest Michelin-starred meal! 🎉",
+  "sections": [
+    {
+      "id": "weird_but_true",
+      "title": "🤔 Weird But True",
+      "render_title": "Wild Facts That'll Make You Go 'Wait, WHAT?!' 🤯",
+      "section_intro": "Nature is way weirder than fiction — here are three facts to prove it!",
+      "block_type": "fact_list",
+      "link_style": "link-purple",
+      "items": [
+        {
+          "title": "Geckos lick their own eyeballs to clean them 👀",
+          "body": "Geckos have no eyelids — they literally cannot blink! Instead, they use their long tongues to wipe their eyeballs clean and keep them from drying out. Next time you blink, think about how handy those eyelids really are."
+        },
+        {
+          "title": "There's a gliding animal in Southeast Asia that looks like a flying blanket 🦎",
+          "body": "The colugo, found in forests near Singapore, has a massive flap of skin stretching from its neck all the way to its fingers and toes. It uses this giant 'cape' to glide up to 70 meters between trees — longer than two school buses parked end to end! It's related to primates, making it one of our distant cousins."
+        },
+        {
+          "title": "Some animals sleep up to 22 hours a day 😴",
+          "body": "Humans need about 8 hours of sleep, but koalas snooze for up to 22 hours! Their only food — eucalyptus leaves — is super hard to digest and barely has any energy in it. Koalas move as little as possible to save every bit of fuel they get. Imagine sleeping through almost your entire day!"
+        }
+      ],
+      "links": [
+        {
+          "label": "More Weird Animal Facts",
+          "url": "https://kids.nationalgeographic.com/weird-but-true/article/animals"
+        },
+        {
+          "label": "Cool Asian Animals",
+          "url": "https://kids.nationalgeographic.com/wacky-weekend/article/asian-animals"
+        }
+      ]
+    },
+    {
+      "id": "world_watch",
+      "title": "🌍 World Watch",
+      "render_title": "Big Stories Shaping Our World This Week 🌐",
+      "section_intro": null,
+      "block_type": "story_list",
+      "link_style": "link-green",
+      "items": [
+        {
+          "headline": "NASA's Artemis II Crew Splashes Down — Moon Mission Complete! 🚀",
+          "body": [
+            "On April 15, 2026, NASA's Artemis II mission made history when the Orion spacecraft splashed down safely in the Pacific Ocean. For the first time since the Apollo era in the 1970s, astronauts had traveled all the way to the Moon and back. The four-person crew orbited the Moon and returned safely to Earth, cheered on by people around the world.",
+            "The splashdown happened off the coast of California — not far from Fremont! Recovery teams were waiting on boats to bring the astronauts home. Artemis II is a stepping stone: NASA's plan is to eventually land people on the Moon again, and one day send humans to Mars."
+          ],
+          "analogy": "Think of Artemis II like a test drive in a brand new car before a big road trip. NASA needed to make sure everything worked perfectly with real astronauts on board before the next mission actually tries to land on the Moon's surface.",
+          "links": [
+            {
+              "label": "Artemis II Splashdown Story",
+              "url": "https://newsforkids.net/category/all_news/science/"
+            }
+          ]
+        },
+        {
+          "headline": "Powerful Storms Sweep Across the United States ⛈️",
+          "body": [
+            "Severe thunderstorms hit parts of the United States this week, destroying homes and vehicles and causing dangerous lightning strikes. Forecasters warned that more severe weather was on the way for other regions, urging people to stay safe and prepared.",
+            "Storms like these are becoming more powerful as Earth's climate changes. When more heat is trapped near the ground, it creates the conditions for stronger, more intense weather. Communities affected by this week's storms are working hard to recover, supported by emergency crews and neighbors."
+          ],
+          "analogy": "Think of the atmosphere like a giant pot of soup on a stove. The more heat you add, the more the soup bubbles and churns. As our planet warms up, that 'soup' gets stirred harder and faster — creating bigger, more dangerous storms.",
+          "links": [
+            {
+              "label": "World News Headlines",
+              "url": "https://www.npr.org/sections/world/"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "singapore_spotlight",
+      "title": "🇸🇬 Singapore Spotlight",
+      "render_title": "The Tiny Island Where Street Food Wins Michelin Stars 🍜",
+      "section_intro": null,
+      "block_type": "spotlight",
+      "link_style": "link-pink",
+      "items": [
+        {
+          "headline": "A $2 Chicken Rice Stall That Won the World's Most Famous Food Award 🌟",
+          "body": [
+            "In 2016, a humble hawker stall in Singapore called Hong Kong Soya Sauce Chicken Rice did something that shocked the food world: it won a Michelin star — one of the most prestigious awards any restaurant can receive. A plate costs just a couple of dollars, making it the world's cheapest Michelin-starred meal. Fancy restaurants in other countries charge hundreds of dollars for the same honor!",
+            "This happened because Singapore's hawker centres — open-air food courts found all over the island — serve some of the most delicious and carefully crafted food anywhere on Earth. In 2020, UNESCO officially recognized Singapore's hawker culture as part of the world's Intangible Cultural Heritage, meaning it's considered a treasure worth protecting for all of humanity."
+          ],
+          "links": [
+            {
+              "label": "Singapore Food Culture",
+              "url": "https://www.bbc.com/travel/article/20101214-travelwise-singaporean-foods-past-and-present"
+            },
+            {
+              "label": "Singapore Country Profile",
+              "url": "https://kids.nationalgeographic.com/geography/countries/article/singapore"
+            }
+          ]
+        },
+        {
+          "headline": "Why Singaporeans Say 'Have You Eaten?' Instead of 'How Are You?' 🥢",
+          "body": [
+            "Singapore is home to people from Chinese, Malay, Indian, and many other cultural backgrounds — and they all brought their food traditions with them. This mix gave birth to iconic dishes that belong entirely to Singapore: Hainanese chicken rice, laksa (a rich, spicy noodle soup), char kway teow (stir-fried flat noodles), and roti prata (a flaky flatbread served with curry).",
+            "Singaporeans are so passionate about food that a common greeting isn't 'How are you?' but 'Have you eaten yet?' Food isn't just fuel in Singapore — it's how people show love, share culture, and feel connected to each other and to home."
+          ],
+          "links": [
+            {
+              "label": "Singaporean Cuisine",
+              "url": "https://en.wikipedia.org/wiki/Singaporean_cuisine"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "usa_corner",
+      "title": "🇺🇸 USA Corner",
+      "render_title": "California Calling: Get Outside This Week! 🌲",
+      "section_intro": null,
+      "block_type": "spotlight",
+      "link_style": "link-blue",
+      "items": [
+        {
+          "headline": "National Parks Are FREE Today — Including Ones Near Fremont! 🏕️",
+          "body": [
+            "Today, April 20, is part of National Park Week, and every US National Park is free to enter — no tickets needed! Parks like Muir Woods, Point Reyes, and Yosemite are all within driving distance of Fremont and are absolutely stunning in the spring. National Park Week runs through April 27, with ranger-led hikes, children's programs, outdoor theater, and more special events planned.",
+            "California has nine national parks — more than almost any other state. From ancient redwood forests taller than a 30-story building in the north, to the dramatic valleys and granite cliffs of Yosemite, to the moonlike lava landscapes of Lassen Volcanic — it's all right here in your backyard!"
+          ],
+          "links": [
+            {
+              "label": "California April Events",
+              "url": "https://www.visitcalifornia.com/experience/april-events-california/"
+            }
+          ]
+        },
+        {
+          "headline": "New Children's Woodland Opens at California Botanic Garden 🌸",
+          "body": [
+            "The California Botanic Garden in Claremont just opened a brand-new Children's Woodland — an outdoor space designed especially for kids to explore, discover, and play among native California plants! It opened on April 10–11, drawing families from across the state.",
+            "What makes this garden special is that it only features plants that naturally grow in California — plants that local birds, butterflies, and bees depend on. Exploring native plants is a great way to understand and appreciate the ecosystem right outside your door."
+          ],
+          "links": [
+            {
+              "label": "Children's Woodland Opens",
+              "url": "https://www.dailybulletin.com/2026/04/16/california-botanic-garden-in-claremont-opens-new-space-for-children/"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "gymnastics_corner",
+      "title": "🤸 Gymnastics Corner",
+      "render_title": "Chalk Up! Championship Season Just Peaked 🏅",
+      "section_intro": "Two incredible stories from college gymnastics this week — a comeback championship and a history-making farewell!",
+      "block_type": "interest_feature",
+      "link_style": "link-rose",
+      "items": [
+        {
+          "headline": "Oklahoma Wins the 2026 NCAA Championship — Fighting Back on Beam! 🥇",
+          "body": [
+            "The University of Oklahoma won the 2026 NCAA Women's Gymnastics Championships on April 18 — their eighth national title in program history! It wasn't easy: Oklahoma stumbled on the balance beam early in the competition and fell behind Louisiana State University (LSU). But they came back strong in the final rotation to take the title.",
+            "The balance beam is only 4 inches wide — about the width of your hand — and gymnasts flip and leap on it at full speed. Recovering from a tough beam rotation and still winning the whole meet takes serious mental toughness. Oklahoma proved that champions never stop fighting! 💪"
+          ],
+          "links": [
+            {
+              "label": "Oklahoma Wins 2026 Title",
+              "url": "https://www.olympics.com/en/news/oklahoma-wins-2026-ncaa-women-s-gymnastics-championships-title"
+            }
+          ]
+        },
+        {
+          "headline": "Brie Clark Made History — and Did It for Her Younger Self 🌟",
+          "body": [
+            "Brie Clark of Clemson University just finished the final routine of her college gymnastics career — and what a career it was! She became the very first Clemson gymnast to qualify for the NCAA Championships, the program's first-ever All-American, and part of Clemson's first ACC championship team. She's written her name into the record books for good.",
+            "After her last routine, Brie said she wanted to 'make little Brie proud' — the little girl who first fell in love with gymnastics years ago. That's one of the most beautiful things about sports: the athlete you become is a gift to the kid you once were. 🤸‍♀️"
+          ],
+          "links": [
+            {
+              "label": "Brie Clark's Story",
+              "url": "https://www.olympics.com/en/news/brie-clark-reflects-final-routine-college-career"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "money_moves",
+      "title": "💰 Money Moves",
+      "render_title": "From Piggy Banks to Big Ideas: Think Like an Entrepreneur 💡",
+      "section_intro": null,
+      "block_type": "story_list",
+      "link_style": "link-amber",
+      "items": [
+        {
+          "headline": "How One Family Helped Their Kids Earn $10,000 Before High School 🚀",
+          "body": [
+            "One mom shared how she taught her kids to think like entrepreneurs from a very young age — and by the time they were teenagers, they had earned about $10,000 combined! The secret wasn't luck. She taught them to see every problem as a possible business opportunity, and every dollar earned as something to budget thoughtfully rather than spend immediately.",
+            "The biggest lesson she passed on: entrepreneurs don't ask 'what can I buy?' — they ask 'what problem can I solve for someone else?' Whether it's making something, offering a service to neighbors, or turning a skill into a small business, the entrepreneurial mindset is something you can start building right now."
+          ],
+          "analogy": null,
+          "links": [
+            {
+              "label": "Teaching Kids to Think Like Entrepreneurs",
+              "url": "https://www.businessinsider.com/teaching-kids-entrepreneurship-money-lessons-2024-11"
+            }
+          ]
+        },
+        {
+          "headline": "The Savings Match Game — A Trick Grown-Ups Use Too 🎮",
+          "body": [
+            "Here's a smart way to grow your savings faster: ask a parent or family member to match a portion of what you save. For example, for every $5 you put away, they chip in $2 extra. This isn't just a game — it's exactly how many adult jobs work! It's called a '401(k) match,' and financial experts say it's one of the most powerful money tools available.",
+            "The key is building the habit first. Experts say if you do something consistently for 2–3 months, it starts to feel automatic. Start with even a small amount each week, keep it up, and the money — and the habit — will both grow."
+          ],
+          "analogy": null,
+          "links": [
+            {
+              "label": "5 Ways to Build Financial Smarts",
+              "url": "https://www.entrepreneur.com/money-finance/5-ways-to-build-your-kids-financial-literacy/367183"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "sophies_challenge",
+      "title": "🧩 Weekly Challenge",
+      "render_title": "Mission Control: Can You Do the Math? 🚀",
+      "section_intro": null,
+      "block_type": "challenge",
+      "link_style": "link-orange",
+      "items": [
+        {
+          "prompt_intro": "This week in World Watch, we learned that NASA's Artemis II mission splashed down safely after a 10-day journey to the Moon and back! The Moon is about 240,000 miles from Earth, and the Orion spacecraft traveled there at an average speed of about 2,500 miles per hour.",
+          "prompt": "How many hours did it take the spacecraft to travel from Earth to the Moon? Then figure out: how many full days is that? Finally, what percentage of the 10-day mission (which equals 240 hours) was spent just on the one-way trip to the Moon?",
+          "bonus": "There were 4 astronauts on Artemis II. If each astronaut needed to complete 6 safety checks per day during the 10-day mission, how many total safety checks did the whole crew complete?",
+          "hint": "For the travel time, use: Time = Distance divided by Speed. So divide 240,000 by 2,500. Then divide your answer by 24 to get days. For the percentage, divide your travel hours by 240 (total mission hours) and multiply by 100.",
+          "links": [
+            {
+              "label": "Artemis II Splashdown",
+              "url": "https://newsforkids.net/category/all_news/science/"
+            }
+          ]
+        }
+      ],
+      "links": []
+    }
+  ],
+  "footer": {
+    "issue_number": 5,
+    "issue_date_display": "April 20, 2026",
+    "tagline": "Made with love by Dad & Claude 🤖❤️",
+    "location_line": "Fremont, California ↔ Singapore"
+  }
+}

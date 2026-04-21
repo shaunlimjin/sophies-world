@@ -56,6 +56,13 @@ A working backlog for improving the newsletter generator and delivery flow.
 - Add a kid entrepreneurship tracker or recurring savings challenge over multiple weeks.
 - Add a feedback loop where Shaun can mark sections as hits or misses, and future prompts adapt.
 
+## Shortlisted
+
+Features actively being considered for near-term implementation:
+
+- **Pluggable hosted model support.** Refactor `hosted_llm_provider.py` so the model (e.g. Claude Sonnet vs Opus, or a future alternative) can be configured per-child or per-mode without code changes — likely a `model` field in `sophie.yaml` or `sections.yaml`.
+- **Local model support.** Add a local model content provider (e.g. Ollama) as an alternative to hosted providers, for offline use or cost reduction — should fit the existing provider interface so it is selectable via `content_provider` in config.
+
 ## Recommended Next Few
 
 If we want the highest leverage next steps, I’d start here:

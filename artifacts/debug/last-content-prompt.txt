@@ -3,10 +3,10 @@ You are generating structured newsletter content for Sophie's World.
 Return valid JSON only. Do not return HTML. Do not use markdown fences. Do not include commentary.
 
 Issue metadata:
-- issue_date: 2026-04-19
-- issue_number: 4
+- issue_date: 2026-04-20
+- issue_number: 5
 - child_id: sophie
-- formatted_date: April 19, 2026
+- formatted_date: April 20, 2026
 
 Child summary:
 {
@@ -232,7 +232,8 @@ Block-type item contracts:
       ]
     },
     "quality_notes": [
-      "one strong spotlight item is better than several thin ones",
+      "return 1-2 spotlight items; prefer 2 when you have two distinct strong ideas",
+      "if the second item would feel weak or repetitive, return 1 strong item instead",
       "headline should be specific and exciting"
     ]
   },
@@ -286,12 +287,12 @@ Block-type item contracts:
 }
 
 Previously covered headlines to avoid repeating:
-- 🚢 The World's Most Important Doorway Opens Again
-- 🕊️ The Fight in Ukraine Continues — Russia Launches Massive Attack
-- 🌊 The World's Tallest Indoor Waterfall Is in Singapore!
-- 🦁 The "Lion City" That Never Had Lions!
-- 🐱 Katseye SLAYS Coachella! #KATSCHELLA
-- 💗 BLACKPINK's Jennie Gets Award Nomination!
+- 💸 The US–China Trade War Heats Up
+- 🌊 Scientists Sound the Alarm on Coral Reefs
+- 🍜 Singapore's Hawker Centers Are a UNESCO World Treasure
+- 🌿 Singapore: The City That Grows Gardens Between Skyscrapers
+- 🌍 Earth Day Is This Week — and California Is Leading the Charge
+- ⚡ Fremont's Own Factory Is Changing How We Drive
 
 Return JSON with this top-level structure:
 {
@@ -328,6 +329,7 @@ Rules:
 - Use block-type-appropriate item shapes from the contracts above.
 - Links must be structured objects with label and url.
 - Prefer 1-2 strong items over many weak ones.
+- For `spotlight`, usually return 2 items when there are two clearly distinct good ideas; fall back to 1 only when the second would be weak or repetitive.
 - Write for a smart 4th grader: warm, energetic, easy to follow, but not babyish.
 - For `challenge`, split the content cleanly across `prompt_intro`, `prompt`, optional `bonus`, and `hint` so the renderer can avoid one squished text blob.
 - `greeting_text` must NOT start with another greeting like "Hi Sophie" or include day-of-week phrasing like "Happy Saturday".

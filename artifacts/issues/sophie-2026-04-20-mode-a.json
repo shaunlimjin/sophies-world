@@ -1,0 +1,291 @@
+{
+  "issue_date": "2026-04-20",
+  "issue_number": 5,
+  "child_id": "sophie",
+  "child_name": "Sophie",
+  "theme_id": "default",
+  "editorial": {
+    "reading_level": "4th grade",
+    "tone": [
+      "warm",
+      "fun",
+      "curious"
+    ],
+    "use_emojis": true,
+    "global_source_preferences": [
+      "Time for Kids",
+      "NewsForKids.net",
+      "Britannica",
+      "BBC Newsround",
+      "Nat Geo Kids"
+    ]
+  },
+  "greeting_text": "Your fifth issue of <span>Sophie's World</span> is here — packed with wild facts, big news, and one seriously tricky puzzle! 🌍✨",
+  "sections": [
+    {
+      "id": "weird_but_true",
+      "title": "🤔 Weird But True",
+      "render_title": "You Won't Believe These Are Real! 🤯",
+      "section_intro": "Nature is absolutely full of surprises — here are three that might make you say \"No way!\"",
+      "block_type": "fact_list",
+      "link_style": "link-purple",
+      "items": [
+        {
+          "title": "Octopuses have THREE hearts 🐙",
+          "body": "An octopus has three hearts pumping blue blood through its body. Two hearts push blood to the gills, and one pumps it everywhere else. But here is the wild part — when an octopus swims, two of its hearts actually stop beating! That is why octopuses prefer crawling around. No wonder they are one of the ocean's biggest mysteries."
+        },
+        {
+          "title": "Honey lasts forever 🍯",
+          "body": "Archaeologists found honey inside ancient Egyptian tombs that was over 3,000 years old — and it was still perfectly edible! Honey never spoils because it is so thick and acidic that bacteria cannot survive in it. That means the honey sitting in your kitchen could theoretically outlast almost anything on Earth."
+        },
+        {
+          "title": "A group of flamingos is called a 'flamboyance' 🦩",
+          "body": "Scientists did not just pick that name randomly — a flamboyance perfectly captures how these pink birds look when they gather in huge, showy crowds. Flamingos actually get their pink color from the tiny shrimp and algae they eat. A flamingo raised without that food would turn completely white!"
+        }
+      ],
+      "links": [
+        {
+          "label": "Wild Animal Facts at Nat Geo Kids",
+          "url": "https://kids.nationalgeographic.com/animals"
+        },
+        {
+          "label": "Weird Science at Britannica Kids",
+          "url": "https://kids.britannica.com/"
+        }
+      ]
+    },
+    {
+      "id": "world_watch",
+      "title": "🌍 World Watch",
+      "render_title": "Big Stories From Around the Globe 🗺️",
+      "section_intro": "Two stories shaping the world this week — let's break them down together!",
+      "block_type": "story_list",
+      "link_style": "link-green",
+      "items": [
+        {
+          "headline": "Trade Troubles Are Making Everyday Prices Climb 📦",
+          "body": [
+            "You may have noticed that some things at the store cost more than they used to. A big reason is tariffs — special taxes that countries charge on goods coming in from other countries. The United States and China have been putting high tariffs on each other's products, and that has sent companies scrambling to find new ways to make and ship their goods.",
+            "Countries like Vietnam, India, and Mexico are now building more factories than ever before, because companies are moving there to avoid the extra taxes. But change takes time, and while businesses are adjusting, shoppers — including families like yours — are often paying higher prices at the checkout counter."
+          ],
+          "analogy": "Imagine your friend charges you 25 extra cents every time you buy a pencil from her. You would probably start buying pencils from someone else — but while you are switching, you might go without pencils for a bit. That is kind of what is happening with countries and trade right now.",
+          "links": [
+            {
+              "label": "What Are Tariffs? (Time for Kids)",
+              "url": "https://www.timeforkids.com/"
+            },
+            {
+              "label": "Trade Explained at NewsForKids",
+              "url": "https://newsforkids.net/"
+            }
+          ]
+        },
+        {
+          "headline": "The Moon Race Is Back — and It Is Bigger Than Ever 🌕🚀",
+          "body": [
+            "More than 50 years after the first Moon landing, humans are gearing up to go back — and this time, countries from all over the world want to be part of it. NASA's Artemis program is aiming to land astronauts near the Moon's south pole, where scientists believe frozen water might be hiding in deep craters that never see sunlight. China and India are sending spacecraft there too.",
+            "Why does frozen Moon water matter so much? If astronauts can use that water, they can make drinking water, produce breathable oxygen, and even create rocket fuel right on the Moon. That would make it far easier to one day send humans all the way to Mars. The Moon could become humanity's first real pit stop in deep space!"
+          ],
+          "analogy": "Finding water on the Moon is like discovering a gas station in the middle of a very long road trip. It completely changes how far you can travel.",
+          "links": [
+            {
+              "label": "NASA Artemis Program",
+              "url": "https://www.nasa.gov/specials/artemis/"
+            },
+            {
+              "label": "Moon Facts at Nat Geo Kids",
+              "url": "https://kids.nationalgeographic.com/space/article/moon"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "singapore_spotlight",
+      "title": "🇸🇬 Singapore Spotlight",
+      "render_title": "Amazing Things About the Little Red Dot 🔴",
+      "block_type": "spotlight",
+      "link_style": "link-pink",
+      "items": [
+        {
+          "headline": "Changi Airport: The World's Most Amazing Airport 🛫",
+          "body": [
+            "Singapore's Changi Airport has been voted the world's best airport more times than any other airport on the planet — and once you see it, it is easy to understand why. Inside, there is a seven-storey indoor waterfall called the Rain Vortex that drops water through a giant hole in a glass roof. There are also indoor gardens, a cinema, a swimming pool, and hundreds of places to eat and shop.",
+            "Changi handles over 60 million passengers a year, which is about the same as the entire population of Italy passing through in 12 months. For a country no bigger than a small city, having one of the world's greatest airports is a huge deal — it connects Singapore to almost everywhere on Earth."
+          ],
+          "links": [
+            {
+              "label": "Changi Airport at Britannica",
+              "url": "https://www.britannica.com/topic/Changi-Airport"
+            },
+            {
+              "label": "Singapore at Nat Geo Kids",
+              "url": "https://kids.nationalgeographic.com/geography/countries/article/singapore"
+            }
+          ]
+        },
+        {
+          "headline": "The World's First Nocturnal Zoo 🌙🐆",
+          "body": [
+            "Singapore is home to something found nowhere else on Earth: a zoo designed entirely for nighttime visits! The Night Safari opened in 1994 and lets visitors walk through the jungle after dark to see animals that are naturally active at night — like leopards, tapirs, fishing cats, and giant flying squirrels.",
+            "The zoo uses special warm-tinted lights that do not bother the animals but let visitors see clearly. More than 900 animals from over 100 species roam in large open areas that feel like real wild jungle. It is one of the most magical wildlife experiences anywhere in the world — and it is right in the heart of Singapore!"
+          ],
+          "links": [
+            {
+              "label": "Singapore Night Safari",
+              "url": "https://www.wrs.com.sg/en/night-safari.html"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usa_corner",
+      "title": "🇺🇸 USA Corner",
+      "render_title": "From the Golden State and Beyond 🌊☀️",
+      "block_type": "spotlight",
+      "link_style": "link-blue",
+      "items": [
+        {
+          "headline": "California Is Turning Used Water Into Drinking Water 💧",
+          "body": [
+            "California has a tough challenge: the state has millions of people but not always enough rain to keep up. So engineers came up with a bold solution — cleaning used water so thoroughly that it becomes safe to drink again! This process, called advanced water recycling, pushes water through layers of filtration, ultraviolet light, and super-fine membranes that remove anything harmful.",
+            "The Orange County Water District has been doing this for years, and now cities across California are building their own systems. It might sound strange at first, but the science is solid — the recycled water is cleaner than most tap water anywhere in the world. California is once again proving that tackling a hard problem with smart thinking can change everything."
+          ],
+          "links": [
+            {
+              "label": "Water Recycling Explained (Britannica Kids)",
+              "url": "https://kids.britannica.com/"
+            },
+            {
+              "label": "California Environment at Time for Kids",
+              "url": "https://www.timeforkids.com/"
+            }
+          ]
+        },
+        {
+          "headline": "America's National Parks Turn 110! 🏕️🦅",
+          "body": [
+            "The National Park Service, which protects places like Yosemite, the Grand Canyon, and Yellowstone, is celebrating a big milestone. These parks protect some of the most stunning land on Earth — and California alone has nine of them, including Yosemite National Park, which is just a few hours from Fremont!",
+            "National parks are free for kids under 15, and families with a fourth grader can even get a free annual pass through the Every Kid Outdoors program. From giant sequoia trees taller than a 26-storey building to geysers that shoot boiling water 60 metres into the air, America's parks are like nothing else in the world."
+          ],
+          "links": [
+            {
+              "label": "Every Kid Outdoors Pass",
+              "url": "https://everykidoutdoors.gov/"
+            },
+            {
+              "label": "US National Parks at Nat Geo Kids",
+              "url": "https://kids.nationalgeographic.com/nature/national-parks"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gymnastics_corner",
+      "title": "🤸 Gymnastics Corner",
+      "render_title": "Flip, Twist, and Stick the Landing! 🏅",
+      "block_type": "interest_feature",
+      "link_style": "link-rose",
+      "items": [
+        {
+          "headline": "Simone Biles: The Athlete Who Rewrote the Rules 🌟",
+          "body": [
+            "Simone Biles is not just a great gymnast — she may be the greatest athlete in the history of gymnastics, full stop. She has won more World Championship medals than any other gymnast, male or female, in the sport's entire history. She performs skills so difficult that the gymnastics rulebook had to add brand-new moves named after her, including a double-layout with a half twist on floor that no one else dares to try in competition.",
+            "What makes Simone extra special is her courage off the mat too. At the 2020 Tokyo Olympics, she stepped back to protect her mental health when things got hard — and then came back at the 2024 Paris Olympics to win more gold. She shows that being truly strong means knowing when to take care of yourself. If you dream of gymnastics, Simone is proof that hard work, focus, and bravery can take you all the way."
+          ],
+          "links": [
+            {
+              "label": "Simone Biles at Olympics.com",
+              "url": "https://olympics.com/en/athletes/simone-biles"
+            },
+            {
+              "label": "USA Gymnastics",
+              "url": "https://usagym.org/"
+            }
+          ]
+        },
+        {
+          "headline": "The Secret to a Perfect Cartwheel 🤸‍♀️",
+          "body": [
+            "Every amazing gymnastics routine starts with the basics — and the cartwheel is one of the most important foundation skills in the sport. The key to a clean cartwheel is thinking of it like a spinning wheel: your arms and legs should each touch the ground in a straight line, and your whole body turns sideways through the air like a rolling tyre.",
+            "Here is a tip top coaches give beginners: imagine doing your cartwheel along a straight chalk line on the floor. Your hands and feet should all land directly on that line. Keep your arms and legs as straight as possible, and look at your hands while they are on the ground. With practice it starts to feel natural — and it opens the door to roundoffs, back walkovers, and so much more!"
+          ],
+          "links": [
+            {
+              "label": "Gymnastics at Britannica Kids",
+              "url": "https://kids.britannica.com/students/article/gymnastics/274527"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "money_moves",
+      "title": "💰 Money Moves",
+      "render_title": "Smart Money Habits for Future Go-Getters 💸",
+      "block_type": "story_list",
+      "link_style": "link-amber",
+      "items": [
+        {
+          "headline": "The Golden Rule: Pay Yourself First 🏦",
+          "body": [
+            "Most people spend money first and save whatever is left over — which is often nothing! But here is a smarter approach: save first, then spend what remains. This is called paying yourself first, and it is one of the most powerful money habits you can ever build. Every time you get money — from allowance, a birthday card, or helping a neighbour — put a portion straight into savings before spending a single cent.",
+            "Even saving just 10 cents from every dollar adds up faster than you would think. If you save 20 cents from every dollar and you receive $10 a week, after a year you would have saved $104 — before counting any interest the bank might pay you. The habit itself is the superpower. The best time to start? Right now."
+          ],
+          "links": [
+            {
+              "label": "Money Basics for Kids at Britannica",
+              "url": "https://kids.britannica.com/"
+            }
+          ]
+        },
+        {
+          "headline": "Meet Moziah Bridges: The Kid Who Built a Bow Tie Empire 🎀",
+          "body": [
+            "When Moziah Bridges was just 9 years old in Memphis, Tennessee, he could not find bow ties he liked — so he asked his grandmother to teach him to sew, and he started making his own. His bow ties were so colourful and stylish that he began selling them, naming his company Mo's Bows.",
+            "By age 12, Moziah appeared on the TV show Shark Tank and impressed everyone with his business knowledge. His company kept growing, and he eventually landed a licensing deal with the NBA. Moziah's story shows that you do not have to wait until you are grown up to build a real business. You just need a great idea, a willingness to learn, and someone who believes in you."
+          ],
+          "links": [
+            {
+              "label": "Kid Entrepreneurs at NewsForKids",
+              "url": "https://newsforkids.net/"
+            },
+            {
+              "label": "Entrepreneurship for Kids",
+              "url": "https://kids.britannica.com/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sophies_challenge",
+      "title": "🧩 Weekly Challenge",
+      "render_title": "Can You Crack This Week's Puzzle? 🔍",
+      "block_type": "challenge",
+      "link_style": "link-orange",
+      "items": [
+        {
+          "prompt_intro": "This week in World Watch, we learned how tariffs are making everyday products cost more. Tariffs are often shown as percentages — and percentages are something a sharp 4th grader like you can definitely tackle!",
+          "prompt": "A pair of sneakers normally costs $40. Because of new tariffs, the price goes up by 25%. What is the new price of one pair of sneakers? If your mum wants to buy 2 pairs — one for you and one for your brother — how much will she pay in total?",
+          "bonus": "Your family has a shoe budget of $100. If every pair of sneakers now costs the new tariff price, how many pairs can you buy? Will there be any money left over?",
+          "hint": "To find 25% of a number, divide it by 4. Then add that amount to the original price to get the new total. Try it on $40 first!",
+          "links": [
+            {
+              "label": "Percentages Practice at Britannica Kids",
+              "url": "https://kids.britannica.com/"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "issue_number": 5,
+    "issue_date_display": "April 20, 2026",
+    "tagline": "Made with love by Dad & Claude 🤖❤️",
+    "location_line": "Fremont, California ↔ Singapore"
+  }
+}

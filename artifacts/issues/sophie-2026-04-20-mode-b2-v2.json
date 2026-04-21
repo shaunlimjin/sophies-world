@@ -1,0 +1,270 @@
+{
+  "issue_date": "2026-04-20",
+  "issue_number": 5,
+  "child_id": "sophie",
+  "child_name": "Sophie",
+  "theme_id": "default",
+  "editorial": {
+    "reading_level": "4th grade",
+    "tone": [
+      "warm",
+      "fun",
+      "curious"
+    ],
+    "use_emojis": true,
+    "global_source_preferences": [
+      "Time for Kids",
+      "NewsForKids.net",
+      "Britannica",
+      "BBC Newsround",
+      "Nat Geo Kids"
+    ]
+  },
+  "greeting_text": "Issue #5 of <span>Sophie's World</span> is here — real astronauts, a monster earthquake, gymnastics perfection, and wild secrets about the Lion City! 🚀🌏",
+  "sections": [
+    {
+      "id": "weird_but_true",
+      "title": "🤔 Weird But True",
+      "render_title": "Nature's Strangest Secrets",
+      "section_intro": "These animal facts are so wild, you might have to read them twice!",
+      "block_type": "fact_list",
+      "link_style": "link-purple",
+      "items": [
+        {
+          "title": "Giraffes use their tongues as face washers! 👅",
+          "body": "A giraffe's tongue is about 18 inches long — longer than a ruler — and they actually use it to clean their own eyes and ears. Next time you wash your face, be glad you have hands."
+        },
+        {
+          "title": "A blue whale's tongue weighs more than an elephant 🐋",
+          "body": "Blue whales are the biggest animals on Earth, and their tongues alone can weigh as much as a full-grown elephant — around 4 tons! That's one seriously heavy taste bud."
+        },
+        {
+          "title": "Kangaroos can only move forward 🦘",
+          "body": "A kangaroo's powerful back legs and long tail make it physically impossible to hop in reverse. They literally cannot go backwards! That's actually why the kangaroo appears on Australia's coat of arms — as a symbol of always moving forward."
+        }
+      ],
+      "links": [
+        {
+          "label": "More Wild Animal Facts at Nat Geo Kids",
+          "url": "https://kids.nationalgeographic.com/nature/article/animal-myths-busted"
+        }
+      ]
+    },
+    {
+      "id": "world_watch",
+      "title": "🌍 World Watch",
+      "render_title": "Big Stories Shaking Up the World This Week",
+      "section_intro": "One story happened in outer space, and one happened right under the ocean — both are incredible.",
+      "block_type": "story_list",
+      "link_style": "link-green",
+      "items": [
+        {
+          "headline": "NASA's Artemis II Crew Returns Safely After Flying Around the Moon",
+          "body": [
+            "Last week, four astronauts completed NASA's Artemis II mission — the first time humans have traveled beyond low Earth orbit in over 50 years! Their Orion spacecraft flew all the way around the Moon, then splashed down safely in the Pacific Ocean. The whole world was watching.",
+            "This is a massive moment in space history. The last time people traveled that far from Earth was during the Apollo 17 mission back in 1972. Artemis II paves the way for future missions that could land astronauts on the Moon again — and eventually send humans to Mars."
+          ],
+          "analogy": "Think of Artemis II like a test drive before a big road trip. Before heading across the country, you do a loop around the neighborhood first to make sure the car is working perfectly. These astronauts did the ultimate test drive — all the way around the Moon and back!",
+          "links": [
+            {
+              "label": "Artemis II Splashdown at NewsForKids",
+              "url": "https://newsforkids.net/category/all_news/science/"
+            }
+          ]
+        },
+        {
+          "headline": "Powerful 7.7 Earthquake Strikes Japan, Tsunami Warnings Issued",
+          "body": [
+            "Today, a massive earthquake measuring 7.7 on the Richter scale struck off the northern coast of Japan. Tsunami warnings went out immediately, and people near the coast were told to evacuate to higher ground to stay safe. It was one of the strongest earthquakes to hit the region in years.",
+            "Japan sits in an area called the Ring of Fire, where many of the world's earthquakes and volcanoes happen. Japanese people practice earthquake drills regularly, and buildings there are specially designed to flex and sway without collapsing — which helps save lives when big quakes hit."
+          ],
+          "analogy": "An earthquake under the ocean is like dropping a heavy rock into a bathtub full of water — it sends ripples radiating outward in every direction. When those ripples are massive ocean waves traveling at jet-plane speeds, we call them tsunamis.",
+          "links": [
+            {
+              "label": "Japan Earthquake Updates at The Guardian",
+              "url": "https://www.theguardian.com/world/live/2026/apr/20/japan-tsunami-earthquake-sanriku-latest-news-updates"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "singapore_spotlight",
+      "title": "🇸🇬 Singapore Spotlight",
+      "render_title": "Secrets of the Lion City You Never Knew",
+      "block_type": "spotlight",
+      "link_style": "link-pink",
+      "items": [
+        {
+          "headline": "Singapore's Most Famous Symbol Is Half Lion, Half Fish 🦁🐟",
+          "body": [
+            "Meet the Merlion — Singapore's national symbol and one of the most recognized sculptures in the world! It has the head of a lion and the body of a fish, and it stands proudly at Marina Bay looking out over the water.",
+            "The name 'Singapore' comes from an old Sanskrit word meaning 'Lion City.' The fish tail represents the island's history as a small fishing village, while the lion head stands for strength and courage. Legends say an ancient prince once spotted a lion on the island and named it after the majestic cat — even though scientists think no wild lions ever actually lived there!"
+          ],
+          "links": [
+            {
+              "label": "The Merlion at Britannica Kids",
+              "url": "https://kids.britannica.com/students/assembly/view/139715"
+            }
+          ]
+        },
+        {
+          "headline": "Wild Tigers Once Roamed the Streets of Singapore 🐯",
+          "body": [
+            "Here's a fact that might surprise you: wild tigers actually lived in Singapore until around 1930! As the city grew and forests were cleared to make room for buildings, the tigers slowly disappeared from the wild.",
+            "Today, Singapore is one of the most modern cities on Earth — with gleaming skyscrapers, a world-famous airport, and one of the busiest ports on the planet. But just a century ago, you might have bumped into a tiger taking a stroll through the jungle. You can still see tigers safely at the Singapore Zoo today!"
+          ],
+          "links": [
+            {
+              "label": "More Singapore Facts for Kids",
+              "url": "https://worldoftravelswithkids.com/interesting-singapore-facts-for-kids/"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "usa_corner",
+      "title": "🇺🇸 USA Corner",
+      "render_title": "California Is Full of Amazing New Things",
+      "block_type": "spotlight",
+      "link_style": "link-blue",
+      "items": [
+        {
+          "headline": "A Brand-New Science Museum Just for Kids Opens in California! 🔬",
+          "body": [
+            "California just got a brilliant new destination — the KidSTREAM museum, built specifically for curious kids who love learning through doing. It was dreamed up by a former teacher who was searching for a place to take her young daughters and realized nothing quite like it existed.",
+            "The museum cost $7 million to build and is packed with hands-on activities connecting science, technology, reading, engineering, art, and math. If you're ever looking for an unforgettable Saturday adventure, this sounds like the place to go!"
+          ],
+          "links": [
+            {
+              "label": "KidSTREAM Museum Story at the NY Times",
+              "url": "https://www.nytimes.com/2026/04/19/arts/children-kidstream-museum-california-science.html"
+            }
+          ]
+        },
+        {
+          "headline": "California Botanic Garden Opens a Magical New Space for Children 🌿",
+          "body": [
+            "The California Botanic Garden in Claremont — which showcases plants native to California — just opened a brand-new Children's Woodland area! Families from all over the region came out to explore the outdoor space when it opened earlier this month.",
+            "The garden is a great reminder that California has some of the most incredible plants and nature in the world, from giant redwood trees to desert wildflowers. The new children's area is designed to get kids outside, curious, and connected to nature."
+          ],
+          "links": [
+            {
+              "label": "Children's Woodland Opening at Daily Bulletin",
+              "url": "https://www.dailybulletin.com/2026/04/16/california-botanic-garden-in-claremont-opens-new-space-for-children/"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "gymnastics_corner",
+      "title": "🤸 Gymnastics Corner",
+      "render_title": "Perfect 10s, Championships, and a 15-Year-Old Superstar!",
+      "section_intro": "This week in gymnastics was electric — history was made on the vault, and a teenager took everyone by surprise.",
+      "block_type": "interest_feature",
+      "link_style": "link-rose",
+      "items": [
+        {
+          "headline": "Oklahoma Wins the NCAA Women's Gymnastics Championship — and LSU Lands a Perfect 10! 🏆",
+          "body": [
+            "On April 18, the University of Oklahoma gymnasts claimed their 8th NCAA Women's Gymnastics Championship title! They came back from some tough balance beam scores to beat LSU in the final rotation — a real nail-biter finish.",
+            "But LSU had their own moment to celebrate: gymnast Kailin Chio made history by scoring a perfect 10 on vault — the first perfect vault score in LSU's entire history at the NCAA Championships! A perfect 10 means the routine was absolutely flawless. Not a single point taken away. Judges saw nothing to improve. That almost never happens!"
+          ],
+          "links": [
+            {
+              "label": "Oklahoma's Championship Win at Olympics.com",
+              "url": "https://www.olympics.com/en/news/oklahoma-wins-2026-ncaa-women-s-gymnastics-championships-title"
+            },
+            {
+              "label": "Full Highlights at Gymnastics Now",
+              "url": "https://gymnastics-now.com/2026-ncaa-womens-gymnastics-championships-final-live-updates-scores-results/"
+            }
+          ]
+        },
+        {
+          "headline": "Meet 15-Year-Old Nishiyama Misa — Japan's Gymnastics Surprise! 🇯🇵",
+          "body": [
+            "At the All-Japan Gymnastics All-Around Championships, a 15-year-old named Nishiyama Misa stunned everyone by jumping to the top of the leaderboard in the women's qualification round. She was one of the youngest gymnasts in the competition — and she's already leading it!",
+            "It is so exciting to watch young gymnasts rise to the top of major competitions. With the 2028 Olympics just around the corner, Nishiyama Misa is definitely a name to remember. Who knows — maybe she'll be competing for a gold medal in a couple of years!"
+          ],
+          "links": [
+            {
+              "label": "Nishiyama Misa at Olympics.com",
+              "url": "https://www.olympics.com/en/news/all-japan-all-around-championships-2026-women-qualification"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "money_moves",
+      "title": "💰 Money Moves",
+      "render_title": "Kid Entrepreneurs Who Made It Real",
+      "block_type": "story_list",
+      "link_style": "link-amber",
+      "items": [
+        {
+          "headline": "She Turned a Big Idea Into a Real Business — Meet Simone Hufana",
+          "body": [
+            "Simone Hufana looked at the shelves of coloring books and thought: where are the books celebrating women who look like me? Instead of just wishing they existed, she created them. Her business, Color Herstory, is a series of coloring books celebrating influential women of color.",
+            "Simone now works at a nonprofit helping young girls — and she still runs Color Herstory on the side. Her story is a perfect example of the best kind of business: one that solves a real problem you actually care about. You don't need to be a grown-up to spot a gap and fill it."
+          ],
+          "links": [
+            {
+              "label": "Kid Business Ideas at Shopify",
+              "url": "https://www.shopify.com/blog/business-ideas-for-kids"
+            }
+          ]
+        },
+        {
+          "headline": "The 3-Jar Money Rule That Even a 6-Year-Old Can Use 🏺",
+          "body": [
+            "Shark Tank investor Daymond John has three daughters, and he teaches them a simple money habit: every time you earn money, split it into three jars — one for spending now, one for saving for something bigger, and one for giving to others or a cause you care about.",
+            "Even if you earn just $5 from chores, try putting $2 in savings, $2 for spending, and $1 to give. Over time your savings jar grows — and more importantly, so does the habit of thinking about money wisely. That habit is worth more than any single jar!"
+          ],
+          "links": [
+            {
+              "label": "Daymond John's Money Tips for Kids",
+              "url": "https://www.marieforleo.com/blog/daymond-john-money"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "sophies_challenge",
+      "title": "🧩 Weekly Challenge",
+      "render_title": "Can You Crack This Earthquake Puzzle?",
+      "block_type": "challenge",
+      "link_style": "link-orange",
+      "items": [
+        {
+          "prompt_intro": "In this week's World Watch, we learned about the powerful 7.7 magnitude earthquake that hit Japan today. Japan is one of the most earthquake-prone places on Earth — scientists estimate that about 1,500 earthquakes happen there every single year! Most are too small to notice, but not all of them.",
+          "prompt": "About 1 out of every 5 earthquakes in Japan is strong enough for people to actually feel the ground shaking. If Japan has 1,500 earthquakes per year, how many earthquakes can Japanese people feel each year? Then, if those earthquakes are spread evenly across all 12 months, how many would that be per month?",
+          "bonus": "The Richter scale works in a fascinating way — each whole number up is 10 times more powerful than the one before it. So a 3.0 is 10 times stronger than a 2.0, and a 4.0 is 10 times stronger than a 3.0. How many times more powerful is a 4.0 earthquake than a 2.0 earthquake?",
+          "hint": "For the first part, divide 1,500 by 5 to find the yearly total, then divide that answer by 12 for the monthly number. For the bonus, think about what happens when you multiply 10 by 10 — because you are jumping up two whole steps on the scale.",
+          "links": [
+            {
+              "label": "Japan Earthquake Story at The Guardian",
+              "url": "https://www.theguardian.com/world/live/2026/apr/20/japan-tsunami-earthquake-sanriku-latest-news-updates"
+            }
+          ]
+        }
+      ],
+      "links": []
+    }
+  ],
+  "footer": {
+    "issue_number": 5,
+    "issue_date_display": "April 20, 2026",
+    "tagline": "Made with love by Dad & Claude 🤖❤️",
+    "location_line": "Fremont, California ↔ Singapore"
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "issue_date": "2026-04-20",
+  "issue_number": 5,
+  "child_id": "sophie",
+  "child_name": "Sophie",
+  "theme_id": "default",
+  "editorial": {
+    "reading_level": "4th grade",
+    "tone": [
+      "warm",
+      "fun",
+      "curious"
+    ],
+    "use_emojis": true,
+    "global_source_preferences": [
+      "Time for Kids",
+      "NewsForKids.net",
+      "Britannica",
+      "BBC Newsround",
+      "Nat Geo Kids"
+    ]
+  },
+  "greeting_text": "Issue #5 of <span>Sophie's World</span> is here — moonshots, earthquakes, perfect 10s, and a teen who turned babysitting money into a real business! 🚀",
+  "sections": [
+    {
+      "id": "weird_but_true",
+      "title": "🤔 Weird But True",
+      "render_title": "Nature's Most Outrageous Secrets 🤯",
+      "block_type": "fact_list",
+      "link_style": "link-purple",
+      "items": [
+        {
+          "title": "Kangaroos Can Only Hop Forward 🦘",
+          "body": "A kangaroo's powerful back legs and heavy tail work so well together that it is physically impossible for them to move backward! That's why the kangaroo appears on Australia's coat of arms — it's a symbol of always moving forward. No reverse gear for these guys!"
+        },
+        {
+          "title": "A Blue Whale's Tongue Weighs as Much as an Elephant 🐋",
+          "body": "Blue whales are the largest animals ever to live on Earth, and their tongues alone can weigh around 2,700 kilograms — about as much as a full-grown elephant. Just imagine trying to brush those teeth every morning!"
+        },
+        {
+          "title": "Male Seahorses Are the Ones Who Give Birth 🐠",
+          "body": "Seahorses are the only animals on Earth where the dad carries and gives birth to the babies! The male has a special pouch on his belly and can carry up to 2,000 tiny seahorses at once. Super-dad level: unlocked."
+        }
+      ]
+    },
+    {
+      "id": "world_watch",
+      "title": "🌍 World Watch",
+      "render_title": "Big Stories Happening Right Now 🗺️",
+      "block_type": "story_list",
+      "link_style": "link-green",
+      "items": [
+        {
+          "headline": "A Powerful Earthquake Rattled Japan — Today",
+          "body": [
+            "Early this morning, a massive earthquake with a magnitude of 7.7 struck off the northern coast of Japan. Tsunami alerts were sent out right away, warning people living near the ocean to move to higher ground immediately. The alerts were later downgraded to less dangerous levels, but people in the area are still being asked to stay safe and evacuate if needed.",
+            "Japan sits in a region scientists call the Ring of Fire — a horseshoe-shaped zone around the Pacific Ocean where earthquakes and volcanoes are very common. Japan experiences thousands of small earthquakes every single year, and its people train hard to be prepared for the big ones."
+          ],
+          "analogy": "Think of Earth's outer layer like a giant jigsaw puzzle made of huge rocky pieces called tectonic plates. When two plates grind against each other or one slides under the other, they release a burst of energy — kind of like when you push two books together on a slippery table and they suddenly shift. That burst of energy travels through the ground as shaking, which is what we feel as an earthquake.",
+          "links": [
+            {
+              "label": "Live Updates at The Guardian",
+              "url": "https://www.theguardian.com/world/live/2026/apr/20/japan-tsunami-earthquake-sanriku-latest-news-updates"
+            }
+          ]
+        },
+        {
+          "headline": "NASA's Artemis II Crew Makes It Home from the Moon 🚀",
+          "body": [
+            "Last week, NASA's Artemis II mission made history: four astronauts flew all the way around the Moon and splashed down safely in the Pacific Ocean. It was the first time humans had traveled that far from Earth since the Apollo 17 mission more than 50 years ago, back in 1972!",
+            "The Artemis program is NASA's big plan to eventually land people back on the Moon — and one day use the Moon as a stepping stone for traveling to Mars. Artemis II was the all-important test run, checking that the Orion spacecraft can safely carry a crew to the Moon and bring them back home."
+          ],
+          "analogy": "Imagine you're planning an epic road trip to somewhere you've never been. You wouldn't just load up the car and drive without testing it first! Artemis II was NASA's test drive — sending a real crew around the Moon to make sure everything works before they try the actual landing.",
+          "links": [
+            {
+              "label": "Read About It at NewsForKids",
+              "url": "https://newsforkids.net/category/all_news/science/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "singapore_spotlight",
+      "title": "🇸🇬 Singapore Spotlight",
+      "render_title": "The Little Red Dot's Big Secrets 🦁",
+      "block_type": "spotlight",
+      "link_style": "link-pink",
+      "items": [
+        {
+          "headline": "Singapore Is Named After a Lion Nobody Ever Saw!",
+          "body": [
+            "Long ago, a prince from Sumatra landed on a small island and spotted an animal he believed was a lion. He named the place Singapura — which means Lion City in Sanskrit. But here's the amazing twist: historians think there were never any lions on the island at all! The animal was almost certainly a tiger.",
+            "Tigers really did roam Singapore in the wild until around 1930, when the last one was spotted. Today, Singapore's most beloved symbol is the Merlion — a statue with a lion's head and a fish's body — standing proudly by the waterfront and welcoming visitors from all over the world."
+          ],
+          "links": [
+            {
+              "label": "Singapore Facts for Kids",
+              "url": "https://worldoftravelswithkids.com/interesting-singapore-facts-for-kids/"
+            }
+          ]
+        },
+        {
+          "headline": "Singapore's Hawker Centers: Where Everyone Eats Together 🍜",
+          "body": [
+            "In Singapore, one of the most beloved ways to eat is at a hawker center — a big open-air food court where dozens of stalls sell amazing dishes from Chinese, Malay, Indian, and many other food traditions all in one place. You can get a delicious bowl of chicken rice or laksa noodles for just a couple of dollars!",
+            "Hawker culture is such an important part of Singapore's identity that UNESCO — the global organization that protects precious cultural traditions — officially recognized it as cultural heritage worth preserving. It's not just about the food; hawker centers are the heart of the neighborhood, where people of every background sit side by side and share a meal."
+          ],
+          "links": [
+            {
+              "label": "Explore Hawker Culture",
+              "url": "https://oneplanetjourney.com/singapore-street-food-hawker-culture-neighbourhoods/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usa_corner",
+      "title": "🇺🇸 USA Corner",
+      "render_title": "Cool Things Happening Right Here in California 🌉",
+      "block_type": "spotlight",
+      "link_style": "link-blue",
+      "items": [
+        {
+          "headline": "A Brand-New Science Museum Just Opened — Built Just for Kids! 🔬",
+          "body": [
+            "A fantastic new museum called KidSTREAM just opened in California, and it was designed specifically for kids who love to explore, build, and discover. The $7 million museum was the idea of a former teacher who wanted an exciting place for her own daughters to learn through hands-on science and art.",
+            "KidSTREAM stands for Science, Technology, Reading, Engineering, Art, and Math — basically every amazing subject packed into one building. It sounds like the kind of place where you could spend a whole weekend and never get bored!"
+          ],
+          "links": [
+            {
+              "label": "Read About KidSTREAM at NYTimes",
+              "url": "https://www.nytimes.com/2026/04/19/arts/children-kidstream-museum-california-science.html"
+            }
+          ]
+        },
+        {
+          "headline": "National Park Week: Free Entry at All US Parks Today! 🌲",
+          "body": [
+            "This week is National Park Week across the United States, and today — April 20 — admission to all national parks is completely free. That means a family could visit places like Yosemite Valley or Point Reyes National Seashore in California without spending a cent.",
+            "National parks protect some of America's most breathtaking wild places — giant redwood forests, dramatic ocean cliffs, and starry desert skies. Ranger-led hikes, kids' programs, and outdoor theater are all happening at parks this weekend!"
+          ],
+          "links": [
+            {
+              "label": "Plan Your Visit at Visit California",
+              "url": "https://www.visitcalifornia.com/experience/april-events-california/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gymnastics_corner",
+      "title": "🤸 Gymnastics Corner",
+      "render_title": "Perfect Tens and Championship Moments! 🏆",
+      "block_type": "interest_feature",
+      "link_style": "link-rose",
+      "items": [
+        {
+          "headline": "Oklahoma Wins the NCAA Gymnastics Championship — And It Was SO Close",
+          "body": [
+            "The University of Oklahoma just claimed the 2026 NCAA Women's Gymnastics Championship in Fort Worth, Texas — their eighth national title in program history! It was an absolute nail-biter. Oklahoma stumbled with two shaky balance beam scores and fell behind, but they rallied hard in the final rotation and edged out LSU by less than one tenth of a point: 198.1625 to 198.0750.",
+            "The competition also produced a jaw-dropping moment: LSU gymnast Kailin Chio became the first Tiger in school history to score a perfect 10.0 on vault at the NCAA Championships. A perfect 10 means every single element — the power, the height, the flight through the air, and the landing — was absolutely flawless. That's one of the rarest scores in gymnastics!"
+          ],
+          "links": [
+            {
+              "label": "Full Results at NCAA",
+              "url": "https://www.ncaa.com/news/gymnastics-women/article/2026-04-16/2026-ncaa-womens-gymnastics-championships-bracket-schedule-results"
+            },
+            {
+              "label": "More Coverage at Olympics.com",
+              "url": "https://www.olympics.com/en/news/oklahoma-wins-2026-ncaa-women-s-gymnastics-championships-title"
+            }
+          ]
+        },
+        {
+          "headline": "15-Year-Old Gymnast Stuns Everyone at Japan's All-Around Championships 🌟",
+          "body": [
+            "At the All-Japan Gymnastics All-Around Championships this week, a 15-year-old named Nishiyama Misa surprised absolutely everyone by jumping to the top of the leaderboard in the women's qualification round. Most elite competitors are in their late teens or twenties, so for someone her age to lead the whole competition is a really big deal.",
+            "Nishiyama Misa is a reminder that in gymnastics, hard work and passion can take you further than anyone expects — no matter how young you are. Every skill you practice today is building toward something amazing!"
+          ],
+          "links": [
+            {
+              "label": "Read More at Olympics.com",
+              "url": "https://www.olympics.com/en/news/all-japan-all-around-championships-2026-women-qualification"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "money_moves",
+      "title": "💰 Money Moves",
+      "render_title": "Young Entrepreneurs Making Big Things Happen 💡",
+      "block_type": "story_list",
+      "link_style": "link-amber",
+      "items": [
+        {
+          "headline": "The Snowball Secret: Why Starting Early Is Your Superpower",
+          "body": [
+            "Here's one of the most powerful money secrets there is: small amounts saved regularly, over a long time, grow into something surprisingly big. It's called compound interest — your savings earn a little extra, and then that extra earns a little extra too. The earlier you start, the more powerful it gets.",
+            "Think of it like a snowball rolling down a long hill. At first it's tiny and easy to miss. But as it rolls, it picks up more and more snow and eventually becomes enormous. Money in a savings account works the same way — patience is the secret ingredient."
+          ],
+          "analogy": "If you saved just $5 every single week starting today, by the time you turn 18 you'd have set aside over $2,000 — just from amounts smaller than a movie ticket!",
+          "links": [
+            {
+              "label": "Business Ideas for Kids",
+              "url": "https://www.shopify.com/blog/business-ideas-for-kids"
+            }
+          ]
+        },
+        {
+          "headline": "She Started Earning at Age 5 — and Bought a Business at 17! 🎉",
+          "body": [
+            "Meet a young entrepreneur who started making money when she was just five years old — mowing lawns, babysitting neighbors, and doing extra chores. Instead of spending everything she earned, she kept saving and saving, year after year. By the time she was 17, she had saved enough to become the majority owner of a real franchise business!",
+            "Her story shows that every single dollar you earn and choose to save is a building block toward something much bigger. Whether it comes from a lemonade stand, selling crafts, or helping around the neighborhood — every bit adds up if you stay patient and keep your goal in sight."
+          ],
+          "links": [
+            {
+              "label": "Read Her Full Story",
+              "url": "https://www.entrepreneur.com/franchises/18-year-old-turned-babysitting-money-into-a-franchise/497932"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sophies_challenge",
+      "title": "🧩 Weekly Challenge",
+      "render_title": "Can You Crack the Space Math? 🧠",
+      "block_type": "challenge",
+      "link_style": "link-orange",
+      "items": [
+        {
+          "prompt_intro": "This week, NASA's Artemis II astronauts flew all the way to the Moon and back safely — the first crewed mission to travel that far from Earth in over 50 years! The Moon is about 384,000 kilometers away from Earth. That's an almost unimaginably long trip! 🚀",
+          "prompt": "If the Orion spacecraft traveled at an average speed of 40,000 kilometers per hour, how many hours would it take to travel from Earth to the Moon? Use this formula: Time = Distance divided by Speed.",
+          "bonus": "The full Artemis II mission lasted about 10 days. If the crew slept for 8 hours every day, how many total hours were the astronauts awake during the entire mission?",
+          "hint": "For the main question, divide 384,000 by 40,000 — try breaking it into smaller steps if that helps! For the bonus, first figure out the total hours in 10 days (multiply 24 by 10), then subtract all the sleeping hours.",
+          "links": [
+            {
+              "label": "Artemis II at NewsForKids",
+              "url": "https://newsforkids.net/category/all_news/science/"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "issue_number": 5,
+    "issue_date_display": "April 20, 2026",
+    "tagline": "Made with love by Dad & Claude 🤖❤️",
+    "location_line": "Fremont, California ↔ Singapore"
+  }
+}
