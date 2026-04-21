@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved.
+Approved (revised per architectural feedback 2026-04-21).
 
 ## Goal
 
@@ -12,14 +12,13 @@ Refactor `hosted_llm_provider.py` so the model (Claude Sonnet vs Opus, MiniMax, 
 
 ```
 ModelProvider (ABC)
-├── HostedProvider (ABC)
-│   ├── ClaudeProvider     → supports --model flag
-│   ├── MiniMaxProvider    → no model param
-│   └── OpenAIProvider     → supports --model flag (future)
-└── LocalProvider (ABC)    → no model param (e.g. Ollama)
+├── ClaudeProvider          → uses anthropic Python SDK, supports model override
+├── MiniMaxProvider         → uses anthropic Python SDK, no model param
+└── OpenAICompatibleProvider → uses openai Python SDK, supports model override
+                               (covers Ollama, LM Studio, and any /v1/chat/completions server)
 ```
 
-Each provider is a thin, self-contained class that knows how to invoke its underlying CLI or API. The config layer only names the provider and model; the provider handles the mechanics.
+Each provider is a thin, self-contained class that knows how to invoke its underlying SDK or API. The config layer only names the provider and model; the provider handles the mechanics. Pipeline stages own task-specific prompt construction and output parsing.
 
 ---
 
@@ -34,41 +33,28 @@ class ModelProvider(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
-        """Provider identifier, e.g. 'claude', 'minimax', 'ollama'."""
+        """Provider identifier, e.g. 'claude', 'minimax', 'openai_compatible'."""
 
     @abstractmethod
-    def rank(self, prompt: str, **kwargs) -> dict:
-        """Run ranking task. Returns dict with 'result' key (JSON string)."""
+    def generate(self, prompt: str, **kwargs) -> dict:
+        """Execute a prompt against the model. Returns dict with 'result' key (raw model output).
 
-    @abstractmethod
-    def synthesize(self, prompt: str, **kwargs) -> dict:
-        """Run synthesis task. Returns dict with 'result' key (JSON string)."""
+        The caller (ranking_stage, content_stage) is responsible for:
+        - Constructing the prompt in the format expected by this provider
+        - Interpreting and parsing the result
+        - Handling task-specific error recovery (e.g. fallback to filtered ordering in ranking)
+
+        The provider only handles the mechanics of invoking the model.
+        """
 ```
 
-Both `rank` and `synthesize` return `{"result": "...", ...}`. The caller (ranking_stage, content_stage) doesn't care which CLI or API produced it.
+`generate()` is generic and task-agnostic. It returns `{"result": "...", ...}` — the raw output that the calling stage then interprets. This decouples the provider from pipeline semantics.
 
 ---
 
-## 2. HostedProvider Base
+## 2. HostedProvider Base (removed)
 
-```python
-class HostedProvider(ModelProvider, ABC):
-    """Base for cloud-hosted model providers."""
-
-    @property
-    @abstractmethod
-    def supports_model_param(self) -> bool:
-        """Whether this provider accepts a model override."""
-
-    def build_cli_args(self, prompt: str, model: str | None = None) -> list[str]:
-        """Build the CLI invocation args. Override for providers with custom flag styles."""
-        args = [self.name, "-p", prompt, "--output-format", "json"]
-        if model and self.supports_model_param:
-            args.extend(["--model", model])
-        return args
-```
-
-`supports_model_param` gates whether the model arg gets passed. Providers that need a different flag style (e.g. `--model` vs `-m`) override `build_cli_args`.
+`HostedProvider` is removed. There is no meaningful shared CLI-building logic once we move to SDKs, and the `supports_model_param` concept does not translate cleanly to SDK-style providers. Each provider implements `generate()` directly.
 
 ---
 
@@ -76,51 +62,91 @@ class HostedProvider(ModelProvider, ABC):
 
 ### ClaudeProvider
 
+Uses the official `anthropic` Python SDK.
+
 ```python
-class ClaudeProvider(HostedProvider):
+from anthropic import Anthropic
+
+class ClaudeProvider(ModelProvider):
     name = "claude"
-    supports_model_param = True
 
-    def rank(self, prompt: str, model: str | None = None, timeout: int = 120, **kwargs) -> dict:
-        args = self.build_cli_args(prompt, model)
-        result = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
-        return self._parse_output(result, prompt, kwargs.get("debug_dir"))
+    def __init__(self, config: dict):
+        self.model = config.get("model")
+        self.client = Anthropic()
 
-    def synthesize(self, prompt: str, model: str | None = None, timeout: int = 120, **kwargs) -> dict:
-        args = self.build_cli_args(prompt, model)
-        result = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
-        return self._parse_output(result, prompt, kwargs.get("debug_dir"))
+    def generate(self, prompt: str, **kwargs) -> dict:
+        timeout = kwargs.get("timeout", 120)
+        max_retries = kwargs.get("max_retries", 2)
 
-    def _parse_output(self, result, prompt, debug_dir) -> dict:
-        # handles exit code checking, stdout/stderr logging, JSON parsing
-        ...
+        for attempt in range(max_retries + 1):
+            try:
+                response = self.client.messages.create(
+                    model=self.model,
+                    max_tokens=kwargs.get("max_tokens", 4096),
+                    messages=[{"role": "user", "content": prompt}],
+                    timeout=timeout,
+                )
+                return {"result": response.content[0].text}
+            except Exception as exc:
+                if attempt < max_retries:
+                    continue
+                raise
+
+        return {"result": ""}
 ```
+
+If `model` is not set in config, raise `ValueError` at instantiation time.
 
 ### MiniMaxProvider
 
+Uses the `anthropic` SDK. MiniMax exposes the same API as Anthropic (they are API-compatible).
+
 ```python
-class MiniMaxProvider(HostedProvider):
+class MiniMaxProvider(ModelProvider):
     name = "minimax"
-    supports_model_param = False
-    # inherits build_cli_args — model arg silently ignored
+
+    def __init__(self, config: dict):
+        api_key = config.get("api_key") or os.environ.get("MINIMAX_API_KEY")
+        if not api_key:
+            raise ValueError("MiniMaxProvider requires api_key in config or MINIMAX_API_KEY env var")
+        self.client = Anthropic(base_url="https://api.minimax.chat/v1", api_key=api_key)
+        self.model = config.get("model", "MiniMax-Text-01")
+
+    def generate(self, prompt: str, **kwargs) -> dict:
+        # same pattern as ClaudeProvider
 ```
 
-### LocalProvider
+`model` has a sensible default — no config required if using the default model.
+
+### OpenAICompatibleProvider
+
+Uses the official `openai` Python SDK. Connects to any server implementing the standard `/v1/chat/completions` endpoint (Ollama, LM Studio, etc.).
 
 ```python
-class LocalProvider(ModelProvider, ABC):
-    """For local servers (e.g. Ollama). Uses HTTP client instead of subprocess."""
+from openai import OpenAI
 
-    @property
-    @abstractmethod
-    def base_url(self) -> str:
-        """Base URL of the running local model server."""
+class OpenAICompatibleProvider(ModelProvider):
+    name = "openai_compatible"
 
-    def rank(self, prompt: str, **kwargs) -> dict:
-        # POST to /v1/generate or similar
-        response = requests.post(f"{self.base_url}/v1/generate", json={"prompt": prompt})
-        return {"result": response.json()["response"]}
+    def __init__(self, config: dict):
+        base_url = config.get("base_url", "http://localhost:1234/v1")
+        api_key = config.get("api_key", "not-needed")  # most local servers don't require a key
+        self.model = config.get("model")
+        if not self.model:
+            raise ValueError("OpenAICompatibleProvider requires model in config")
+        self.client = OpenAI(base_url=base_url, api_key=api_key)
+
+    def generate(self, prompt: str, **kwargs) -> dict:
+        timeout = kwargs.get("timeout", 120)
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            timeout=timeout,
+        )
+        return {"result": response.choices[0].message.content}
 ```
+
+`supports_model_param` is always `True` here — the model name is sent in the API payload and is configured dynamically via YAML.
 
 ---
 
@@ -131,22 +157,26 @@ In `config/children/sophie.yaml`:
 ```yaml
 providers:
   synthesis:
-    type: hosted
     provider: claude
     model: opus
   ranking:
-    type: hosted
     provider: claude
     model: sonnet
 
-  # Future local example:
+  # Local example (M4 Mac Mini with Ollama):
   # synthesis:
-  #   type: local
-  #   provider: ollama
-  #   model: llama3
+  #   provider: openai_compatible
+  #   base_url: http://localhost:1234/v1
+  #   model: gemma3:12b
+  # ranking:
+  #   provider: openai_compatible
+  #   base_url: http://localhost:1234/v1
+  #   model: qwen3:3b
 ```
 
-If `model` is provided for a provider where `supports_model_param` is `False`, it is silently ignored (LocalProvider, MiniMaxProvider). If a provider requires a model and none is provided, raise `ValueError` at startup.
+The `type` key is removed — routing is done solely on the `provider` name. No hosted/local distinction needed at the config level.
+
+If `model` is required by a provider but not provided, `ValueError` is raised at startup.
 
 ---
 
@@ -156,11 +186,13 @@ If `model` is provided for a provider where `supports_model_param` is `False`, i
 PROVIDER_MAP = {
     "claude": ClaudeProvider,
     "minimax": MiniMaxProvider,
-    "ollama": OllamaProvider,
+    "openai_compatible": OpenAICompatibleProvider,
 }
 
 def make_provider(config: dict) -> ModelProvider:
-    provider_type = config["provider"]
+    provider_type = config.get("provider")
+    if not provider_type:
+        raise ValueError("Provider config missing 'provider' key")
     if provider_type not in PROVIDER_MAP:
         raise ValueError(
             f"Unknown provider '{provider_type}'. "
@@ -169,34 +201,36 @@ def make_provider(config: dict) -> ModelProvider:
     return PROVIDER_MAP[provider_type](config)
 ```
 
-Called once per task (synthesis, ranking) at pipeline startup. The provider instance is passed into the stage that needs it.
-
 ---
 
 ## 6. File Structure
 
 ```
 scripts/providers/
+  llm_providers.py          # renamed from hosted_llm_provider.py
+                           # model_rank_candidates() updated to accept ModelProvider
   model_providers/
-    __init__.py          # PROVIDER_MAP, make_provider, public exports
-    base.py              # ModelProvider, HostedProvider, LocalProvider ABCs
-    claude.py            # ClaudeProvider
-    minimax.py           # MiniMaxProvider
-    local.py             # LocalProvider (Ollama)
+    __init__.py              # PROVIDER_MAP, make_provider, public exports
+    base.py                  # ModelProvider ABC
+    claude.py                # ClaudeProvider
+    minimax.py               # MiniMaxProvider
+    openai_compatible.py     # OpenAICompatibleProvider
 ```
 
-`hosted_llm_provider.py` remains as the module containing `model_rank_candidates`, which gets updated to accept a `ModelProvider` instance rather than calling subprocess directly.
+`llm_providers.py` (renamed from `hosted_llm_provider.py`) contains `model_rank_candidates`, updated to accept a `ModelProvider` instance and call `provider.generate()` instead of subprocess calls.
 
 ---
 
 ## 7. Migration
 
 1. Create `scripts/providers/model_providers/` with the class hierarchy above.
-2. Refactor `model_rank_candidates` in `hosted_llm_provider.py` to accept a `ModelProvider` instance.
-3. Refactor content_stage's `claude -p` calls to use `make_provider` + provider instance.
-4. Add `providers` section to `config/children/sophie.yaml`.
-5. The CLI flags `--content-provider` and `--ranker` remain as-is; they now select the config-driven provider chain.
-6. Existing pipeline tests continue to pass as black-box tests.
+2. Add `anthropic` and `openai` to `requirements.txt` if not already present.
+3. Refactor `model_rank_candidates` in `llm_providers.py` to accept a `ModelProvider` instance and call `generate()`.
+4. Refactor content_stage's `claude -p` calls to use `make_provider` + provider instance.
+5. Rename `hosted_llm_provider.py` → `llm_providers.py`.
+6. Add `providers` section to `config/children/sophie.yaml`.
+7. The CLI flags `--content-provider` and `--ranker` remain as-is; they now select the config-driven provider chain.
+8. Existing pipeline tests continue to pass as black-box tests.
 
 ---
 
@@ -205,17 +239,16 @@ scripts/providers/
 | Scenario | Behavior |
 |---|---|
 | Unknown provider name | `ValueError` at startup |
-| Model param on unsupported provider | Silently ignored |
-| Required model param missing | `ValueError` at startup |
-| Subprocess timeout | Ranking: fall back to filtered ordering. Synthesis: propagate. |
-| Parse error | Ranking: fall back to filtered ordering. Synthesis: propagate. |
-| Non-zero exit code | Log stderr, treat as failure with appropriate fallback |
+| Required `model` missing | `ValueError` at startup |
+| SDK timeout | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+| SDK parse error | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+| SDK non-success response | Ranker: fall back to filtered ordering. Synthesis: propagate. |
 
 ---
 
 ## 9. Testing Strategy
 
-- Unit test each provider in isolation (mock `subprocess.run` / `requests.post`).
+- Unit test each provider in isolation (mock SDK client calls).
 - Integration test `make_provider` with valid and invalid config.
 - Ranking stage and content stage remain black-box tested via existing pipeline tests.
 - No new integration tests required at this layer — the existing `test_pipeline_integration.py` covers end-to-end behavior.
