@@ -6,7 +6,7 @@ Approved (revised per architectural feedback 2026-04-21).
 
 ## Goal
 
-Refactor `hosted_llm_provider.py` so the model (Claude Sonnet vs Opus, future alternatives) can be configured per-child and per-task (synthesis vs. ranking) without code changes.
+Refactor `llm_providers.py` (renamed from `hosted_llm_provider.py`) so the model (Claude Sonnet vs Opus, future alternatives) can be configured per-child and per-task (synthesis vs. ranking) without code changes.
 
 ## Architecture Overview
 
@@ -46,6 +46,15 @@ class ModelProvider(ABC):
         - Handling task-specific error recovery (e.g. fallback to filtered ordering in ranking)
 
         The provider only handles the mechanics of invoking the model.
+
+        Recognized kwargs:
+        - timeout (int): seconds before timeout (default 120)
+        - max_retries (int): number of retry attempts on failure (default 2)
+        - base_delay (float): initial backoff delay in seconds (default 2.0, CLI only)
+        - debug_dir (Path): directory to write debug artifacts (CLI only)
+
+        On error, result dict includes an "error" key describing the failure, e.g.
+        {"result": "", "error": "timeout"} or {"result": "", "error": "exit 1"}.
         """
 ```
 
@@ -100,15 +109,14 @@ class ClaudeProvider(ModelProvider):
                 return {"result": "", "error": f"exit {result.returncode}"}
 
             try:
-                outer = json.loads(result.stdout)
-                return {"result": outer.get("result", "")}
-            except json.JSONDecodeError:
+                return {"result": json.loads(result.stdout)["result"]}
+            except (json.JSONDecodeError, KeyError):
                 if attempt < max_retries:
                     time.sleep(base_delay * (2 ** attempt))
                     continue
                 return {"result": "", "error": "parse_error"}
 
-        return {"result": ""}
+        return {"result": "", "error": "exhausted_retries"}
 ```
 
 Retry loop uses exponential backoff: delay doubles on each retry (2s → 4s). Catches timeout, non-zero exit, and JSON parse failures. The caller decides how to handle an errored result.
@@ -243,6 +251,7 @@ scripts/providers/
 | CLI timeout | Ranker: fall back to filtered ordering. Synthesis: propagate. |
 | CLI non-zero exit | Ranker: fall back to filtered ordering. Synthesis: propagate. |
 | CLI parse error | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+| CLI exhausted retries | Ranker: fall back to filtered ordering. Synthesis: propagate. |
 | SDK timeout / error | Ranker: fall back to filtered ordering. Synthesis: propagate. |
 
 All error responses from `generate()` include an `"error"` key so callers can distinguish clean results from failures without exceptions.
