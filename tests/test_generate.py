@@ -535,3 +535,33 @@ def test_template_uses_generic_interest_slot():
     assert ".interest-item" in template
     assert "K-pop Corner" not in template
     assert "KPOP_CORNER" not in template
+
+
+def test_issue_artifact_path_staging(tmp_path):
+    artifacts_root = tmp_path / "artifacts" / "staging"
+    result = issue_schema.get_issue_artifact_path(tmp_path, "sophie", "2026-04-23", artifacts_root=artifacts_root)
+    assert result == artifacts_root / "issues" / "sophie-2026-04-23.json"
+
+
+def test_issue_artifact_path_approach(tmp_path):
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "approach-b1"
+    result = issue_schema.get_issue_artifact_path(tmp_path, "sophie", "2026-04-23", artifacts_root=artifacts_root)
+    assert result == artifacts_root / "issues" / "sophie-2026-04-23.json"
+
+
+def test_write_issue_artifact_staging(tmp_path):
+    issue = {
+        "issue_date": "2026-04-23",
+        "issue_number": 5,
+        "child_id": "sophie",
+        "theme_id": "default",
+        "editorial": {},
+        "child_name": "Sophie",
+        "greeting_text": "Hello!",
+        "sections": [{"id": "weird_but_true", "title": "A", "render_title": "A", "block_type": "fact_list", "items": [{"title": "x", "body": "y"}], "links": [], "link_style": "link-purple"}],
+        "footer": {"issue_number": 5, "issue_date_display": "April 23, 2026", "tagline": "x", "location_line": "y"}
+    }
+    artifacts_root = tmp_path / "artifacts" / "staging"
+    out_path = issue_schema.write_issue_artifact(tmp_path, issue, artifacts_root=artifacts_root)
+    assert out_path == artifacts_root / "issues" / "sophie-2026-04-23.json"
+    assert out_path.exists()
