@@ -28,11 +28,15 @@ This repo is now meaningfully config-driven and split into clean generation stag
 - issue artifact validation/persistence happens in `scripts/issue_schema.py`
 - final HTML rendering happens in `scripts/render_stage.py`
 - orchestration lives in `scripts/generate.py`
+- overlay config resolution and output routing live in `scripts/env_resolver.py`
+- approach promotion lives in `scripts/promote.py`
 
 It is still a single-child implementation in practice, because `generate.py` currently loads `config/children/sophie.yaml` directly.
 
 Current working recommendation after first-pass evaluation: **Mode B1 is the best default path right now.**
 B2 is promising, but still slightly behind B1 on issue-level coherence and novelty, even after prompt upgrades.
+
+The app now supports **staging** and **production** environments with **named approaches** for safe experimentation. See [Environments and Approaches](#environments-and-approaches) below.
 
 ---
 
@@ -333,23 +337,35 @@ sophies-world/
   requirements.txt
   .env
   .env.example
-  config/
+  config/                          # production config (prod env baseline)
     children/
       sophie.yaml
     research.yaml
     sections.yaml
     themes/
       default.yaml
+  staging/                         # staging env (isolated runtime)
+    config/                        # staging config overrides (partial overlay)
+    approaches/                    # named experiment approaches
+      approach-b1/                 # first named approach snapshot
+        config/
+        scripts/
   artifacts/
     issues/
     research/
     debug/
+    staging/                      # staging artifacts
+    approaches/                    # approach-run artifacts
+      <approach-name>/
   newsletters/
-    sophies-world-YYYY-MM-DD.html
-    test/
+    sophies-world-YYYY-MM-DD.html  # production issues
+    test/                          # test runs (prod env)
+    staging/                       # staging runs
   scripts/
+    env_resolver.py               # overlay config + output dir routing
+    generate.py                   # orchestration (--env, --approach flags)
+    promote.py                    # approach → staging → prod promotion
     content_stage.py
-    generate.py
     issue_schema.py
     providers/
       __init__.py
@@ -363,6 +379,8 @@ sophies-world/
     template.html
   tests/
     test_generate.py
+    test_env_resolver.py
+    test_promote.py
     test_pipeline_integration.py
     test_research_pipeline.py
     test_send.py
@@ -375,6 +393,7 @@ sophies-world/
 
 Note:
 - `artifacts/debug/` exists for local debugging but is gitignored.
+- `staging/scripts/` is currently empty — staging uses prod scripts by default.
 
 ---
 
@@ -545,9 +564,75 @@ Evaluation docs:
 - `docs/superpowers/specs/2026-04-18-modular-sections-design.md` — approved modular-sections spec
 - `docs/superpowers/specs/2026-04-18-content-render-split-design.md` — approved content/render split spec
 - `docs/superpowers/specs/2026-04-19-local-llm-research-stage-design.md` — local-LLM + deterministic research design
+- `docs/superpowers/specs/2026-04-20-admin-console-design-spec.md` — admin console UI design spec
 - `docs/superpowers/plans/2026-04-20-deterministic-research-pipeline.md` — deterministic research pipeline implementation plan
+- `docs/superpowers/plans/2026-04-21-staging-prod-and-approaches.md` — staging/prod/approaches implementation plan (implemented)
 - `docs/superpowers/evals/2026-04-20-mode-comparison-scorecard.md` — evaluation rubric for mode comparison
 - `docs/superpowers/evals/2026-04-20-first-pass-mode-comparison-review.md` — first-pass mode comparison findings
+
+---
+
+## Environments and approaches
+
+The app has two runtimes: **prod** (safe, affects what Sophie receives) and **staging** (isolated, for testing changes). Within staging, named **approaches** let you test fully self-contained variants.
+
+### Environment selection
+
+```bash
+# Prod (default)
+python3 scripts/generate.py --test
+
+# Staging
+python3 scripts/generate.py --env staging --test
+
+# Staging with a named approach
+python3 scripts/generate.py --env staging --approach approach-b1 --test
+```
+
+### Config overlay resolution
+
+Each environment reads config using overlay resolution:
+
+| Env | Config source priority |
+|---|---|
+| `prod` | `config/` only |
+| `staging` | `staging/config/` → `config/` |
+| `staging --approach <name>` | `staging/approaches/<name>/config/` → `staging/config/` → `config/` |
+
+Only the files you want to override need exist in the staging layer — everything else falls back to prod.
+
+### Output routing
+
+| Env | HTML output | Artifact output |
+|---|---|---|
+| `prod` | `newsletters/` | `artifacts/` |
+| `prod --test` | `newsletters/test/` | `artifacts/` |
+| `staging` | `newsletters/staging/` | `artifacts/staging/` |
+| `staging --approach <name>` | `artifacts/approaches/<name>/newsletters/` | `artifacts/approaches/<name>/` |
+
+### Promoting changes
+
+Use `scripts/promote.py` to move changes up the stack:
+
+```bash
+# Promote an approach to staging
+python3 scripts/promote.py --from approach-b2-v2 --to staging
+
+# Promote staging to prod
+python3 scripts/promote.py --from staging --to prod
+
+# Dry run (see what would change)
+python3 scripts/promote.py --from staging --to prod --dry-run
+
+# Skip confirmation (for automation)
+python3 scripts/promote.py --from staging --to prod --yes
+```
+
+Promotion diffs are shown before applying, and the result is auto-committed. Approach → prod directly is blocked (must go through staging first).
+
+### Creating new approaches
+
+Duplicate `staging/approaches/approach-b1/` as a starting point, then modify its `config/` and `scripts/` as needed. Use `--env staging --approach <your-approach>` to run it.
 
 ---
 
@@ -556,7 +641,7 @@ Evaluation docs:
 If picking up the project fresh, the highest-leverage next steps are probably:
 
 1. harden novelty guards against repeated stories, repeated events, and recurring evergreen factoids across recent issues
-2. continue refining B2 as an experimental path, especially with stronger section-specific anti-repeat guidance
-3. tighten cache identity further if real-world retrieval drift becomes a problem
+2. restructure `sections.yaml` with phase-aware zones (research / synthesis / display) and fold `research.yaml` into it
+3. continue refining B2 as an experimental path, especially with stronger section-specific anti-repeat guidance
 4. replace file-count issue numbering with stable state
 5. add explicit multi-child selection
