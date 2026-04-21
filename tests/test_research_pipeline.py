@@ -167,6 +167,14 @@ def test_get_research_artifact_path_with_run_tag(tmp_path):
     assert "research" in str(path)
 
 
+def test_get_research_artifact_path_with_artifacts_root(tmp_path):
+    artifacts_root = tmp_path / "artifacts" / "staging"
+    path = research_stage.get_research_artifact_path(
+        tmp_path, date(2026, 4, 20), artifacts_root=artifacts_root
+    )
+    assert path == artifacts_root / "research" / "sophie-2026-04-20.json"
+
+
 # ---------------------------------------------------------------------------
 # ranking_stage: tokenize and jaccard
 # ---------------------------------------------------------------------------
