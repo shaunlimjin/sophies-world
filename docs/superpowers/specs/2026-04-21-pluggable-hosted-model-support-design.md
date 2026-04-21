@@ -6,19 +6,20 @@ Approved (revised per architectural feedback 2026-04-21).
 
 ## Goal
 
-Refactor `hosted_llm_provider.py` so the model (Claude Sonnet vs Opus, MiniMax, future alternatives) can be configured per-child and per-task (synthesis vs. ranking) without code changes.
+Refactor `hosted_llm_provider.py` so the model (Claude Sonnet vs Opus, future alternatives) can be configured per-child and per-task (synthesis vs. ranking) without code changes.
 
 ## Architecture Overview
 
 ```
 ModelProvider (ABC)
-├── ClaudeProvider          → uses anthropic Python SDK, supports model override
-├── MiniMaxProvider         → uses anthropic Python SDK, no model param
-└── OpenAICompatibleProvider → uses openai Python SDK, supports model override
-                               (covers Ollama, LM Studio, and any /v1/chat/completions server)
+├── ClaudeProvider            → CLI subprocess (no SDK), supports model override via --model flag
+└── OpenAICompatibleProvider  → openai Python SDK, supports model override via API payload
+                                 (covers Ollama, LM Studio, MiniMax, and any /v1/chat/completions server)
 ```
 
-Each provider is a thin, self-contained class that knows how to invoke its underlying SDK or API. The config layer only names the provider and model; the provider handles the mechanics. Pipeline stages own task-specific prompt construction and output parsing.
+MiniMax is dropped as a dedicated provider — it exposes an OpenAI-compatible endpoint and is configured via `OpenAICompatibleProvider` with `base_url` and `api_key`.
+
+Each provider is a thin, self-contained class implementing `generate(prompt: str, **kwargs) -> dict`. Pipeline stages own task-specific prompt construction and output parsing. The provider handles only the mechanics of invoking the model.
 
 ---
 
@@ -33,7 +34,7 @@ class ModelProvider(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
-        """Provider identifier, e.g. 'claude', 'minimax', 'openai_compatible'."""
+        """Provider identifier, e.g. 'claude', 'openai_compatible'."""
 
     @abstractmethod
     def generate(self, prompt: str, **kwargs) -> dict:
@@ -52,75 +53,69 @@ class ModelProvider(ABC):
 
 ---
 
-## 2. HostedProvider Base (removed)
-
-`HostedProvider` is removed. There is no meaningful shared CLI-building logic once we move to SDKs, and the `supports_model_param` concept does not translate cleanly to SDK-style providers. Each provider implements `generate()` directly.
-
----
-
-## 3. Concrete Providers
+## 2. Concrete Providers
 
 ### ClaudeProvider
 
-Uses the official `anthropic` Python SDK.
+Uses the `claude -p` CLI subprocess (no SDK — avoids API billing). Implements custom retry with exponential backoff.
 
 ```python
-from anthropic import Anthropic
+import subprocess
+import time
 
 class ClaudeProvider(ModelProvider):
     name = "claude"
 
     def __init__(self, config: dict):
         self.model = config.get("model")
-        self.client = Anthropic()
+        if not self.model:
+            raise ValueError("ClaudeProvider requires 'model' in config (e.g. 'sonnet', 'opus')")
 
     def generate(self, prompt: str, **kwargs) -> dict:
         timeout = kwargs.get("timeout", 120)
         max_retries = kwargs.get("max_retries", 2)
+        base_delay = kwargs.get("base_delay", 2.0)  # seconds
 
         for attempt in range(max_retries + 1):
             try:
-                response = self.client.messages.create(
-                    model=self.model,
-                    max_tokens=kwargs.get("max_tokens", 4096),
-                    messages=[{"role": "user", "content": prompt}],
+                result = subprocess.run(
+                    ["claude", "-p", prompt,
+                     "--output-format", "json",
+                     "--model", self.model,
+                     "--max-turns", "2"],
+                    capture_output=True,
+                    text=True,
                     timeout=timeout,
                 )
-                return {"result": response.content[0].text}
-            except Exception as exc:
+            except subprocess.TimeoutExpired:
                 if attempt < max_retries:
+                    time.sleep(base_delay * (2 ** attempt))
                     continue
-                raise
+                return {"result": "", "error": "timeout"}
+
+            if result.returncode != 0:
+                if attempt < max_retries:
+                    time.sleep(base_delay * (2 ** attempt))
+                    continue
+                return {"result": "", "error": f"exit {result.returncode}"}
+
+            try:
+                outer = json.loads(result.stdout)
+                return {"result": outer.get("result", "")}
+            except json.JSONDecodeError:
+                if attempt < max_retries:
+                    time.sleep(base_delay * (2 ** attempt))
+                    continue
+                return {"result": "", "error": "parse_error"}
 
         return {"result": ""}
 ```
 
-If `model` is not set in config, raise `ValueError` at instantiation time.
-
-### MiniMaxProvider
-
-Uses the `anthropic` SDK. MiniMax exposes the same API as Anthropic (they are API-compatible).
-
-```python
-class MiniMaxProvider(ModelProvider):
-    name = "minimax"
-
-    def __init__(self, config: dict):
-        api_key = config.get("api_key") or os.environ.get("MINIMAX_API_KEY")
-        if not api_key:
-            raise ValueError("MiniMaxProvider requires api_key in config or MINIMAX_API_KEY env var")
-        self.client = Anthropic(base_url="https://api.minimax.chat/v1", api_key=api_key)
-        self.model = config.get("model", "MiniMax-Text-01")
-
-    def generate(self, prompt: str, **kwargs) -> dict:
-        # same pattern as ClaudeProvider
-```
-
-`model` has a sensible default — no config required if using the default model.
+Retry loop uses exponential backoff: delay doubles on each retry (2s → 4s). Catches timeout, non-zero exit, and JSON parse failures. The caller decides how to handle an errored result.
 
 ### OpenAICompatibleProvider
 
-Uses the official `openai` Python SDK. Connects to any server implementing the standard `/v1/chat/completions` endpoint (Ollama, LM Studio, etc.).
+Uses the official `openai` Python SDK. Connects to any server implementing the standard `/v1/chat/completions` endpoint (Ollama, LM Studio, MiniMax, etc.).
 
 ```python
 from openai import OpenAI
@@ -133,7 +128,7 @@ class OpenAICompatibleProvider(ModelProvider):
         api_key = config.get("api_key", "not-needed")  # most local servers don't require a key
         self.model = config.get("model")
         if not self.model:
-            raise ValueError("OpenAICompatibleProvider requires model in config")
+            raise ValueError("OpenAICompatibleProvider requires 'model' in config")
         self.client = OpenAI(base_url=base_url, api_key=api_key)
 
     def generate(self, prompt: str, **kwargs) -> dict:
@@ -146,11 +141,11 @@ class OpenAICompatibleProvider(ModelProvider):
         return {"result": response.choices[0].message.content}
 ```
 
-`supports_model_param` is always `True` here — the model name is sent in the API payload and is configured dynamically via YAML.
+SDK handles retries, connection pooling, and JSON parsing natively.
 
 ---
 
-## 4. Config Structure
+## 3. Config Structure
 
 In `config/children/sophie.yaml`:
 
@@ -172,20 +167,26 @@ providers:
   #   provider: openai_compatible
   #   base_url: http://localhost:1234/v1
   #   model: qwen3:3b
+
+  # MiniMax example (OpenAI-compatible endpoint):
+  # synthesis:
+  #   provider: openai_compatible
+  #   base_url: https://api.minimax.chat/v1
+  #   api_key: YOUR_MINIMAX_API_KEY
+  #   model: MiniMax-Text-01
 ```
 
-The `type` key is removed — routing is done solely on the `provider` name. No hosted/local distinction needed at the config level.
+The `type` key is removed — routing is done solely on the `provider` name.
 
 If `model` is required by a provider but not provided, `ValueError` is raised at startup.
 
 ---
 
-## 5. Provider Factory
+## 4. Provider Factory
 
 ```python
 PROVIDER_MAP = {
     "claude": ClaudeProvider,
-    "minimax": MiniMaxProvider,
     "openai_compatible": OpenAICompatibleProvider,
 }
 
@@ -203,28 +204,27 @@ def make_provider(config: dict) -> ModelProvider:
 
 ---
 
-## 6. File Structure
+## 5. File Structure
 
 ```
 scripts/providers/
-  llm_providers.py          # renamed from hosted_llm_provider.py
-                           # model_rank_candidates() updated to accept ModelProvider
+  llm_providers.py            # renamed from hosted_llm_provider.py
+                               # model_rank_candidates() updated to accept ModelProvider
   model_providers/
-    __init__.py              # PROVIDER_MAP, make_provider, public exports
-    base.py                  # ModelProvider ABC
-    claude.py                # ClaudeProvider
-    minimax.py               # MiniMaxProvider
-    openai_compatible.py     # OpenAICompatibleProvider
+    __init__.py                # PROVIDER_MAP, make_provider, public exports
+    base.py                    # ModelProvider ABC
+    claude.py                  # ClaudeProvider (CLI subprocess, exponential backoff)
+    openai_compatible.py       # OpenAICompatibleProvider (openai SDK)
 ```
 
 `llm_providers.py` (renamed from `hosted_llm_provider.py`) contains `model_rank_candidates`, updated to accept a `ModelProvider` instance and call `provider.generate()` instead of subprocess calls.
 
 ---
 
-## 7. Migration
+## 6. Migration
 
 1. Create `scripts/providers/model_providers/` with the class hierarchy above.
-2. Add `anthropic` and `openai` to `requirements.txt` if not already present.
+2. Add `openai` to `requirements.txt` if not already present. (No new dependency for ClaudeProvider — it uses existing CLI.)
 3. Refactor `model_rank_candidates` in `llm_providers.py` to accept a `ModelProvider` instance and call `generate()`.
 4. Refactor content_stage's `claude -p` calls to use `make_provider` + provider instance.
 5. Rename `hosted_llm_provider.py` → `llm_providers.py`.
@@ -234,21 +234,24 @@ scripts/providers/
 
 ---
 
-## 8. Error Handling
+## 7. Error Handling
 
 | Scenario | Behavior |
 |---|---|
 | Unknown provider name | `ValueError` at startup |
 | Required `model` missing | `ValueError` at startup |
-| SDK timeout | Ranker: fall back to filtered ordering. Synthesis: propagate. |
-| SDK parse error | Ranker: fall back to filtered ordering. Synthesis: propagate. |
-| SDK non-success response | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+| CLI timeout | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+| CLI non-zero exit | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+| CLI parse error | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+| SDK timeout / error | Ranker: fall back to filtered ordering. Synthesis: propagate. |
+
+All error responses from `generate()` include an `"error"` key so callers can distinguish clean results from failures without exceptions.
 
 ---
 
-## 9. Testing Strategy
+## 8. Testing Strategy
 
-- Unit test each provider in isolation (mock SDK client calls).
+- Unit test each provider in isolation (mock `subprocess.run` for ClaudeProvider; mock `openai.OpenAI` for OpenAICompatibleProvider).
 - Integration test `make_provider` with valid and invalid config.
 - Ranking stage and content stage remain black-box tested via existing pipeline tests.
 - No new integration tests required at this layer — the existing `test_pipeline_integration.py` covers end-to-end behavior.
