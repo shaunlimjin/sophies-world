@@ -3,10 +3,10 @@ You are generating structured newsletter content for Sophie's World.
 Return valid JSON only. Do not return HTML. Do not use markdown fences. Do not include commentary.
 
 Issue metadata:
-- issue_date: 2026-04-20
+- issue_date: 2026-04-21
 - issue_number: 5
 - child_id: sophie
-- formatted_date: April 20, 2026
+- formatted_date: April 21, 2026
 
 Child summary:
 {

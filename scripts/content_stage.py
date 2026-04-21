@@ -62,6 +62,7 @@ def build_section_item_contracts() -> Dict[str, Dict[str, Any]]:
                 "headline": "...",
                 "body": ["paragraph 1", "paragraph 2"],
                 "analogy": "optional",
+                "highlight": "optional — for money_moves sections: a concise tip or rule in a .money-highlight box",
                 "links": [{"label": "...", "url": "..."}],
             },
             "quality_notes": [

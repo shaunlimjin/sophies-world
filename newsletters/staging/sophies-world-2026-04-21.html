@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sophie's World · April 21, 2026 · Issue #5</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', Arial, sans-serif;
+    background: #f0f4ff;
+    color: #2d2d2d;
+    padding: 20px;
+  }
+
+  .wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #ff6eb4 0%, #ff9a3c 50%, #ffda47 100%);
+    border-radius: 24px 24px 0 0;
+    padding: 36px 32px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: "✨🌍✨";
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 6px;
+  }
+  .header h1 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.92);
+    margin-top: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 50px;
+    padding: 5px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── GREETING BAND ── */
+  .greeting {
+    background: #fff;
+    border-left: 5px solid #ff6eb4;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1.6;
+  }
+  .greeting span { color: #ff6eb4; }
+
+  /* ── SECTION CARDS ── */
+  .card {
+    background: #fff;
+    padding: 24px 28px;
+    margin-top: 3px;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-wbt   { border-top: 4px solid #a78bfa; }
+  .label-wbt  { background: #ede9fe; color: #6d28d9; }
+
+  .card-world { border-top: 4px solid #34d399; }
+  .label-world{ background: #d1fae5; color: #065f46; }
+
+  .card-sg    { border-top: 4px solid #f472b6; }
+  .label-sg   { background: #fce7f3; color: #9d174d; }
+
+  .card-usa   { border-top: 4px solid #60a5fa; }
+  .label-usa  { background: #dbeafe; color: #1e40af; }
+
+  .card-interest  { border-top: 4px solid #f9a8d4; }
+  .label-interest { background: #fdf2f8; color: #be185d; }
+
+  .card-money { border-top: 4px solid #fbbf24; }
+  .label-money{ background: #fef3c7; color: #92400e; }
+
+  .card-challenge { border-top: 4px solid #fb923c; background: #fff7ed; }
+  .label-challenge{ background: #ffedd5; color: #9a3412; }
+
+  .card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.2;
+    color: #1a1a2e;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #3d3d3d;
+    margin-bottom: 10px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+  .section-intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #5b5563;
+    margin: -2px 0 14px;
+  }
+
+  /* ── LEARN MORE LINKS ── */
+  .learn-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .learn-more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 5px 13px;
+    border-radius: 50px;
+    border: 2px solid;
+    transition: opacity 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .learn-more a:hover { opacity: 0.8; }
+  .link-green  { color: #065f46; border-color: #34d399; background: #d1fae5; }
+  .link-purple { color: #5b21b6; border-color: #a78bfa; background: #ede9fe; }
+  .link-pink   { color: #9d174d; border-color: #f472b6; background: #fce7f3; }
+  .link-blue   { color: #1e40af; border-color: #60a5fa; background: #dbeafe; }
+  .link-rose   { color: #be185d; border-color: #f9a8d4; background: #fdf2f8; }
+  .link-amber  { color: #92400e; border-color: #fbbf24; background: #fef3c7; }
+  .link-orange { color: #9a3412; border-color: #fb923c; background: #ffedd5; }
+
+  /* ── FACT PILLS ── */
+  .fact-list { display: block; margin-top: 4px; }
+  .fact-item {
+    display: block;
+    background: #f5f3ff;
+    border-left: 4px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #3d3d3d;
+    margin-bottom: 12px;
+  }
+  .fact-item:last-child { margin-bottom: 0; }
+  .fact-item strong { color: #6d28d9; }
+
+  /* ── WORLD WATCH STORIES ── */
+  .world-stories { display: block; margin-top: 4px; }
+  .world-story {
+    display: block;
+    background: #f0fdf4;
+    border-left: 4px solid #34d399;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .world-story:last-child { margin-bottom: 0; }
+  .world-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #065f46;
+    margin-bottom: 6px;
+  }
+  .world-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .world-story p:last-of-type { margin-bottom: 0; }
+  .world-story .analogy {
+    background: #dcfce7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: #166534;
+    margin-top: 8px;
+  }
+  .world-story .story-links { margin-top: 10px; }
+
+  /* ── SG SPOTS ── */
+  .sg-spots { display: block; margin-top: 4px; }
+  .sg-spot {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f472b6;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .sg-spot:last-child { margin-bottom: 0; }
+  .sg-spot h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .sg-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  .usa-spots { display: block; margin-top: 4px; }
+  .usa-spot {
+    display: block;
+    background: #eff6ff;
+    border-left: 4px solid #60a5fa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .usa-spot:last-child { margin-bottom: 0; }
+  .usa-spot h3 { font-size: 15px; font-weight: 800; color: #1d4ed8; margin-bottom: 4px; }
+  .usa-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  /* ── INTEREST FEATURE ── */
+  .interest-grid { display: block; margin-top: 4px; }
+  .interest-item {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f9a8d4;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .interest-item:last-child { margin-bottom: 0; }
+  .interest-item h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .interest-item p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  .money-stories { display: block; margin-top: 4px; }
+  .money-story {
+    display: block;
+    background: #fffbeb;
+    border-left: 4px solid #fbbf24;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .money-story:last-child { margin-bottom: 0; }
+  .money-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #b45309;
+    margin-bottom: 6px;
+  }
+  .money-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .money-story p:last-of-type { margin-bottom: 0; }
+
+  /* ── MONEY HIGHLIGHT ── */
+  .money-highlight {
+    background: #fffbeb;
+    border: 2px dashed #fbbf24;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .money-highlight strong { color: #b45309; }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-q {
+    background: #fff;
+    border: 3px solid #fb923c;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .challenge-intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #7c5a35;
+    margin-bottom: 12px;
+  }
+  .challenge-q {
+    white-space: pre-line;
+  }
+  .challenge-bonus {
+    background: #fff;
+    border: 2px dashed #fdba74;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #9a3412;
+    font-weight: 700;
+  }
+  .challenge-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #9a6a3e;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .footer .hearts {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+  .footer strong { color: #ff6eb4; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #ff6eb4, #ff9a3c, #ffda47, #34d399, #60a5fa, #a78bfa);
+    border-radius: 3px;
+    margin: 3px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Sophie's World</h1>
+    <div class="subtitle">Your weekly dose of wow, fun &amp; big ideas</div>
+    <div class="date-badge">📅 April 21, 2026 · Issue #5</div>
+  </div>
+
+  <!-- GREETING -->
+  <div class="greeting">Hey Sophie! 👋 Another week, another edition of <span>Sophie's World</span> — filled with wild facts, big news, and one seriously tricky challenge! 🌟</div>
+
+  <div class="divider"></div>
+
+  <!-- WEIRD BUT TRUE -->
+  <div class="card card-wbt">
+    <div class="section-label label-wbt">🤯 Weird But True</div>
+    <h2>You Won't Believe These Are Real!</h2><p class="section-intro">Nature loves to show off — here are three facts that might make you go 'wait, WHAT?'</p><div class="fact-list"><div class="fact-item"><strong>🦦 Sea Otters Hold Hands While They Sleep</strong> So they don't drift away from each other! A group of floating otters is called a 'raft,' and they hold paws to stay together on the water. Baby otters float on their mothers like fluffy little boats. Scientists call this behavior 'rafting,' and it's one of the cutest things in nature. 🛶</div><div class="fact-item"><strong>🐘 Elephants Are the Only Large Mammals That Can't Jump</strong> Every other large mammal can leap off the ground — but not elephants! Their massive weight (up to 14,000 pounds!) means their legs are built for power and long walks, not jumping. They do love to swim, though, and are surprisingly graceful in water. 🏊</div><div class="fact-item"><strong>🌡️ Hot Water Can Freeze Faster Than Cold Water</strong> This real phenomenon is called the Mpemba Effect, named after a Tanzanian student who noticed it while making ice cream in school. Scientists still debate exactly why it happens. Sometimes the coolest discoveries start right in the kitchen! 🍦</div></div><div class="learn-more"><a href="https://kids.nationalgeographic.com/animals" class="link-purple">More Wild Animal Facts — Nat Geo Kids</a><a href="https://kids.britannica.com/kids/browse/science-and-technology" class="link-purple">Strange Science Phenomena — Britannica Kids</a></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WORLD WATCH -->
+  <div class="card card-world">
+    <div class="section-label label-world">🌍 World Watch</div>
+    <h2>Big Stories From Around the Globe</h2><p class="section-intro">Two important things are happening in the world right now — here's the scoop!</p><div class="world-stories"><div class="world-story"><h3>🤝 Countries Are Scrambling to Make New Trade Deals</h3><p>After months of rising tariffs (those are extra taxes countries charge on goods crossing their borders), the US is now in talks with countries like India, Japan, South Korea, and the UK to work out new trade agreements. Both sides want lower tariffs so businesses can buy and sell goods without paying so much extra.</p><p>These negotiations are happening fast because higher tariffs have made everyday things — electronics, clothes, groceries — more expensive. A good trade deal can bring prices back down and help workers who make those goods keep their jobs. But getting countries to agree takes a lot of back-and-forth bargaining.</p><div class="analogy">Imagine two kids at lunch trading snacks. If one suddenly says 'I'll only trade if you give me two cookies per chip,' the other might look for a new trading partner. Countries work the same way — if tariffs get too high, everyone starts looking for better deals elsewhere.</div><div class="story-links learn-more"><a href="https://kids.britannica.com/kids/article/trade/390883" class="link-green">What Is a Trade Deal? — Britannica Kids</a><a href="https://newsforkids.net" class="link-green">How Tariffs Work — NewsForKids.net</a></div></div><div class="world-story"><h3>🌊 Epic Flooding Is Hitting Communities Around the World</h3><p>Unusually heavy rains have triggered serious flooding across parts of Europe and Southeast Asia in recent weeks, washing out roads, damaging homes, and forcing thousands of people to evacuate. Scientists say that as Earth's climate changes, intense rainstorms are becoming more common — when it rains, it REALLY rains.</p><p>The good news: engineers and city planners are getting creative. Some cities are building 'sponge parks' — green spaces designed to soak up floodwater like a giant sponge. Others are planting more trees along riverbanks and installing early-warning systems so people have more time to get to safety. 🌿</p><div class="analogy">Think of soil like a kitchen sponge. When it's already soaked, even a little more water makes it overflow. Climate change is making our rainstorms so heavy that the ground simply can't soak it all up in time.</div><div class="story-links learn-more"><a href="https://www.bbc.co.uk/newsround/topics/c83plqexy9vt" class="link-green">Climate and Extreme Weather — BBC Newsround</a><a href="https://kids.nationalgeographic.com/science/article/flood" class="link-green">How Floods Form — Nat Geo Kids</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SINGAPORE SPOTLIGHT -->
+  <div class="card card-sg">
+    <div class="section-label label-sg">🇸🇬 Singapore Spotlight</div>
+    <h2>Little Island, Enormous Surprises</h2><div class="sg-spots"><div class="sg-spot"><h3>✈️ Changi Airport Has a 40-Metre Indoor Waterfall — Yes, Really</h3><p>Singapore's Changi Airport has been named the world's best airport many times over — and once you hear what's inside, you'll understand why. There's a butterfly garden, a rooftop pool, movie theaters, a sunflower garden, and a giant indoor waterfall called The Jewel that stands 40 metres tall. That's taller than a 13-storey building, right inside an airport!</p><p>Changi handles over 65 million passengers a year. To put that in perspective, that's more than twice the entire population of California — all passing through one airport. If you ever land in Singapore, budget some extra time just to explore the terminal. It's an adventure before the adventure even starts. 🌺</p></div><div class="sg-spot"><h3>🦁 The Merlion: Half Lion, Half Fish, 100% Singapore</h3><p>Singapore's national symbol is a creature with a lion's head and a fish's body — the Merlion! The lion head comes from the country's ancient name, 'Singapura,' which means 'Lion City' in Sanskrit. The fish tail represents Singapore's history as a humble fishing village before it grew into one of the world's most modern cities.</p><p>The most famous Merlion statue stands by the waterfront and spouts water from its mouth, watching over the glittering skyline. Tourists travel from every corner of the globe just to take a photo with it. It's a reminder that even a tiny place with big dreams can become something truly extraordinary. 🌊</p></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- USA CORNER -->
+  <div class="card card-usa">
+    <div class="section-label label-usa">🇺🇸 USA Corner</div>
+    <h2>Cool Things Happening Close to Home</h2><div class="usa-spots"><div class="usa-spot"><h3>🚀 NASA Wants to Build a Base on the Moon — and California Is Helping</h3><p>NASA's Artemis program is pushing forward with its bold plan to return astronauts to the Moon — and eventually use it as a stepping stone to Mars! The program aims to set up a long-term lunar base where scientists can live and work, learning how to survive far from Earth before attempting the much longer journey to the Red Planet.</p><p>California is right at the heart of this mission. NASA's Jet Propulsion Laboratory (JPL), located in Pasadena — just a few hours from Fremont — designs and operates some of NASA's most famous spacecraft, including the Mars rovers. The science of space exploration is practically in our own backyard! 🌌</p></div><div class="usa-spot"><h3>⚾ Baseball Season Is Back — and the Bay Area Is Ready!</h3><p>Spring means baseball, and Major League Baseball's 2026 season is in full swing! The Oakland Athletics are in a transitional period as they work toward a new stadium, while Bay Area fans are finding ways to stay passionate about the game. Baseball has been played professionally in the US since 1869, making it one of the oldest team sports in American history.</p><p>Whether you're a stats whiz or just love the sound of a ball cracking off a bat, baseball season is a great time to explore America's favorite pastime. Many kids even keep score at home — it's sneaky great math practice! ⚾</p></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INTEREST FEATURE -->
+  <div class="card card-interest">
+    <div class="section-label label-interest">⭐ Interest Corner</div>
+    <h2>Flip, Twist, Soar — You've Got This!</h2><p class="section-intro">Whether you're in the gym or just love the sport, here's your weekly gymnastics moment! 💪</p><div class="interest-grid"><div class="interest-item"><h3>🏆 Simone Biles Has Skills Named After Her Forever</h3><p>Simone Biles is widely considered the greatest gymnast of all time — and she keeps proving why. In gymnastics, when you perform a skill so difficult and original that no one had done it before, they name it after you in the official code of points. Simone has multiple skills named after her, which means her legacy is written into the rulebook of the sport itself. That's like having a math theorem named after you!</p><p>What makes Simone especially inspiring isn't just her unreal athleticism — it's how she handles pressure and speaks up for her mental health and values. She's shown millions of young athletes that you can be strong, brave, and honest at the same time. Pretty incredible role model if you ask me. 🌟</p><div class="story-links learn-more"><a href="https://kids.britannica.com/kids/article/Simone-Biles/634539" class="link-rose">Simone Biles — Britannica Kids</a><a href="https://usagym.org" class="link-rose">USA Gymnastics — Official Site</a></div></div><div class="interest-item"><h3>💡 Why Do Gymnasts Chalk Their Hands?</h3><p>Ever noticed gymnasts rubbing white powder on their hands before bars or rings? That's not regular chalk — it's magnesium carbonate, and it works by absorbing sweat so their palms don't slip on the bar. Without it, even the strongest grip would be dangerously unreliable.</p><p>Elite gymnasts can go through a lot of chalk in a single training session. Some mix it with a tiny bit of water to make a thick paste for extra grip on tough release moves. It's one of those small details that makes a huge difference between a clean routine and a scary fall. Science + gymnastics = winning combo! 🤲</p><div class="story-links learn-more"><a href="https://olympics.com/en/sports/artistic-gymnastics/" class="link-rose">Artistic Gymnastics Basics — Olympics</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MONEY MOVES -->
+  <div class="card card-money">
+    <div class="section-label label-money">💰 Money Moves</div>
+    <h2>Smart Habits, Real Results</h2><div class="money-stories"><div class="money-story"><h3>💡 The Secret Trick: Pay Yourself First</h3><p>Here's a tip that money experts swear by: every time you get money — allowance, a birthday gift, payment for a chore — set some aside for savings before you spend a single cent. This is called 'paying yourself first.'</p><p>Most people do it backwards: they spend first and save whatever's left. The problem? There's usually nothing left! When you save first, even 20 cents from every dollar, it adds up faster than you'd expect. Try dividing your money into three jars: Save, Spend, and Give. It sounds simple — because it is. And simple habits, done consistently, create big results over time. 🏦</p><div class="analogy">It's like eating your vegetables before dessert. If you wait until the end, you might be too full — or too tempted to skip them. Savings work the exact same way.</div><div class="story-links learn-more"><a href="https://www.britannica.com/money/financial-literacy-for-kids" class="link-amber">Money Basics for Kids — Britannica</a></div></div><div class="money-story"><h3>🧁 The 8-Year-Old Who Built a Cupcake Business</h3><p>Chloe Stirling from Illinois started baking and selling cupcakes when she was just 8 years old. By the time she was 10, she was earning hundreds of dollars a month from custom orders for birthdays, parties, and local events. She even appeared on national TV!</p><p>Chloe saved a big chunk of her earnings for college and used the rest to invest in better baking equipment — which helped her make even more. Her formula was simple: make something people actually want, price it fairly, and treat every customer with kindness. Turns out those rules work whether you're selling cupcakes or running a tech company someday. 🎂</p><div class="story-links learn-more"><a href="https://www.timeforkids.com" class="link-amber">Kid Entrepreneurs — Time for Kids</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SOPHIE'S CHALLENGE -->
+  <div class="card card-challenge">
+    <div class="section-label label-challenge">🧠 Sophie's Challenge</div>
+    <h2>Can You Crack the Trade Deal Math?</h2><p class="challenge-intro">This week in World Watch, we learned that countries are negotiating new trade deals to lower tariffs. A tariff is a percentage-based tax — so if a tariff drops, the savings can really add up. Let's see if you can figure out exactly how much!</p><div class="challenge-q">The US imports a shipment of electronics worth $200. Under the old rules, the tariff is 15%. A new trade deal drops the tariff to 5%. How much money does the US save on that one shipment?</div><div class="challenge-bonus">⭐ Bonus: If the US imports 1,000 of these same shipments every month, how much money would the new trade deal save in a single year?</div><div class="challenge-hint">To find a percentage of a number, turn the percentage into a decimal first (15% becomes 0.15). Multiply that by the shipment value to find the tariff cost. Do it for both rates, then subtract to find the savings!</div><div class="learn-more"><a href="https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-factors-and-multiples/cc-6th-percentages/e/percentage_word_problems_1" class="link-orange">Percentage Word Problems — Khan Academy</a></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;"><span class="hearts">💖 🌏 💖</span><strong>Sophie's World</strong> · Issue #5 · April 21, 2026<br>Made with love by Dad & Claude 🤖❤️<br><span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span></div>
+
+</div>
+</body>
+</html>

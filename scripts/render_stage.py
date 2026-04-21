@@ -30,11 +30,13 @@ def render_story_list(items: List[Dict[str, Any]], link_style: str, section_clas
     wrapper_class = "world-stories" if section_class == "world" else f"{section_class}-stories"
     for item in items:
         paragraphs = "".join(f"<p>{paragraph}</p>" for paragraph in item.get("body", []))
+        highlight = item.get("highlight")
+        highlight_html = f'<div class="money-highlight"><strong>{highlight}</strong></div>' if highlight else ""
         analogy = item.get("analogy")
         analogy_html = f'<div class="analogy">{analogy}</div>' if analogy else ""
         links_html = render_links(item.get("links", []), link_style, extra_class="story-links learn-more")
         stories.append(
-            f'<div class="{card_class}"><h3>{item["headline"]}</h3>{paragraphs}{analogy_html}{links_html}</div>'
+            f'<div class="{card_class}"><h3>{item["headline"]}</h3>{paragraphs}{highlight_html}{analogy_html}{links_html}</div>'
         )
     return f'<div class="{wrapper_class}">{"".join(stories)}</div>'
 
