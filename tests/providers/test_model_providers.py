@@ -39,6 +39,39 @@ def test_openai_compatible_generate_success():
         mock_client.chat.completions.create.assert_called_once()
 
 
+from scripts.providers.model_providers import make_provider, PROVIDER_MAP
+
+
+def test_make_provider_unknown_raises():
+    try:
+        make_provider({"provider": "nonexistent"})
+        raise AssertionError("Expected ValueError")
+    except ValueError as exc:
+        assert "nonexistent" in str(exc)
+
+
+def test_make_provider_missing_provider_key():
+    try:
+        make_provider({})
+        raise AssertionError("Expected ValueError")
+    except ValueError as exc:
+        assert "provider" in str(exc)
+
+
+def test_make_provider_claude():
+    provider = make_provider({"provider": "claude", "model": "sonnet"})
+    assert provider.name == "claude"
+
+
+def test_make_provider_openai_compatible():
+    provider = make_provider({
+        "provider": "openai_compatible",
+        "model": "llama3",
+        "base_url": "http://localhost:1234/v1",
+    })
+    assert provider.name == "openai_compatible"
+
+
 def test_model_provider_is_abc():
     try:
         provider = ModelProvider()
