@@ -99,7 +99,7 @@ def test_parse_ranker_output_strips_leading_non_json():
     assert result[0]["reasons"] == ["reason B"]
 
     # Pure valid JSON still works
-    raw_pure = '{"result": [{"index": 0, "reasons": ["reason C"]}]}''
+    raw_pure = '{"result": [{"index": 0, "reasons": ["reason C"]}]}'
     result = _parse_ranker_output(raw_pure, candidates)
     assert len(result) == 1
     assert result[0]["reasons"] == ["reason C"]

@@ -203,43 +203,51 @@ def _run_model_ranker(
 def _parse_ranker_output(raw: str, candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Extract and validate structured ranking selections from model output."""
     # Strip any leading non-JSON content (blank lines, warning messages, etc.)
-    json_start = min(
-        raw.find("{"),
-        raw.find("["),
-    )
-    if json_start == -1:
+    # Find the first `[` since arrays are the outer structure; falling back to first `{`
+    first_bracket = raw.find("[")
+    first_brace = raw.find("{")
+    if first_bracket == -1 and first_brace == -1:
         raise ValueError("ranker output does not contain a JSON object or array")
+    json_start = first_bracket if first_bracket != -1 and (first_brace == -1 or first_bracket < first_brace) else first_brace
     raw = raw[json_start:]
 
+    outer = None
     try:
         outer = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"ranker output invalid envelope JSON: {exc}") from exc
+    except json.JSONDecodeError:
+        # Some model/tool paths can emit a Python-ish envelope like:
+        # {"result": '[{"index": 0, ...}]'}
+        # That's invalid JSON because the inner string uses single quotes.
+        # Fall back to extracting the first JSON array payload directly.
+        pass
 
     # Handle two formats:
     # 1. Envelope dict: {"result": "[{...}]"} from subprocess path
     # 2. Direct array string: "[{...}]" from provider.generate() result
+    # 3. Pseudo-JSON envelope with a directly extractable array payload
     if isinstance(outer, list):
-        # Provider path: raw is already the JSON array string, parsed to list
         selections = outer
-        result_text = raw
     else:
-        # Subprocess path: outer is the envelope dict
-        result_text = outer.get("result", "")
-        if not result_text:
+        result_text = outer.get("result", "") if isinstance(outer, dict) else raw
+        if isinstance(outer, dict) and not result_text:
             raise ValueError("ranker output has empty result field")
 
-        result_text = result_text.strip()
-        result_text = result_text.removeprefix("```json").removeprefix("```").strip()
-        result_text = result_text.removesuffix("```").strip()
+        if isinstance(result_text, list):
+            selections = result_text
+        else:
+            result_text = result_text.strip()
+            result_text = result_text.removeprefix("```json").removeprefix("```").strip()
+            result_text = result_text.removesuffix("```").strip()
 
-        # The model should return a JSON array
-        start = result_text.find("[")
-        end = result_text.rfind("]")
-        if start == -1 or end == -1:
-            raise ValueError("ranker output does not contain a JSON array")
+            start = result_text.find("[")
+            end = result_text.rfind("]")
+            if start == -1 or end == -1 or end < start:
+                raise ValueError("ranker output does not contain a JSON array")
 
-        selections = json.loads(result_text[start:end + 1])
+            try:
+                selections = json.loads(result_text[start:end + 1])
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"ranker output invalid JSON array: {exc}") from exc
         if not isinstance(selections, list):
             raise ValueError("ranker output is not a list")
 
