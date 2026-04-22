@@ -430,6 +430,8 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
             **kwargs,
         )
         raw_output = result.get("result", "")
+        (debug_dir / "last-packet-stdout.txt").write_text(raw_output, encoding="utf-8")
+        (debug_dir / "last-packet-stderr.txt").write_text(result.get("error", "") or "", encoding="utf-8")
         parse_content_output(raw_output, repo_root)
         return raw_output
 
