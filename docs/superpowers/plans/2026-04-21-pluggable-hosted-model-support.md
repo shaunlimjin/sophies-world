@@ -845,7 +845,7 @@ Expected: FAIL — content_stage doesn't accept `provider` kwarg yet
 Both functions take `provider=None` as a kwarg. When provider is None (backward compat), they fall back to the existing subprocess behavior. When provider is provided, they call `provider.generate()`.
 
 ```python
-def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 300, provider=None) -> str:
+def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 300, provider=None, **kwargs) -> str:
     debug_dir = get_debug_dir(repo_root)
     (debug_dir / "last-content-prompt.txt").write_text(prompt, encoding="utf-8")
 
@@ -855,6 +855,7 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
             timeout=timeout_seconds,
             max_retries=2,
             debug_dir=debug_dir,
+            **kwargs,
         )
         raw_output = result.get("result", "")
         if "error" in result:
@@ -864,7 +865,7 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
             sys.exit(1)
         return raw_output
 
-    # Existing subprocess path (backward compat)
+    # Existing subprocess path (backward compat) — hardcodes Mode A tools
     try:
         result = subprocess.run(
             [
@@ -888,7 +889,7 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
     return result.stdout
 ```
 
-Similarly for `run_packet_synthesis_provider` — add `provider=None` kwarg, use provider.generate() when available, fall back to subprocess otherwise.
+Similarly for `run_packet_synthesis_provider` — add `provider=None, **kwargs`, use provider.generate() with **kwargs when available, fall back to subprocess otherwise.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
