@@ -134,9 +134,14 @@ class ModelProvider(ABC):
         - max_retries (int): number of retry attempts on failure (default 2)
         - base_delay (float): initial backoff delay in seconds (default 2.0, CLI only)
         - debug_dir (Path): directory to write debug artifacts (CLI only)
+        - max_turns (int): max turns for CLI (default varies by caller; Mode A uses 10)
+        - allowed_tools (str): comma-separated tool names for CLI (e.g. "WebSearch,WebFetch"; Mode A only)
 
         On error, result dict includes an "error" key describing the failure, e.g.
         {"result": "", "error": "timeout"} or {"result": "", "error": "exit 1"}.
+
+        Note: OpenAICompatibleProvider does not support tools or max_turns. Mode A
+        (integrated search) requires a tool-capable provider (only ClaudeProvider currently)."
         """
 ```
 
@@ -196,6 +201,27 @@ def test_claude_provider_generate_success():
         assert "--model" in args
         assert "sonnet" in args
         assert result["result"] == "test output"
+
+def test_claude_provider_generate_with_tools_and_max_turns():
+    """Mode A calls generate with allowed_tools and max_turns=10."""
+    provider = ClaudeProvider({"model": "sonnet"})
+    mock_result = MagicMock()
+    mock_result.returncode = 0
+    mock_result.stdout = '{"result": "web search output"}'
+    mock_result.stderr = ""
+
+    with patch("subprocess.run", return_value=mock_result) as mock_run:
+        result = provider.generate(
+            "search prompt",
+            allowed_tools="WebSearch,WebFetch",
+            max_turns=10,
+        )
+        args = mock_run.call_args[0][0]
+        assert "--allowedTools" in args
+        assert "WebSearch,WebFetch" in args
+        idx = args.index("--max-turns")
+        assert args[idx + 1] == "10"
+        assert result["result"] == "web search output"
 
 def test_claude_provider_generate_retry_on_nonzero_exit():
     provider = ClaudeProvider({"model": "sonnet"})
@@ -273,16 +299,22 @@ class ClaudeProvider(ModelProvider):
         timeout = kwargs.get("timeout", 120)
         max_retries = kwargs.get("max_retries", 2)
         base_delay = kwargs.get("base_delay", 2.0)
+        max_turns = kwargs.get("max_turns", 2)
+        allowed_tools = kwargs.get("allowed_tools")
 
         for attempt in range(max_retries + 1):
             try:
+                args = [
+                    "claude", "-p", prompt,
+                    "--output-format", "json",
+                    "--model", self.model,
+                    "--max-turns", str(max_turns),
+                ]
+                if allowed_tools:
+                    args.extend(["--allowedTools", allowed_tools])
+
                 result = subprocess.run(
-                    [
-                        "claude", "-p", prompt,
-                        "--output-format", "json",
-                        "--model", self.model,
-                        "--max-turns", "2",
-                    ],
+                    args,
                     capture_output=True,
                     text=True,
                     timeout=timeout,
@@ -300,8 +332,12 @@ class ClaudeProvider(ModelProvider):
                 return {"result": "", "error": f"exit {result.returncode}"}
 
             try:
-                return {"result": json.loads(result.stdout)["result"]}
-            except (json.JSONDecodeError, KeyError):
+                outer = json.loads(result.stdout)
+                result_text = outer.get("result", "")
+                if not result_text:
+                    raise ValueError("content provider returned empty result")
+                return {"result": result_text}
+            except (json.JSONDecodeError, KeyError, ValueError):
                 if attempt < max_retries:
                     time.sleep(base_delay * (2 ** attempt))
                     continue
@@ -732,7 +768,7 @@ def rank_candidates(
     if ranker_provider == "heuristic_ranker":
         return _heuristic_rank(filtered_pool, config, repo_root)
     if ranker_provider == "hosted_model_ranker":
-        from scripts.providers.model_providers import make_provider
+        from providers.model_providers import make_provider
         generation_cfg = config.get("profile", {}).get("newsletter", {}).get("generation", {})
         provider_cfg = generation_cfg.get("providers", {}).get("ranking")
         if not provider_cfg:
@@ -941,7 +977,7 @@ In `generate.py`, at the top of `run_mode_b`, add provider instantiation:
 
 ```python
 def run_mode_b(...):
-    from scripts.providers.model_providers import make_provider
+    from providers.model_providers import make_provider
     generation_cfg = config["profile"].get("newsletter", {}).get("generation", {})
     synthesis_provider_cfg = generation_cfg.get("providers", {}).get("synthesis")
     synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
@@ -952,7 +988,31 @@ def run_mode_b(...):
     raw_output = run_packet_synthesis_provider(prompt, repo_root, provider=synthesis_provider)
 ```
 
-Also update `run_mode_a` similarly — add provider instantiation and pass it to `run_content_provider`. The provider is determined from the same `providers.synthesis` config.
+Also update `run_mode_a` similarly. Since Mode A requires web tools (WebSearch, WebFetch), it passes them explicitly when calling the provider:
+
+```python
+def run_mode_a(today, issue_num, config, recent_headlines, repo_root):
+    from providers.model_providers import make_provider
+    generation_cfg = config["profile"].get("newsletter", {}).get("generation", {})
+    synthesis_provider_cfg = generation_cfg.get("providers", {}).get("synthesis")
+    synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
+
+    prompt = build_content_prompt(today, issue_num, config, recent_headlines)
+
+    if synthesis_provider is not None:
+        raw_output = run_content_provider(
+            prompt, repo_root,
+            provider=synthesis_provider,
+            allowed_tools="WebSearch,WebFetch",
+            max_turns=10,
+        )
+    else:
+        raw_output = run_content_provider(prompt, repo_root)
+
+    issue = parse_content_output(raw_output, repo_root)
+    validate_issue_artifact(issue)
+    return issue
+```
 
 - [ ] **Step 4: Run existing tests to verify nothing is broken**
 
