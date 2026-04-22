@@ -139,9 +139,24 @@ def resolve_providers(config: dict, content_provider_override: Optional[str], ra
 
 def run_mode_a(today: date, issue_num: int, config: dict, recent_headlines: List[str], repo_root: Path) -> dict:
     """Mode A: hosted provider with integrated search (baseline path)."""
+    from providers.model_providers import make_provider
+    generation_cfg = config["profile"].get("newsletter", {}).get("generation", {})
+    synthesis_provider_cfg = generation_cfg.get("providers", {}).get("synthesis")
+    synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
+
     print("Mode A: hosted provider with integrated search")
     prompt = build_content_prompt(today, issue_num, config, recent_headlines)
-    raw_output = run_content_provider(prompt, repo_root)
+
+    if synthesis_provider is not None:
+        raw_output = run_content_provider(
+            prompt, repo_root,
+            provider=synthesis_provider,
+            allowed_tools="WebSearch,WebFetch",
+            max_turns=10,
+        )
+    else:
+        raw_output = run_content_provider(prompt, repo_root)
+
     issue = parse_content_output(raw_output, repo_root)
     validate_issue_artifact(issue)
     return issue
@@ -159,6 +174,11 @@ def run_mode_b(
     artifacts_root: Optional[Path] = None,
 ) -> dict:
     """Mode B: deterministic retrieval + configurable ranking + hosted packet synthesis."""
+    from providers.model_providers import make_provider
+    generation_cfg = config["profile"].get("newsletter", {}).get("generation", {})
+    synthesis_provider_cfg = generation_cfg.get("providers", {}).get("synthesis")
+    synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
+
     from research_stage import (
         build_research_plan, run_research,
         load_research_packet, save_research_packet,
@@ -195,7 +215,7 @@ def run_mode_b(
         print(f"Research packet saved: {artifact_path}")
 
     prompt = build_packet_synthesis_prompt(today, issue_num, config, packet)
-    raw_output = run_packet_synthesis_provider(prompt, repo_root)
+    raw_output = run_packet_synthesis_provider(prompt, repo_root, provider=synthesis_provider)
     issue = parse_content_output(raw_output, repo_root)
     validate_issue_artifact(issue)
     return issue

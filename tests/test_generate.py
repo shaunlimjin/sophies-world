@@ -584,3 +584,69 @@ def test_load_config_default_env_is_prod(tmp_path):
     make_config(tmp_path, VALID_SOPHIE_YAML)
     config = generate.load_config(tmp_path)
     assert config["profile"]["name"] == "Sophie"
+
+
+def test_run_mode_b_wires_provider():
+    """Verify run_mode_b instantiates provider from config and passes it to run_packet_synthesis_provider."""
+    from unittest.mock import MagicMock, patch
+
+    mock_provider = MagicMock()
+
+    def fake_generate(prompt, **kwargs):
+        return {
+            "result": json.dumps({
+                "greeting_text": "Hi Sophie",
+                "sections": []
+            })
+        }
+
+    mock_provider.generate.side_effect = fake_generate
+
+    config = {
+        "profile": {
+            "id": "sophie",
+            "name": "Sophie",
+            "age_band": "4th-grade",
+            "newsletter": {
+                "generation": {
+                    "providers": {
+                        "synthesis": {"provider": "claude", "model": "opus"}
+                    }
+                }
+            },
+            "interests": {"active": []},
+        },
+        "sections": {},
+        "research": {"ranking": {"sections": {}}},
+        "theme": "default",
+    }
+
+    # Capture the provider argument as it flows from make_provider -> run_packet_synthesis_provider
+    captured_provider = []
+
+    def capture_run_packet_synthesis_provider(prompt, repo_root, provider=None, **kwargs):
+        captured_provider.append(provider)
+        return json.dumps({
+            "is_error": False,
+            "result": json.dumps({"greeting_text": "Hi Sophie", "sections": []})
+        })
+
+    with patch.object(generate, 'run_packet_synthesis_provider', side_effect=capture_run_packet_synthesis_provider):
+        with patch.object(generate, 'parse_content_output', return_value={"greeting_text": "Hi Sophie", "sections": []}):
+            with patch.object(generate, 'validate_issue_artifact'):
+                with patch("scripts.ranking_stage.prefilter_candidates", return_value={"sections": []}):
+                    with patch("scripts.ranking_stage.rank_candidates", return_value={"sections": []}):
+                        with patch("providers.model_providers.make_provider", return_value=mock_provider):
+                            result = generate.run_mode_b(
+                                today=date.today(),
+                                issue_num=1,
+                                config=config,
+                                recent_headlines=[],
+                                repo_root=Path("/tmp"),
+                                ranker_provider="heuristic_ranker",
+                                refresh_research=True,
+                            )
+                            # Verify the provider that was passed to run_packet_synthesis_provider is our mock
+                            assert len(captured_provider) == 1, f"Expected 1 call, got {len(captured_provider)}"
+                            assert captured_provider[0] is mock_provider, \
+                                f"Expected mock_provider to be passed, got {captured_provider[0]}"
