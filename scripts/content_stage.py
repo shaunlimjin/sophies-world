@@ -199,9 +199,26 @@ def get_debug_dir(repo_root: Path) -> Path:
     return path
 
 
-def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 300) -> str:
+def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 300, provider=None, **kwargs) -> str:
     debug_dir = get_debug_dir(repo_root)
     (debug_dir / "last-content-prompt.txt").write_text(prompt, encoding="utf-8")
+
+    if provider is not None:
+        result = provider.generate(
+            prompt,
+            timeout=timeout_seconds,
+            max_retries=2,
+            debug_dir=debug_dir,
+            **kwargs,
+        )
+        raw_output = result.get("result", "")
+        (debug_dir / "last-content-stdout.txt").write_text(raw_output, encoding="utf-8")
+        (debug_dir / "last-content-stderr.txt").write_text(result.get("error", "") or "", encoding="utf-8")
+        if "error" in result and not raw_output:
+            print(result["error"], file=sys.stderr)
+            sys.exit(1)
+        return raw_output
+
     try:
         result = subprocess.run(
             [
@@ -399,10 +416,22 @@ Rules:
 """
 
 
-def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds: int = 300, max_retries: int = 2) -> str:
+def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds: int = 300, max_retries: int = 2, provider=None, **kwargs) -> str:
     """Call Claude without web tools (packet-driven synthesis mode)."""
     debug_dir = get_debug_dir(repo_root)
     (debug_dir / "last-packet-prompt.txt").write_text(prompt, encoding="utf-8")
+
+    if provider is not None:
+        result = provider.generate(
+            prompt,
+            timeout=timeout_seconds,
+            max_retries=max_retries,
+            debug_dir=debug_dir,
+            **kwargs,
+        )
+        raw_output = result.get("result", "")
+        parse_content_output(raw_output, repo_root)
+        return raw_output
 
     for attempt in range(max_retries + 1):
         try:
