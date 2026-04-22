@@ -2,6 +2,41 @@ import subprocess
 from unittest.mock import MagicMock, patch
 from scripts.providers.model_providers.base import ModelProvider
 from scripts.providers.model_providers.claude import ClaudeProvider
+from scripts.providers.model_providers.openai_compatible import OpenAICompatibleProvider
+
+
+def test_openai_compatible_requires_model():
+    try:
+        OpenAICompatibleProvider({})
+        raise AssertionError("Expected ValueError for missing model")
+    except ValueError as exc:
+        assert "model" in str(exc).lower()
+
+
+def test_openai_compatible_name():
+    provider = OpenAICompatibleProvider({"model": "llama3"})
+    assert provider.name == "openai_compatible"
+
+
+def test_openai_compatible_generate_success():
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock(message=MagicMock(content="synthesized output"))]
+
+    with patch("scripts.providers.model_providers.openai_compatible.OpenAI") as mock_openai_class:
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+
+        from scripts.providers.model_providers.openai_compatible import OpenAICompatibleProvider
+        provider = OpenAICompatibleProvider({
+            "model": "llama3",
+            "base_url": "http://localhost:1234/v1",
+            "api_key": "test-key",
+        })
+
+        result = provider.generate("test prompt")
+        assert result["result"] == "synthesized output"
+        mock_client.chat.completions.create.assert_called_once()
 
 
 def test_model_provider_is_abc():
