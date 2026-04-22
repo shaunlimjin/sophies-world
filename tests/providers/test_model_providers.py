@@ -1,4 +1,8 @@
+import subprocess
+from unittest.mock import MagicMock, patch
 from scripts.providers.model_providers.base import ModelProvider
+from scripts.providers.model_providers.claude import ClaudeProvider
+
 
 def test_model_provider_is_abc():
     try:
@@ -6,6 +10,7 @@ def test_model_provider_is_abc():
         raise AssertionError("ModelProvider cannot be instantiated directly")
     except TypeError:
         pass  # ABC raises TypeError
+
 
 def test_model_provider_name_property():
     """Subclasses must implement the name property."""
@@ -19,3 +24,86 @@ def test_model_provider_name_property():
 
     p = DummyProvider({})
     assert p.name == "dummy"
+
+
+def test_claude_provider_requires_model():
+    try:
+        ClaudeProvider({})
+        raise AssertionError("Expected ValueError for missing model")
+    except ValueError as exc:
+        assert "model" in str(exc).lower()
+
+
+def test_claude_provider_name():
+    provider = ClaudeProvider({"model": "sonnet"})
+    assert provider.name == "claude"
+
+
+def test_claude_provider_generate_success():
+    provider = ClaudeProvider({"model": "sonnet"})
+    mock_result = MagicMock()
+    mock_result.returncode = 0
+    mock_result.stdout = '{"result": "test output"}'
+    mock_result.stderr = ""
+
+    with patch("subprocess.run", return_value=mock_result) as mock_run:
+        result = provider.generate("test prompt")
+        mock_run.assert_called_once()
+        args = mock_run.call_args[0][0]
+        assert "--model" in args
+        assert "sonnet" in args
+        assert result["result"] == "test output"
+
+
+def test_claude_provider_generate_with_tools_and_max_turns():
+    """Mode A calls generate with allowed_tools and max_turns=10."""
+    provider = ClaudeProvider({"model": "sonnet"})
+    mock_result = MagicMock()
+    mock_result.returncode = 0
+    mock_result.stdout = '{"result": "web search output"}'
+    mock_result.stderr = ""
+
+    with patch("subprocess.run", return_value=mock_result) as mock_run:
+        result = provider.generate(
+            "search prompt",
+            allowed_tools="WebSearch,WebFetch",
+            max_turns=10,
+        )
+        args = mock_run.call_args[0][0]
+        assert "--allowedTools" in args
+        assert "WebSearch,WebFetch" in args
+        idx = args.index("--max-turns")
+        assert args[idx + 1] == "10"
+        assert result["result"] == "web search output"
+
+
+def test_claude_provider_generate_retry_on_nonzero_exit():
+    provider = ClaudeProvider({"model": "sonnet"})
+    mock_fail = MagicMock()
+    mock_fail.returncode = 1
+    mock_fail.stdout = ""
+    mock_fail.stderr = "rate limit"
+
+    mock_success = MagicMock()
+    mock_success.returncode = 0
+    mock_success.stdout = '{"result": "recovered"}'
+    mock_success.stderr = ""
+
+    with patch("subprocess.run", side_effect=[mock_fail, mock_success]):
+        with patch("time.sleep"):
+            result = provider.generate("test prompt", max_retries=1, base_delay=0.01)
+            assert result["result"] == "recovered"
+
+
+def test_claude_provider_generate_error_on_exhausted_retries():
+    provider = ClaudeProvider({"model": "sonnet"})
+    mock_fail = MagicMock()
+    mock_fail.returncode = 1
+    mock_fail.stdout = ""
+    mock_fail.stderr = ""
+
+    with patch("subprocess.run", return_value=mock_fail):
+        with patch("time.sleep"):
+            result = provider.generate("test prompt", max_retries=0, base_delay=0.01)
+            assert "error" in result
+            assert result["result"] == ""
