@@ -73,7 +73,7 @@ def rank_candidates(
     if ranker_provider == "heuristic_ranker":
         return _heuristic_rank(filtered_pool, config, repo_root)
     if ranker_provider == "hosted_model_ranker":
-        from providers.hosted_llm_provider import model_rank_candidates
+        from providers.llm_providers import model_rank_candidates
         return model_rank_candidates(filtered_pool, config, repo_root)
     raise ValueError(f"Unknown ranker_provider: '{ranker_provider}'")
 
