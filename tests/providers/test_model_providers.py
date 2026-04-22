@@ -163,6 +163,51 @@ def test_claude_provider_generate_retry_on_nonzero_exit():
             assert result["result"] == "recovered"
 
 
+def test_openai_compatible_minimax_key_missing_raises():
+    """OpenAICompatibleProvider raises when MINIMAX_API_KEY is absent from .env and env."""
+    with patch.dict("os.environ", {}, clear=True):
+        with patch(
+            "scripts.providers.model_providers.openai_compatible._load_minimax_api_key",
+            side_effect=RuntimeError("MINIMAX_API_KEY not found in .env or environment"),
+        ):
+            try:
+                OpenAICompatibleProvider(
+                    {"model": "MiniMax-Text-01", "base_url": "https://api.minimax.io/v1"},
+                    repo_root=None,
+                )
+                raise AssertionError("Expected RuntimeError")
+            except RuntimeError as exc:
+                assert "MINIMAX_API_KEY" in str(exc)
+
+
+def test_openai_compatible_uses_env_key_for_minimax():
+    """When base_url contains minimax.io and key is absent, env var is used."""
+    with patch.dict("os.environ", {"MINIMAX_API_KEY": "env-secret-key"}):
+        with patch(
+            "scripts.providers.model_providers.openai_compatible.OpenAI"
+        ) as mock_openai_class:
+            mock_client = MagicMock()
+            mock_openai_class.return_value = mock_client
+
+            from scripts.providers.model_providers.openai_compatible import (
+                OpenAICompatibleProvider,
+            )
+
+            provider = OpenAICompatibleProvider(
+                {
+                    "model": "MiniMax-Text-01",
+                    "base_url": "https://api.minimax.io/v1",
+                },
+                repo_root=None,
+            )
+
+            # Verify OpenAI client was called with the env key
+            mock_openai_class.assert_called_once_with(
+                base_url="https://api.minimax.io/v1",
+                api_key="env-secret-key",
+            )
+
+
 def test_claude_provider_generate_error_on_exhausted_retries():
     provider = ClaudeProvider({"model": "sonnet"})
     mock_fail = MagicMock()
