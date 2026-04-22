@@ -192,7 +192,7 @@ def _run_mode_b_patched(config, tmp_path, refresh_research, artifact_path, resea
     rank_mod.prefilter_candidates = lambda pool, cfg: pool
     rank_mod.rank_candidates = lambda pool, cfg, ranker, repo_root: pool
     gen_mod.build_packet_synthesis_prompt = lambda *a, **kw: "prompt"
-    gen_mod.run_packet_synthesis_provider = lambda prompt, repo_root: "raw"
+    gen_mod.run_packet_synthesis_provider = lambda prompt, repo_root, provider=None, **kwargs: "raw"
     gen_mod.parse_content_output = lambda raw, repo_root=None: _fake_issue()
     gen_mod.validate_issue_artifact = lambda issue: None
     try:
@@ -397,7 +397,7 @@ def test_model_ranker_falls_back_to_filtered_when_model_returns_empty(tmp_path):
         "research": {"ranking": {"defaults": {"max_ranked": 3}, "sections": {}}},
     }
 
-    from providers import hosted_llm_provider
+    from providers import llm_providers as hosted_llm_provider
 
     with patch.object(hosted_llm_provider, "_run_model_ranker", return_value=[]):
         result = hosted_llm_provider.model_rank_candidates(pool, config, tmp_path)
@@ -423,7 +423,7 @@ def test_model_ranker_fallback_preserves_filtered_order(tmp_path):
         "research": {"ranking": {"defaults": {"max_ranked": 3}, "sections": {}}},
     }
 
-    from providers import hosted_llm_provider
+    from providers import llm_providers as hosted_llm_provider
 
     with patch.object(hosted_llm_provider, "_run_model_ranker", return_value=[]):
         result = hosted_llm_provider.model_rank_candidates(pool, config, tmp_path)
@@ -433,7 +433,7 @@ def test_model_ranker_fallback_preserves_filtered_order(tmp_path):
 
 
 def test_model_ranker_prompt_includes_recent_headlines_and_distinctness_guidance():
-    from providers import hosted_llm_provider
+    from providers import llm_providers as hosted_llm_provider
 
     candidates = [
         {"title": "Moon mission update", "url": "https://example.com/1", "domain": "example.com",
