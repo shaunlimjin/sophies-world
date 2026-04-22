@@ -28,6 +28,13 @@ newsletter:
     # Mode B2: brave_deterministic research + hosted_model_ranker + hosted_packet_synthesis
     research_provider: brave_deterministic
     ranker_provider: heuristic_ranker
+    providers:
+      synthesis:
+        provider: claude
+        model: opus
+      ranking:
+        provider: claude
+        model: sonnet
     content_provider: hosted_integrated_search
     content_model: claude_cli
     render_provider: local_renderer
