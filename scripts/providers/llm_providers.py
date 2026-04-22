@@ -15,11 +15,20 @@ def model_rank_candidates(
     repo_root: Path,
     timeout_seconds: int = 120,
     max_retries: int = 2,
+    provider=None,
 ) -> Dict[str, Any]:
     """Rerank filtered candidates per section using a hosted Claude model.
 
     Receives a pool with filtered_candidates per section; returns the same
     structure augmented with ranked_candidates chosen by the model.
+
+    Args:
+        filtered_pool: Pool with filtered_candidates per section
+        config: Newsletter config dict
+        repo_root: Repository root path for debug artifacts
+        timeout_seconds: Timeout for provider calls
+        max_retries: Max retry attempts
+        provider: ModelProvider instance; when None, uses subprocess (backward compat)
     """
     debug_dir = _get_debug_dir(repo_root)
     profile = config["profile"]
@@ -45,7 +54,9 @@ def model_rank_candidates(
         prompt_file = debug_dir / f"last-ranker-prompt-{section_id}.txt"
         prompt_file.write_text(prompt, encoding="utf-8")
 
-        ranked = _run_model_ranker(prompt, section_id, candidates, max_ranked, debug_dir, timeout_seconds, max_retries)
+        ranked = _run_model_ranker(
+            prompt, section_id, candidates, max_ranked, debug_dir, timeout_seconds, max_retries, provider
+        )
 
         if not ranked:
             # Model ranker failed — fall back to filtered ordering (preserves deterministic prefilter signal)
@@ -132,33 +143,49 @@ def _run_model_ranker(
     debug_dir: Path,
     timeout_seconds: int,
     max_retries: int,
+    provider=None,
 ) -> List[Dict[str, Any]]:
     for attempt in range(max_retries + 1):
-        try:
-            result = subprocess.run(
-                [
-                    "claude", "-p", prompt,
-                    "--output-format", "json",
-                    "--max-turns", "2",
-                ],
-                capture_output=True,
-                text=True,
+        if provider is not None:
+            result = provider.generate(
+                prompt,
                 timeout=timeout_seconds,
+                max_retries=max_retries,
+                debug_dir=debug_dir,
             )
-        except subprocess.TimeoutExpired:
-            if attempt < max_retries:
-                continue
-            print(f"model ranker timed out for section {section_id}", file=sys.stderr)
-            return []
+            stdout = result.get("result", "")
+            (debug_dir / f"last-ranker-stdout-{section_id}-attempt{attempt}.txt").write_text(stdout, encoding="utf-8")
+            if result.get("error"):
+                if attempt < max_retries:
+                    continue
+                print(f"model ranker failed for section {section_id} (provider error: {result['error']})", file=sys.stderr)
+                return []
+        else:
+            try:
+                result = subprocess.run(
+                    [
+                        "claude", "-p", prompt,
+                        "--output-format", "json",
+                        "--max-turns", "2",
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout_seconds,
+                )
+            except subprocess.TimeoutExpired:
+                if attempt < max_retries:
+                    continue
+                print(f"model ranker timed out for section {section_id}", file=sys.stderr)
+                return []
 
-        stdout = result.stdout or ""
-        (debug_dir / f"last-ranker-stdout-{section_id}-attempt{attempt}.txt").write_text(stdout, encoding="utf-8")
+            stdout = result.stdout or ""
+            (debug_dir / f"last-ranker-stdout-{section_id}-attempt{attempt}.txt").write_text(stdout, encoding="utf-8")
 
-        if result.returncode != 0:
-            if attempt < max_retries:
-                continue
-            print(f"model ranker failed for section {section_id} (exit {result.returncode})", file=sys.stderr)
-            return []
+            if result.returncode != 0:
+                if attempt < max_retries:
+                    continue
+                print(f"model ranker failed for section {section_id} (exit {result.returncode})", file=sys.stderr)
+                return []
 
         try:
             ranked_selections = _parse_ranker_output(stdout, candidates)
@@ -181,23 +208,32 @@ def _parse_ranker_output(raw: str, candidates: List[Dict[str, Any]]) -> List[Dic
     except json.JSONDecodeError as exc:
         raise ValueError(f"ranker output invalid envelope JSON: {exc}") from exc
 
-    result_text = outer.get("result", "")
-    if not result_text:
-        raise ValueError("ranker output has empty result field")
+    # Handle two formats:
+    # 1. Envelope dict: {"result": "[{...}]"} from subprocess path
+    # 2. Direct array string: "[{...}]" from provider.generate() result
+    if isinstance(outer, list):
+        # Provider path: raw is already the JSON array string, parsed to list
+        selections = outer
+        result_text = raw
+    else:
+        # Subprocess path: outer is the envelope dict
+        result_text = outer.get("result", "")
+        if not result_text:
+            raise ValueError("ranker output has empty result field")
 
-    result_text = result_text.strip()
-    result_text = result_text.removeprefix("```json").removeprefix("```").strip()
-    result_text = result_text.removesuffix("```").strip()
+        result_text = result_text.strip()
+        result_text = result_text.removeprefix("```json").removeprefix("```").strip()
+        result_text = result_text.removesuffix("```").strip()
 
-    # The model should return a JSON array
-    start = result_text.find("[")
-    end = result_text.rfind("]")
-    if start == -1 or end == -1:
-        raise ValueError("ranker output does not contain a JSON array")
+        # The model should return a JSON array
+        start = result_text.find("[")
+        end = result_text.rfind("]")
+        if start == -1 or end == -1:
+            raise ValueError("ranker output does not contain a JSON array")
 
-    selections = json.loads(result_text[start:end + 1])
-    if not isinstance(selections, list):
-        raise ValueError("ranker output is not a list")
+        selections = json.loads(result_text[start:end + 1])
+        if not isinstance(selections, list):
+            raise ValueError("ranker output is not a list")
 
     ranked = []
     for sel in selections:
