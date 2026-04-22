@@ -73,8 +73,17 @@ def rank_candidates(
     if ranker_provider == "heuristic_ranker":
         return _heuristic_rank(filtered_pool, config, repo_root)
     if ranker_provider == "hosted_model_ranker":
+        from providers.model_providers import make_provider
+        generation_cfg = config.get("profile", {}).get("newsletter", {}).get("generation", {})
+        provider_cfg = generation_cfg.get("providers", {}).get("ranking")
+        if not provider_cfg:
+            raise ValueError(
+                "hosted_model_ranker requires 'providers.ranking' in config. "
+                "Example:\n  providers:\n    ranking:\n      provider: claude\n      model: sonnet"
+            )
+        provider = make_provider(provider_cfg)
         from providers.llm_providers import model_rank_candidates
-        return model_rank_candidates(filtered_pool, config, repo_root)
+        return model_rank_candidates(filtered_pool, config, repo_root, provider=provider)
     raise ValueError(f"Unknown ranker_provider: '{ranker_provider}'")
 
 
