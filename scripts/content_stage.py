@@ -479,15 +479,35 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
 def parse_content_output(json_str: str, repo_root: Path | None = None) -> Dict[str, Any]:
     if repo_root is not None:
         get_debug_dir(repo_root).joinpath("last-parse-input.txt").write_text(json_str or "", encoding="utf-8")
-    try:
-        outer = json.loads(json_str)
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"content provider returned invalid envelope JSON: {exc}") from exc
-    if outer.get("is_error") or not outer.get("result"):
+    if not json_str or not json_str.strip():
         raise ValueError("content provider returned empty or error result")
-    result = outer["result"].strip()
-    result = result.removeprefix("```json").removeprefix("```").strip()
-    result = result.removesuffix("```").strip()
+
+    # Strip markdown fences first — some providers return ```json ... ```
+    stripped = json_str.strip()
+    stripped = stripped.removeprefix("```json").removeprefix("```").strip()
+    stripped = stripped.removesuffix("```").strip()
+
+    # Try to extract a JSON object from the string (handles trailing junk)
+    obj_str = extract_first_json_object(stripped)
+
+    # Parse the outer object — may be an envelope {"result": "..."} or direct JSON
+    try:
+        outer = json.loads(obj_str)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"content provider returned invalid JSON: {exc}") from exc
+
+    # Detect envelope vs. direct content
+    if isinstance(outer, dict) and "result" in outer:
+        # Envelope format: result field holds the actual content
+        if outer.get("is_error") or not outer.get("result"):
+            raise ValueError("content provider returned empty or error result")
+        result = outer["result"].strip()
+        result = result.removeprefix("```json").removeprefix("```").strip()
+        result = result.removesuffix("```").strip()
+    else:
+        # Direct JSON format (no envelope)
+        result = obj_str
+
     try:
         return json.loads(extract_first_json_object(result))
     except json.JSONDecodeError as exc:
