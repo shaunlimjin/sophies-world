@@ -202,6 +202,15 @@ def _run_model_ranker(
 
 def _parse_ranker_output(raw: str, candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Extract and validate structured ranking selections from model output."""
+    # Strip any leading non-JSON content (blank lines, warning messages, etc.)
+    json_start = min(
+        raw.find("{"),
+        raw.find("["),
+    )
+    if json_start == -1:
+        raise ValueError("ranker output does not contain a JSON object or array")
+    raw = raw[json_start:]
+
     try:
         outer = json.loads(raw)
     except json.JSONDecodeError as exc:

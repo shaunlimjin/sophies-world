@@ -72,3 +72,34 @@ def test_model_rank_candidates_accepts_provider():
     result = model_rank_candidates(pool, config, repo_root, provider=mock_provider)
     mock_provider.generate.assert_called_once()
     assert "sections" in result
+
+
+def test_parse_ranker_output_strips_leading_non_json():
+    """_parse_ranker_output handles blank lines / warnings before the JSON payload."""
+    from providers.llm_providers import _parse_ranker_output
+
+    candidates = [
+        {"title": "A", "url": "http://a.com", "domain": "a.com", "snippet": "a"},
+        {"title": "B", "url": "http://b.com", "domain": "b.com", "snippet": "b"},
+    ]
+
+    # Envelope dict format with leading blank lines and warning
+    raw_envelope = """\n\nWARNING: some model message
+{"result": '[{"index": 0, "reasons": ["reason A"]}]'}"""
+    result = _parse_ranker_output(raw_envelope, candidates)
+    assert len(result) == 1
+    assert result[0]["title"] == "A"
+    assert result[0]["reasons"] == ["reason A"]
+
+    # Direct array string format with leading garbage
+    raw_direct = 'some stderr noise\n[{"index": 1, "reasons": ["reason B"]}]'
+    result = _parse_ranker_output(raw_direct, candidates)
+    assert len(result) == 1
+    assert result[0]["title"] == "B"
+    assert result[0]["reasons"] == ["reason B"]
+
+    # Pure valid JSON still works
+    raw_pure = '{"result": [{"index": 0, "reasons": ["reason C"]}]}''
+    result = _parse_ranker_output(raw_pure, candidates)
+    assert len(result) == 1
+    assert result[0]["reasons"] == ["reason C"]
