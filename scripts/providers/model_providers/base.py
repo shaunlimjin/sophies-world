@@ -31,7 +31,6 @@ class ModelProvider(ABC):
         - timeout (int): seconds before timeout (default 120)
         - max_retries (int): number of retry attempts on failure (default 2)
         - base_delay (float): initial backoff delay in seconds (default 2.0, CLI only)
-        - debug_dir (Path): directory to write debug artifacts (CLI only)
         - max_turns (int): max turns for CLI (default varies by caller; Mode A uses 10)
         - allowed_tools (str): comma-separated tool names for CLI (e.g. "WebSearch,WebFetch"; Mode A only)
 

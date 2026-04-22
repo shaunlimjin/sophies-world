@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 import subprocess
 import time
-from pathlib import Path
-from typing import Optional
 
 from .base import ModelProvider
 
@@ -21,15 +19,12 @@ class ClaudeProvider(ModelProvider):
         return "claude"
 
     def __init__(self, config: dict):
+        super().__init__(config)
         self.model = config.get("model")
         if not self.model:
             raise ValueError(
                 "ClaudeProvider requires 'model' in config (e.g. 'sonnet', 'opus')"
             )
-        self._debug_dir: Optional[Path] = None
-        if "debug_dir" in config:
-            self._debug_dir = Path(config["debug_dir"])
-            self._debug_dir.mkdir(parents=True, exist_ok=True)
 
     def generate(self, prompt: str, **kwargs) -> dict:
         timeout = kwargs.get("timeout", 120)

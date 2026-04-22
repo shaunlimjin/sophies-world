@@ -17,6 +17,7 @@ class OpenAICompatibleProvider(ModelProvider):
         return "openai_compatible"
 
     def __init__(self, config: dict):
+        super().__init__(config)
         base_url = config.get("base_url", "http://localhost:1234/v1")
         api_key = config.get("api_key", "not-needed")
         self.model = config.get("model")

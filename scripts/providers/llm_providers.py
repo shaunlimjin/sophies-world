@@ -151,13 +151,12 @@ def _run_model_ranker(
                 prompt,
                 timeout=timeout_seconds,
                 max_retries=max_retries,
-                debug_dir=debug_dir,
             )
             stdout = result.get("result", "")
             (debug_dir / f"last-ranker-stdout-{section_id}-attempt{attempt}.txt").write_text(stdout, encoding="utf-8")
             if result.get("error"):
-                if attempt < max_retries:
-                    continue
+                # Provider already exhausted its own retries — don't retry again here.
+                # Outer loop only retries on parse errors.
                 print(f"model ranker failed for section {section_id} (provider error: {result['error']})", file=sys.stderr)
                 return []
         else:
