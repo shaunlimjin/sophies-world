@@ -22,16 +22,6 @@ newsletter:
     - money_moves
     - sophies_challenge
   theme: default
-  generation:
-    # Mode A: hosted provider with integrated search (current default)
-    # Mode B1: brave_deterministic research + heuristic_ranker + hosted_packet_synthesis
-    # Mode B2: brave_deterministic research + hosted_model_ranker + hosted_packet_synthesis
-    research_provider: brave_deterministic
-    ranker_provider: heuristic_ranker
-    content_provider: hosted_integrated_search
-    content_model: claude_cli
-    render_provider: local_renderer
-    fallback_content_provider: hosted_integrated_search
   editorial:
     reading_level: 4th grade
     tone:

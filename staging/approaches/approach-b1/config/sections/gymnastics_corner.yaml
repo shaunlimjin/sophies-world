@@ -1,0 +1,40 @@
+id: gymnastics_corner
+display:
+  title: 🤸 Gymnastics Corner
+  block_type: interest_feature
+  link_style: link-rose
+editorial:
+  goal: Share interesting gymnastics news, athlete stories, fun facts, or beginner-safe
+    tips
+  content_rules:
+  - Keep it age-appropriate and encouraging
+  - Prefer athlete stories, fun facts, competition highlights, or safe basic technique
+    explanations
+  - Use .interest-item structure for each item
+  - Avoid risky coaching advice or unsafe training suggestions
+  - Include 1–2 "Learn More" links
+  source_preferences:
+  - Olympics
+  - USA Gymnastics
+  - Britannica Kids
+  - Kid-friendly sports coverage
+research:
+  queries:
+  - gymnastics news athletes {date}
+  - site:olympics.com gymnastics
+  - gymnastics competition highlights {date}
+  freshness: pm
+  count: 10
+ranking:
+  freshness_boost: 10
+  kid_safe_boost: 12
+  max_ranked: 4
+  keywords:
+  - gymnastics
+  - gymnast
+  - olympics
+  - vault
+  - floor
+  - balance beam
+  - uneven bars
+  - competition

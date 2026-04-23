@@ -240,8 +240,11 @@ Example:
   "ranker_provider": "heuristic_ranker",
   "resolved_config": {
     "child": "staging/config/children/sophie.yaml",
-    "sections": "staging/config/sections.yaml",
-    "research": "staging/config/research.yaml",
+    "pipeline": "config/pipelines/default.yaml",
+    "sections": {
+      "world_watch": "config/sections/world_watch.yaml",
+      "money_moves": "config/sections/money_moves.yaml"
+    },
     "theme": "staging/config/themes/default.yaml"
   },
   "outputs": {

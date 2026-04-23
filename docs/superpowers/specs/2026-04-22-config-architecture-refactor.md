@@ -1,7 +1,7 @@
 # Config Architecture Refactor
 
 **Date:** 2026-04-22
-**Status:** Draft spec
+**Status:** Implemented (merged in PR #3, merge commit `77681e6`)
 **Scope:** Sophie’s World configuration layer (`config/`)
 **Purpose:** Re-architect the configuration files to improve cohesion, separate infrastructure from persona definition, and make the system easier to scale and maintain.
 

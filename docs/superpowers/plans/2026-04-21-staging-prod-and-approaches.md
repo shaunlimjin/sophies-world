@@ -14,7 +14,7 @@
 
 ## Scope Note
 
-Phase 3 (sections.yaml restructure) is explicitly out of scope — it lands in `staging/config/` after this plan is complete. This plan covers Phase 1 (structural split, overlay resolution, output routing) and Phase 2 (first named approach snapshot).
+Historical note: when this plan was written, the later config-architecture refactor was still out of scope. That refactor has since landed in PR #3 (`77681e6`) for the prod baseline. Some staging/approach snapshots may still reflect the older monolithic config shape until they are migrated.
 
 ---
 

@@ -1,0 +1,34 @@
+id: usa_corner
+display:
+  title: 🇺🇸 USA Corner
+  block_type: spotlight
+  link_style: link-blue
+editorial:
+  goal: Share California/Fremont angle, or US sports/science/culture happening this
+    week
+  content_rules:
+  - Content should be current this week
+  - Prefer California or Fremont local angles
+  - Include 1–2 "Learn More" links
+  source_preferences:
+  - Time for Kids
+  - Britannica
+  - Local Fremont/California news
+research:
+  queries:
+  - california kids news {date}
+  - USA science culture kids {date}
+  - site:timeforkids.com usa news
+  freshness: pw
+  count: 10
+ranking:
+  freshness_boost: 20
+  geography_boost: 15
+  max_ranked: 3
+  keywords:
+  - california
+  - fremont
+  - bay area
+  - usa
+  - american
+  - national

@@ -1,0 +1,36 @@
+id: singapore_spotlight
+display:
+  title: 🇸🇬 Singapore Spotlight
+  block_type: spotlight
+  link_style: link-pink
+editorial:
+  goal: Share a fun fact about Singapore—cultural, historical, economic, nature, food,
+    or quirky
+  content_rules:
+  - Does not need to be current news
+  - Timeless or surprising facts are great
+  - Build affinity for Singapore culture and heritage
+  - Include 1–2 "Learn More" links
+  source_preferences:
+  - Britannica
+  - BBC Newsround
+  - Singapore Tourism Board
+research:
+  queries:
+  - singapore interesting facts kids
+  - site:kids.britannica.com singapore
+  - singapore culture food history fun facts
+  freshness: null
+  count: 8
+ranking:
+  freshness_boost: 5
+  geography_boost: 15
+  max_ranked: 3
+  keywords:
+  - singapore
+  - culture
+  - history
+  - food
+  - hawker
+  - heritage
+  - marina bay

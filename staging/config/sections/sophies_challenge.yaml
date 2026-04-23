@@ -1,0 +1,14 @@
+id: sophies_challenge
+display:
+  title: 🧩 Weekly Challenge
+  block_type: challenge
+  link_style: link-orange
+editorial:
+  goal: Present a maths or reasoning puzzle tied to World Watch content this week
+  content_rules:
+  - Include percentages, fractions, or basic reasoning
+  - Reference the World Watch story by name
+  - Add a .challenge-hint for guidance
+  - Make it fun and achievable for a 4th grader
+  source_preferences:
+  - Derives from World Watch content

@@ -4,6 +4,6 @@ __pycache__/
 .pytest_cache/
 logs/
 newsletters/test/
-artifacts/debug/
+artifacts/
 .DS_Store
 .worktrees/

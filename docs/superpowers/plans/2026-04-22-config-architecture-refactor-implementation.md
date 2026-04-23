@@ -1,7 +1,7 @@
 # Config Architecture Refactor Implementation Plan
 
 **Date:** 2026-04-22  
-**Status:** Draft plan  
+**Status:** Implemented (merged in PR #3, merge commit `77681e6`)  
 **Spec:** `docs/superpowers/specs/2026-04-22-config-architecture-refactor.md`  
 **Goal:** Replace the current monolithic `sections.yaml` + `research.yaml` model with cohesive `config/sections/*.yaml` files, move infrastructure into `config/pipelines/*.yaml`, and update the loader/codepath in one clean cutover.
 

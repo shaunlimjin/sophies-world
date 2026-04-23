@@ -1,0 +1,40 @@
+id: world_watch
+display:
+  title: 🌍 World Watch
+  block_type: story_list
+  link_style: link-green
+editorial:
+  goal: Explain 2 real, material current events happening this week in kid-friendly
+    language
+  content_rules:
+  - MUST include serious topics if relevant (conflicts, economy, tariffs)
+  - Explain each story for a 4th grader with an analogy using .analogy div
+  - Use real events happening this week
+  - Include 1–2 "Learn More" links per story
+  source_preferences:
+  - Time for Kids
+  - NewsForKids.net
+  - Britannica
+  - BBC Newsround
+research:
+  queries:
+  - world news for kids {date}
+  - site:bbc.co.uk/newsround current events
+  - site:timeforkids.com current events
+  - site:newsforkids.net world news
+  freshness: pw
+  count: 15
+ranking:
+  freshness_boost: 25
+  keyword_match_boost: 8
+  max_ranked: 4
+  keywords:
+  - war
+  - climate
+  - economy
+  - tariffs
+  - politics
+  - election
+  - science
+  - news
+  - world
