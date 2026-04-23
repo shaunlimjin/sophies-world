@@ -1,0 +1,34 @@
+id: weird_but_true
+display:
+  title: 🤔 Weird But True
+  block_type: fact_list
+  link_style: link-purple
+editorial:
+  goal: Share 2–3 wild fun facts to spark curiosity about animals, science, and nature
+  content_rules:
+  - Search for recent or timeless fascinating facts
+  - Facts should be surprising and age-appropriate
+  - Include sources for each fact
+  source_preferences:
+  - Nat Geo Kids
+  - Britannica
+  - NewsForKids.net
+research:
+  queries:
+  - site:kids.nationalgeographic.com weird animal facts
+  - site:kids.britannica.com surprising science facts
+  - amazing weird animal facts for kids
+  freshness: null
+  count: 10
+ranking:
+  freshness_boost: 0
+  kid_safe_boost: 15
+  max_ranked: 5
+  keywords:
+  - weird
+  - amazing
+  - surprising
+  - animal
+  - science
+  - facts
+  - record

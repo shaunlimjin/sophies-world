@@ -83,7 +83,6 @@ def build_research_plan(today: date, config: dict, recent_headlines: List[str]) 
     """Build a deterministic research plan: per-section queries and parameters."""
     profile = config["profile"]
     sections_catalog = config["sections"]
-    research_cfg = config.get("research", {})
     active_section_ids = profile.get("newsletter", {}).get("active_sections", [])
 
     section_plans = []
@@ -101,10 +100,10 @@ def build_research_plan(today: date, config: dict, recent_headlines: List[str]) 
             continue
 
         section_cfg = sections_catalog.get(section_id, {})
-        queries = _build_queries(section_id, section_cfg, research_cfg, today)
-        freshness = _get_freshness(section_id, research_cfg)
-        count = _get_result_count(section_id, research_cfg)
-        ranking_profile = _get_ranking_profile(section_id, research_cfg)
+        queries = _build_queries(section_id, section_cfg, today)
+        freshness = _get_freshness(section_id, section_cfg)
+        count = _get_result_count(section_id, section_cfg)
+        ranking_profile = _get_ranking_profile(section_id, section_cfg)
 
         section_plans.append({
             "section_id": section_id,
@@ -128,10 +127,9 @@ def _get_dependency(section_id: str) -> Optional[str]:
     return dependencies.get(section_id)
 
 
-def _build_queries(section_id: str, section_cfg: dict, research_cfg: dict, today: date) -> List[str]:
-    """Return template queries for a section from research config or built-in defaults."""
-    section_research = research_cfg.get("sections", {}).get(section_id, {})
-    configured_queries = section_research.get("queries", [])
+def _build_queries(section_id: str, section_cfg: dict, today: date) -> List[str]:
+    """Return template queries for a section from section config or built-in defaults."""
+    configured_queries = section_cfg.get("research", {}).get("queries", [])
     if configured_queries:
         return [q.format(date=today.strftime("%B %Y")) for q in configured_queries]
     return _default_queries(section_id, today)
@@ -175,23 +173,21 @@ def _default_queries(section_id: str, today: date) -> List[str]:
     return defaults.get(section_id, [f"{section_id} kids news {month_year}"])
 
 
-def _get_freshness(section_id: str, research_cfg: dict) -> Optional[str]:
+def _get_freshness(section_id: str, section_cfg: dict) -> Optional[str]:
     """Return Brave freshness parameter for a section (pd/pw/pm/py or None)."""
-    section_research = research_cfg.get("sections", {}).get(section_id, {})
-    if "freshness" in section_research:
-        return section_research["freshness"]
+    if "freshness" in section_cfg.get("research", {}):
+        return section_cfg["research"]["freshness"]
     # Sections that need current content
     current_sections = {"world_watch", "usa_corner", "gymnastics_corner"}
     return "pm" if section_id in current_sections else None
 
 
-def _get_result_count(section_id: str, research_cfg: dict) -> int:
-    section_research = research_cfg.get("sections", {}).get(section_id, {})
-    return section_research.get("count", 10)
+def _get_result_count(section_id: str, section_cfg: dict) -> int:
+    return section_cfg.get("research", {}).get("count", 10)
 
 
-def _get_ranking_profile(section_id: str, research_cfg: dict) -> str:
-    section_research = research_cfg.get("sections", {}).get(section_id, {})
+def _get_ranking_profile(section_id: str, section_cfg: dict) -> str:
+    return section_cfg.get("ranking", {}).get("ranking_profile", f"{section_id}_default")
     return section_research.get("ranking_profile", f"{section_id}_default")
 
 
@@ -285,16 +281,15 @@ def compute_research_config_hash(config: dict) -> str:
     """
     profile = config["profile"]
     active_sections = profile.get("newsletter", {}).get("active_sections", [])
-    research_cfg = config.get("research", {})
-    sections_cfg = research_cfg.get("sections", {})
+    sections_catalog = config.get("sections", {})
 
     fingerprint = {
         "active_sections": active_sections,
         "section_queries": {
             sid: {
-                "queries": sections_cfg.get(sid, {}).get("queries", []),
-                "count": sections_cfg.get(sid, {}).get("count"),
-                "freshness": sections_cfg.get(sid, {}).get("freshness"),
+                "queries": sections_catalog.get(sid, {}).get("research", {}).get("queries", []),
+                "count": sections_catalog.get(sid, {}).get("research", {}).get("count"),
+                "freshness": sections_catalog.get(sid, {}).get("research", {}).get("freshness"),
             }
             for sid in active_sections
         },

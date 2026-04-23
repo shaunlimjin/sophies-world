@@ -14,10 +14,23 @@ from research_stage import DERIVED_SECTIONS
 _FRESHNESS_DAYS = {"pd": 1, "pw": 7, "pm": 30, "py": 365}
 
 
+def _get_blocked_domains(config: dict) -> List[str]:
+    """Return blocked domains from pipeline config or legacy research config."""
+    if "pipeline" in config:
+        return config["pipeline"].get("global_domains", {}).get("blocked", [])
+    return config.get("research", {}).get("domains", {}).get("blocked", [])
+
+
+def _get_kid_safe_domains(config: dict) -> List[str]:
+    """Return kid-safe domains from pipeline config or legacy research config."""
+    if "pipeline" in config:
+        return config["pipeline"].get("global_domains", {}).get("kid_safe", [])
+    return config.get("research", {}).get("domains", {}).get("kid_safe", [])
+
+
 def prefilter_candidates(raw_pool: Dict[str, Any], config: dict) -> Dict[str, Any]:
     """Apply deterministic prefilter to each section's raw candidate list."""
-    research_cfg = config.get("research", {})
-    blocked_domains = set(research_cfg.get("domains", {}).get("blocked", []))
+    blocked_domains = set(_get_blocked_domains(config))
 
     filtered_sections = []
     for section in raw_pool["sections"]:
@@ -74,8 +87,7 @@ def rank_candidates(
         return _heuristic_rank(filtered_pool, config, repo_root)
     if ranker_provider == "hosted_model_ranker":
         from providers.model_providers import make_provider
-        generation_cfg = config.get("profile", {}).get("newsletter", {}).get("generation", {})
-        provider_cfg = generation_cfg.get("providers", {}).get("ranking")
+        provider_cfg = config.get("pipeline", {}).get("models", {}).get("ranking")
         if not provider_cfg:
             raise ValueError(
                 "hosted_model_ranker requires 'providers.ranking' in config. "
@@ -92,12 +104,11 @@ def rank_candidates(
 # ---------------------------------------------------------------------------
 
 def _heuristic_rank(pool: Dict[str, Any], config: dict, repo_root: Path) -> Dict[str, Any]:
-    research_cfg = config.get("research", {})
-    ranking_cfg = research_cfg.get("ranking", {})
-    defaults = ranking_cfg.get("defaults", {})
-    section_overrides = ranking_cfg.get("sections", {})
-    novelty_cfg = research_cfg.get("novelty", {})
-    kid_safe_domains = set(research_cfg.get("domains", {}).get("kid_safe", []))
+    pipeline_cfg = config.get("pipeline", {})
+    global_ranking_defaults = pipeline_cfg.get("global_ranking_defaults", {})
+    novelty_cfg = pipeline_cfg.get("novelty", {})
+    kid_safe_domains = set(_get_kid_safe_domains(config))
+    sections_catalog = config.get("sections", {})
 
     recent_headlines = pool.get("recent_headlines", [])
     issue_history_titles = _load_issue_history_titles(repo_root, novelty_cfg.get("history_window", 3))
@@ -110,10 +121,9 @@ def _heuristic_rank(pool: Dict[str, Any], config: dict, repo_root: Path) -> Dict
             ranked_sections.append({**section, "ranked_candidates": []})
             continue
 
-        sec_overrides = section_overrides.get(section_id, {})
-        sec_cfg = {**defaults, **sec_overrides}
+        sec_cfg = _get_section_ranking_config(section_id, global_ranking_defaults, sections_catalog)
         # Expose freshness window (in days) to scorer; None means no window enforcement
-        raw_freshness = research_cfg.get("sections", {}).get(section_id, {}).get("freshness")
+        raw_freshness = sections_catalog.get(section_id, {}).get("research", {}).get("freshness")
         sec_cfg["freshness_window_days"] = _FRESHNESS_DAYS.get(raw_freshness) if raw_freshness else None
         candidates = section.get("filtered_candidates", [])
         ranking_profile = section.get("ranking_profile", f"{section_id}_default")
@@ -132,6 +142,12 @@ def _heuristic_rank(pool: Dict[str, Any], config: dict, repo_root: Path) -> Dict
         })
 
     return {**pool, "sections": ranked_sections}
+
+
+def _get_section_ranking_config(section_id: str, global_defaults: dict, sections_catalog: dict) -> dict:
+    """Merge global defaults with section-local ranking overrides."""
+    sec_ranking = sections_catalog.get(section_id, {}).get("ranking", {})
+    return {**global_defaults, **sec_ranking}
 
 
 def _score_candidate(

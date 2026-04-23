@@ -44,12 +44,20 @@ def load_config(repo_root: Path, env: str = "prod", approach: Optional[str] = No
         sys.exit(1)
     profile = yaml.safe_load(child_path.read_text(encoding="utf-8"))
 
-    sections_path = resolve_config_file(repo_root, env, approach, "sections.yaml")
-    if not sections_path.exists():
-        print(f"Error: sections config not found: {sections_path}", file=sys.stderr)
+    pipeline_path = resolve_config_file(repo_root, env, approach, "pipelines/default.yaml")
+    if not pipeline_path.exists():
+        print(f"Error: pipeline config not found: {pipeline_path}", file=sys.stderr)
         sys.exit(1)
-    sections_data = yaml.safe_load(sections_path.read_text(encoding="utf-8"))
-    sections = sections_data.get("sections", {})
+    pipeline = yaml.safe_load(pipeline_path.read_text(encoding="utf-8"))
+
+    active_sections = profile.get("newsletter", {}).get("active_sections", [])
+    sections = {}
+    for section_id in active_sections:
+        section_path = resolve_config_file(repo_root, env, approach, f"sections/{section_id}.yaml")
+        if not section_path.exists():
+            print(f"Error: section config not found: {section_path}", file=sys.stderr)
+            sys.exit(1)
+        sections[section_id] = yaml.safe_load(section_path.read_text(encoding="utf-8"))
 
     theme_name = profile.get("newsletter", {}).get("theme", "default")
     theme_path = resolve_config_file(repo_root, env, approach, f"themes/{theme_name}.yaml")
@@ -58,32 +66,7 @@ def load_config(repo_root: Path, env: str = "prod", approach: Optional[str] = No
         sys.exit(1)
     theme = yaml.safe_load(theme_path.read_text(encoding="utf-8"))
 
-    active_sections = profile.get("newsletter", {}).get("active_sections", [])
-    missing = [s for s in active_sections if s not in sections]
-    if missing:
-        print(f"Error: active_sections reference unknown section IDs: {missing}", file=sys.stderr)
-        sys.exit(1)
-
-    research_config = _load_research_config_resolved(repo_root, env, approach)
-
-    return {"profile": profile, "sections": sections, "theme": theme, "research": research_config}
-
-
-def _load_research_config(config_dir: Path) -> dict:
-    research_path = config_dir / "research.yaml"
-    if not research_path.exists():
-        return {}
-    return yaml.safe_load(research_path.read_text(encoding="utf-8")) or {}
-
-
-def _load_research_config_resolved(
-    repo_root: Path, env: str = "prod", approach: Optional[str] = None
-) -> dict:
-    from env_resolver import resolve_config_file
-    research_path = resolve_config_file(repo_root, env, approach, "research.yaml")
-    if not research_path.exists():
-        return {}
-    return yaml.safe_load(research_path.read_text(encoding="utf-8")) or {}
+    return {"profile": profile, "pipeline": pipeline, "sections": sections, "theme": theme}
 
 
 def get_template_path(repo_root: Path, theme: dict) -> Path:
@@ -131,17 +114,16 @@ def check_output_exists(output_path: Path) -> bool:
 
 def resolve_providers(config: dict, content_provider_override: Optional[str], ranker_override: Optional[str]) -> tuple:
     """Return (content_provider, ranker_provider) from config with optional CLI overrides."""
-    generation = config["profile"].get("newsletter", {}).get("generation", {})
-    content_provider = content_provider_override or generation.get("content_provider", CONTENT_PROVIDER_INTEGRATED)
-    ranker_provider = ranker_override or generation.get("ranker_provider", RANKER_HEURISTIC)
+    pipeline_cfg = config.get("pipeline", {}).get("pipeline", {})
+    content_provider = content_provider_override or pipeline_cfg.get("content_provider", CONTENT_PROVIDER_INTEGRATED)
+    ranker_provider = ranker_override or pipeline_cfg.get("ranker_provider", RANKER_HEURISTIC)
     return content_provider, ranker_provider
 
 
 def run_mode_a(today: date, issue_num: int, config: dict, recent_headlines: List[str], repo_root: Path) -> dict:
     """Mode A: hosted provider with integrated search (baseline path)."""
     from providers.model_providers import make_provider
-    generation_cfg = config["profile"].get("newsletter", {}).get("generation", {})
-    synthesis_provider_cfg = generation_cfg.get("providers", {}).get("synthesis")
+    synthesis_provider_cfg = config.get("pipeline", {}).get("models", {}).get("synthesis")
     synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
 
     print("Mode A: hosted provider with integrated search")
@@ -175,8 +157,7 @@ def run_mode_b(
 ) -> dict:
     """Mode B: deterministic retrieval + configurable ranking + hosted packet synthesis."""
     from providers.model_providers import make_provider
-    generation_cfg = config["profile"].get("newsletter", {}).get("generation", {})
-    synthesis_provider_cfg = generation_cfg.get("providers", {}).get("synthesis")
+    synthesis_provider_cfg = config.get("pipeline", {}).get("models", {}).get("synthesis")
     synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
 
     from research_stage import (

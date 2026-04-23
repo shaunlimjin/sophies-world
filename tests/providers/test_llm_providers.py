@@ -27,19 +27,18 @@ def test_rank_candidates_wires_provider_from_config():
                 "name": "Sophie",
                 "age_band": "4th-grade",
                 "interests": {"active": []},
-                "newsletter": {
-                    "generation": {
-                        "providers": {
-                            "ranking": {"provider": "claude", "model": "sonnet"}
-                        }
-                    }
+                "newsletter": {},
+            },
+            "sections": {
+                "weird_but_true": {
+                    "ranking": {"max_ranked": 3}
                 }
             },
-            "research": {
-                "ranking": {
-                    "sections": {"weird_but_true": {"max_ranked": 3}}
+            "pipeline": {
+                "models": {
+                    "ranking": {"provider": "claude", "model": "sonnet"}
                 }
-            }
+            },
         }
         from ranking_stage import rank_candidates
         result = rank_candidates(pool, config, "hosted_model_ranker", Path("/tmp"))
