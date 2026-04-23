@@ -152,10 +152,55 @@ section_order_mode: profile_driven
 
 
 def make_config(tmp_path, sophie_yaml, sections_yaml=MINIMAL_SECTIONS_YAML, theme_yaml=MINIMAL_THEME_YAML, theme_name="default"):
+    import yaml as test_yaml
+
     (tmp_path / "config" / "children").mkdir(parents=True)
     (tmp_path / "config" / "themes").mkdir(parents=True)
+    (tmp_path / "config" / "sections").mkdir(parents=True)
+    (tmp_path / "config" / "pipelines").mkdir(parents=True)
     (tmp_path / "config" / "children" / "sophie.yaml").write_text(sophie_yaml)
-    (tmp_path / "config" / "sections.yaml").write_text(sections_yaml)
+
+    # Write pipeline config (minimal - tests don't need real providers)
+    pipeline_cfg = {
+        "pipeline": {
+            "research_provider": "brave_deterministic",
+            "ranker_provider": "heuristic_ranker",
+            "content_provider": "hosted_integrated_search",
+            "render_provider": "local_renderer",
+        },
+        "models": {"synthesis": None, "ranking": None},
+        "global_ranking_defaults": {
+            "source_boost": 20, "freshness_boost": 15, "keyword_match_boost": 5,
+            "geography_boost": 8, "kid_safe_boost": 10, "novelty_penalty": 30,
+            "junk_penalty": 40, "min_score": 0, "max_ranked": 5,
+        },
+        "global_domains": {"kid_safe": [], "blocked": []},
+        "novelty": {"history_window": 3, "similarity_threshold": 0.4, "title_token_limit": 12},
+    }
+    (tmp_path / "config" / "pipelines" / "default.yaml").write_text(
+        test_yaml.safe_dump(pipeline_cfg, sort_keys=False)
+    )
+
+    # Write individual section files (new per-section format)
+    sections_data = test_yaml.safe_load(sections_yaml)
+    for section_id, section_data in sections_data.get("sections", {}).items():
+        section_file = {
+            "id": section_id,
+            "display": {
+                "title": section_data.get("title"),
+                "block_type": section_data.get("block_type"),
+                "link_style": section_data.get("link_style"),
+            },
+            "editorial": {
+                "goal": section_data.get("goal"),
+                "content_rules": section_data.get("content_rules", []),
+                "source_preferences": section_data.get("source_preferences", []),
+            },
+        }
+        (tmp_path / "config" / "sections" / f"{section_id}.yaml").write_text(
+            test_yaml.safe_dump(section_file, sort_keys=False, allow_unicode=True)
+        )
+
     if theme_yaml is not None:
         (tmp_path / "config" / "themes" / f"{theme_name}.yaml").write_text(theme_yaml)
 
@@ -607,17 +652,15 @@ def test_run_mode_b_wires_provider():
             "id": "sophie",
             "name": "Sophie",
             "age_band": "4th-grade",
-            "newsletter": {
-                "generation": {
-                    "providers": {
-                        "synthesis": {"provider": "claude", "model": "opus"}
-                    }
-                }
-            },
             "interests": {"active": []},
+            "newsletter": {},
         },
         "sections": {},
-        "research": {"ranking": {"sections": {}}},
+        "pipeline": {
+            "models": {
+                "synthesis": {"provider": "claude", "model": "opus"}
+            }
+        },
         "theme": "default",
     }
 
@@ -634,19 +677,20 @@ def test_run_mode_b_wires_provider():
     with patch.object(generate, 'run_packet_synthesis_provider', side_effect=capture_run_packet_synthesis_provider):
         with patch.object(generate, 'parse_content_output', return_value={"greeting_text": "Hi Sophie", "sections": []}):
             with patch.object(generate, 'validate_issue_artifact'):
-                with patch("scripts.ranking_stage.prefilter_candidates", return_value={"sections": []}):
-                    with patch("scripts.ranking_stage.rank_candidates", return_value={"sections": []}):
-                        with patch("providers.model_providers.make_provider", return_value=mock_provider):
-                            result = generate.run_mode_b(
-                                today=date.today(),
-                                issue_num=1,
-                                config=config,
-                                recent_headlines=[],
-                                repo_root=Path("/tmp"),
-                                ranker_provider="heuristic_ranker",
-                                refresh_research=True,
-                            )
-                            # Verify the provider that was passed to run_packet_synthesis_provider is our mock
-                            assert len(captured_provider) == 1, f"Expected 1 call, got {len(captured_provider)}"
-                            assert captured_provider[0] is mock_provider, \
-                                f"Expected mock_provider to be passed, got {captured_provider[0]}"
+                with patch("scripts.research_stage.run_research", return_value={"sections": []}):
+                    with patch("scripts.ranking_stage.prefilter_candidates", return_value={"sections": []}):
+                        with patch("scripts.ranking_stage.rank_candidates", return_value={"sections": []}):
+                            with patch("providers.model_providers.make_provider", return_value=mock_provider):
+                                result = generate.run_mode_b(
+                                    today=date.today(),
+                                    issue_num=1,
+                                    config=config,
+                                    recent_headlines=[],
+                                    repo_root=Path("/tmp"),
+                                    ranker_provider="heuristic_ranker",
+                                    refresh_research=True,
+                                )
+                                # Verify the provider that was passed to run_packet_synthesis_provider is our mock
+                                assert len(captured_provider) == 1, f"Expected 1 call, got {len(captured_provider)}"
+                                assert captured_provider[0] is mock_provider, \
+                                    f"Expected mock_provider to be passed, got {captured_provider[0]}"

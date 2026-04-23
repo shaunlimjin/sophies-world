@@ -1,0 +1,50 @@
+pipeline:
+  research_provider: brave_deterministic
+  ranker_provider: heuristic_ranker
+  content_provider: hosted_integrated_search
+  render_provider: local_renderer
+  fallback_content_provider: hosted_integrated_search
+models:
+  synthesis:
+    provider: claude
+    model: opus
+  ranking:
+    provider: claude
+    model: sonnet
+global_domains:
+  kid_safe:
+  - kids.nationalgeographic.com
+  - kids.britannica.com
+  - britannica.com
+  - newsforkids.net
+  - timeforkids.com
+  - bbc.co.uk
+  - newsela.com
+  - dkfindout.com
+  - natgeokids.com
+  - olympics.com
+  - usagym.org
+  - pbskids.org
+  - sciencenews.org
+  blocked:
+  - reddit.com
+  - quora.com
+  - pinterest.com
+  - facebook.com
+  - twitter.com
+  - x.com
+  - tiktok.com
+global_ranking_defaults:
+  source_boost: 20
+  freshness_boost: 15
+  keyword_match_boost: 5
+  geography_boost: 8
+  kid_safe_boost: 10
+  novelty_penalty: 30
+  junk_penalty: 40
+  min_score: 0
+  max_ranked: 5
+novelty:
+  history_window: 3
+  similarity_threshold: 0.4
+  title_token_limit: 12

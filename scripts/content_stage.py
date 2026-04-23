@@ -32,16 +32,19 @@ def build_section_summaries(profile: Dict[str, Any], sections: Dict[str, Any]) -
     summaries = []
     for section_id in active_section_ids:
         section = sections[section_id]
-        rules = section.get("content_rules", [])[:3]
-        sources = section.get("source_preferences", [])[:3]
+        # Support both new nested format (display/editorial) and legacy flat format
+        display = section.get("display", section)  # fallback to section root for legacy compat
+        editorial = section.get("editorial", {})
+        rules = editorial.get("content_rules", section.get("content_rules", []))[:3]
+        sources = editorial.get("source_preferences", section.get("source_preferences", []))[:3]
         summaries.append({
             "id": section_id,
-            "title": section.get("title"),
-            "goal": section.get("goal"),
-            "block_type": section.get("block_type"),
+            "title": display.get("title"),
+            "goal": editorial.get("goal") or display.get("goal"),
+            "block_type": display.get("block_type"),
             "rules": rules,
             "preferred_sources": sources,
-            "link_style": section.get("link_style"),
+            "link_style": display.get("link_style"),
         })
     return summaries
 

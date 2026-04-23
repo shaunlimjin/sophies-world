@@ -86,27 +86,25 @@ def _base_research_config():
             "newsletter": {
                 "active_sections": ["world_watch", "weird_but_true"],
                 "editorial": {},
-                "generation": {
-                    "content_provider": "hosted_packet_synthesis",
-                    "ranker_provider": "heuristic_ranker",
-                },
             },
         },
-        "sections": {},  # section catalog; empty because tests use empty research packets
-        "research": {
-            "sections": {
-                "world_watch": {
+        "sections": {
+            "world_watch": {
+                "research": {
                     "queries": ["world news kids {date}"],
                     "count": 10,
                     "freshness": "pw",
                 },
-                "weird_but_true": {
+            },
+            "weird_but_true": {
+                "research": {
                     "queries": ["weird animal facts kids"],
                     "count": 8,
                     "freshness": None,
                 },
-            }
+            },
         },
+        "pipeline": {},
     }
 
 
@@ -120,7 +118,7 @@ def test_config_hash_is_stable():
 def test_config_hash_changes_when_query_changes():
     config = _base_research_config()
     h1 = research_stage.compute_research_config_hash(config)
-    config["research"]["sections"]["world_watch"]["queries"] = ["different query"]
+    config["sections"]["world_watch"]["research"]["queries"] = ["different query"]
     h2 = research_stage.compute_research_config_hash(config)
     assert h1 != h2
 
@@ -136,7 +134,7 @@ def test_config_hash_changes_when_active_sections_change():
 def test_config_hash_changes_when_count_changes():
     config = _base_research_config()
     h1 = research_stage.compute_research_config_hash(config)
-    config["research"]["sections"]["world_watch"]["count"] = 20
+    config["sections"]["world_watch"]["research"]["count"] = 20
     h2 = research_stage.compute_research_config_hash(config)
     assert h1 != h2
 

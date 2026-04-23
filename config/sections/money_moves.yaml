@@ -1,0 +1,34 @@
+id: money_moves
+display:
+  title: 💰 Money Moves
+  block_type: story_list
+  link_style: link-amber
+editorial:
+  goal: Share one saving/entrepreneurship concept + a real kid entrepreneur story
+  content_rules:
+  - Include a .money-highlight tip box with the core concept
+  - Feature a real kid entrepreneur story
+  - Make it relatable and actionable
+  - Include 1–2 "Learn More" links
+  source_preferences:
+  - Kid entrepreneur news
+  - Financial literacy sites for kids
+research:
+  queries:
+  - kid entrepreneur story saving money
+  - kids business ideas entrepreneurship
+  - financial literacy kids saving
+  freshness: null
+  count: 8
+ranking:
+  freshness_boost: 5
+  kid_safe_boost: 15
+  max_ranked: 4
+  keywords:
+  - entrepreneur
+  - business
+  - saving
+  - money
+  - kids
+  - startup
+  - invest

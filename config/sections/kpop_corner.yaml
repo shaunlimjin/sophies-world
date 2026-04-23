@@ -1,0 +1,16 @@
+id: kpop_corner
+display:
+  title: 🎤 K-pop Corner
+  block_type: interest_feature
+  link_style: link-rose
+editorial:
+  goal: Share current K-pop news, artist releases, performances, and fun facts
+  content_rules:
+  - Search for their latest releases, performances, or announcements
+  - Use .interest-item structure for each item
+  - Keep content age-appropriate and exciting
+  - Include 1–2 "Learn More" links
+  source_preferences:
+  - YouTube
+  - Official artist channels
+  - K-pop news sites
