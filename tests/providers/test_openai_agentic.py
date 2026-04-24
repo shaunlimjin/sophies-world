@@ -1,5 +1,6 @@
 """Tests for OpenAIAgenticProvider."""
 
+import concurrent.futures
 import json
 from unittest.mock import MagicMock, patch
 
@@ -246,3 +247,88 @@ def test_unsupported_tool_name():
 
     assert "unknown_tool" in payload["error"]
     assert "RunCode" in payload["error"]
+
+
+def test_tool_timeout_returns_stable_error():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_tc = MagicMock()
+    mock_tc.function.name = "WebSearch"
+    mock_tc.function.arguments = json.dumps({"query": "news"})
+
+    # _run_search raising TimeoutError is re-raised by future.result(), caught as tool timeout
+    with patch.object(provider, "_run_search", side_effect=concurrent.futures.TimeoutError()):
+        payload = json.loads(provider._execute_tool(mock_tc, timeout_seconds=30))
+
+    assert payload["query"] == "news"
+    assert payload["error"] == "timeout"
+
+
+def test_max_tool_calls_exceeded():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_brave = MagicMock()
+    mock_brave.search.return_value = []
+    provider._brave_client = mock_brave
+
+    mock_tc = MagicMock()
+    mock_tc.id = "call_1"
+    mock_tc.type = "function"
+    mock_tc.function.name = "WebSearch"
+    mock_tc.function.arguments = json.dumps({"query": "news"})
+
+    mock_msg = MagicMock()
+    mock_msg.content = None
+    mock_msg.tool_calls = [mock_tc]
+
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.return_value = MagicMock(
+        choices=[MagicMock(message=mock_msg, finish_reason="tool_calls")]
+    )
+    provider.client = mock_client
+
+    result = provider.generate("prompt", allowed_tools="WebSearch", max_tool_calls_total=2, max_turns=20)
+
+    assert result["error"] == "max_tool_calls_exceeded"
+
+
+def test_max_turns_exceeded_returns_correct_error_string():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_brave = MagicMock()
+    mock_brave.search.return_value = []
+    provider._brave_client = mock_brave
+
+    mock_tc = MagicMock()
+    mock_tc.id = "call_1"
+    mock_tc.type = "function"
+    mock_tc.function.name = "WebSearch"
+    mock_tc.function.arguments = json.dumps({"query": "news"})
+
+    mock_msg = MagicMock()
+    mock_msg.content = None
+    mock_msg.tool_calls = [mock_tc]
+
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.return_value = MagicMock(
+        choices=[MagicMock(message=mock_msg, finish_reason="tool_calls")]
+    )
+    provider.client = mock_client
+
+    result = provider.generate("prompt", allowed_tools="WebSearch", max_turns=2, max_tool_calls_total=100)
+
+    assert result["error"] == "max_turns_exceeded"
+    assert mock_client.chat.completions.create.call_count == 2
+
+
+def test_api_exception_returns_provider_error():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.side_effect = Exception("connection refused")
+    provider.client = mock_client
+
+    result = provider.generate("prompt")
+
+    assert result["result"] == ""
+    assert result["error"] == "provider_error"
