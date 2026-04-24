@@ -8,23 +8,7 @@ from typing import Optional
 from openai import OpenAI
 
 from .base import ModelProvider
-
-
-def _load_minimax_api_key(repo_root: Optional[Path] = None) -> str:
-    """Load MINIMAX_API_KEY from .env file or environment."""
-    import os
-
-    if repo_root:
-        env_path = repo_root / ".env"
-        if env_path.exists():
-            for line in env_path.read_text(encoding="utf-8").splitlines():
-                line = line.strip()
-                if line.startswith("MINIMAX_API_KEY="):
-                    return line.split("=", 1)[1].strip().strip('"').strip("'")
-    key = os.environ.get("MINIMAX_API_KEY", "")
-    if not key:
-        raise RuntimeError("MINIMAX_API_KEY not found in .env or environment")
-    return key
+from ._api_key import load_api_key
 
 
 class OpenAICompatibleProvider(ModelProvider):
@@ -43,9 +27,8 @@ class OpenAICompatibleProvider(ModelProvider):
         self.model = config.get("model")
         if not self.model:
             raise ValueError("OpenAICompatibleProvider requires 'model' in config")
-        # MiniMax uses OpenAI-compatible endpoint; load key from env if needed
         if "minimax.io" in base_url and (api_key == "not-needed" or api_key == ""):
-            api_key = _load_minimax_api_key(repo_root)
+            api_key = load_api_key("MINIMAX_API_KEY", repo_root)
         self.client = OpenAI(base_url=base_url, api_key=api_key)
 
     def generate(self, prompt: str, **kwargs) -> dict:
