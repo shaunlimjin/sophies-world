@@ -170,3 +170,79 @@ def test_no_system_prompt_omits_system_message():
     first_call_messages = captured[0]
     assert len(first_call_messages) == 1
     assert first_call_messages[0]["role"] == "user"
+
+
+def test_tool_result_includes_query_field():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_brave = MagicMock()
+    mock_brave.search.return_value = [{"title": "T", "url": "U", "snippet": "Some snippet"}]
+    provider._brave_client = mock_brave
+
+    mock_tc = MagicMock()
+    mock_tc.function.name = "WebSearch"
+    mock_tc.function.arguments = json.dumps({"query": "tariff news april 2026"})
+
+    payload = json.loads(provider._execute_tool(mock_tc))
+
+    assert "query" in payload, "result must include 'query' field"
+    assert payload["query"] == "tariff news april 2026"
+    assert "results" in payload
+
+
+def test_snippet_truncated_to_300_chars():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_brave = MagicMock()
+    mock_brave.search.return_value = [{"title": "T", "url": "U", "snippet": "x" * 500}]
+    provider._brave_client = mock_brave
+
+    mock_tc = MagicMock()
+    mock_tc.function.name = "WebSearch"
+    mock_tc.function.arguments = json.dumps({"query": "news"})
+
+    payload = json.loads(provider._execute_tool(mock_tc))
+
+    assert len(payload["results"][0]["snippet"]) == 300
+
+
+def test_empty_search_results_returns_stable_shape():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_brave = MagicMock()
+    mock_brave.search.return_value = []
+    provider._brave_client = mock_brave
+
+    mock_tc = MagicMock()
+    mock_tc.function.name = "WebSearch"
+    mock_tc.function.arguments = json.dumps({"query": "very obscure topic"})
+
+    payload = json.loads(provider._execute_tool(mock_tc))
+
+    assert payload["query"] == "very obscure topic"
+    assert payload["results"] == []
+
+
+def test_malformed_tool_args_returns_invalid_arguments():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_tc = MagicMock()
+    mock_tc.function.name = "WebSearch"
+    mock_tc.function.arguments = "not valid json {"
+
+    payload = json.loads(provider._execute_tool(mock_tc))
+
+    assert payload["error"] == "invalid_arguments"
+
+
+def test_unsupported_tool_name():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+
+    mock_tc = MagicMock()
+    mock_tc.function.name = "RunCode"
+    mock_tc.function.arguments = json.dumps({"code": "print('hi')"})
+
+    payload = json.loads(provider._execute_tool(mock_tc))
+
+    assert "unknown_tool" in payload["error"]
+    assert "RunCode" in payload["error"]

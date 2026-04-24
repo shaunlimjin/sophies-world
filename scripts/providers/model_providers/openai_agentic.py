@@ -44,26 +44,37 @@ class OpenAIAgenticProvider(ModelProvider):
             self._brave_client = BraveSearchClient(api_key=key)
         return self._brave_client
 
-    def _execute_tool(self, tool_call: Any) -> str:
-        """Execute a requested tool and return the stringified JSON result."""
+    def _run_search(self, query: str) -> list:
+        """Execute Brave search. Isolated for timeout wrapping and unit test patching."""
+        return self._get_brave_client().search(q=query, count=5)
+
+    def _execute_tool(self, tool_call: Any, timeout_seconds: int = 30) -> str:
+        """Execute a single tool call. Always returns a JSON string with a stable shape."""
         name = tool_call.function.name
         try:
             args = json.loads(tool_call.function.arguments)
-        except Exception as e:
-            return json.dumps({"error": f"Invalid arguments JSON: {e}"})
+        except Exception:
+            return json.dumps({"error": "invalid_arguments"})
 
         if name == "WebSearch":
             query = args.get("query", "")
             if not query:
-                return json.dumps({"error": "Missing 'query' parameter"})
+                return json.dumps({"query": "", "error": "invalid_arguments"})
             try:
-                brave = self._get_brave_client()
-                results = brave.search(q=query, count=5)
-                return json.dumps({"results": results})
-            except Exception as e:
-                return json.dumps({"error": f"Search failed: {e}"})
-        else:
-            return json.dumps({"error": f"Unknown tool: {name}"})
+                results = self._run_search(query)
+            except Exception:
+                return json.dumps({"query": query, "error": "search_failed"})
+            truncated = [
+                {
+                    "title": r.get("title", ""),
+                    "url": r.get("url", ""),
+                    "snippet": (r.get("snippet") or "")[:300],
+                }
+                for r in results
+            ]
+            return json.dumps({"query": query, "results": truncated})
+
+        return json.dumps({"error": f"unknown_tool: {name}"})
 
     def generate(self, prompt: str, **kwargs) -> dict:
         timeout = kwargs.get("timeout", 120)
