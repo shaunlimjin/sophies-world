@@ -167,7 +167,7 @@ def test_openai_compatible_minimax_key_missing_raises():
     """OpenAICompatibleProvider raises when MINIMAX_API_KEY is absent from .env and env."""
     with patch.dict("os.environ", {}, clear=True):
         with patch(
-            "scripts.providers.model_providers.openai_compatible._load_minimax_api_key",
+            "scripts.providers.model_providers._api_key.load_api_key",
             side_effect=RuntimeError("MINIMAX_API_KEY not found in .env or environment"),
         ):
             try:
