@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sophies-world/research.schema.json",
+  "title": "Research Configuration",
+  "description": "Ranking weights, domain lists, novelty window, and per-section query overrides for the legacy flat research config.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {"$ref": "#/definitions/rankingWeights"},
+        "sections": {
+          "type": "object",
+          "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+          "additionalProperties": {"$ref": "#/definitions/rankingWeights"}
+        }
+      }
+    },
+    "novelty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "history_window": {"type": "integer", "minimum": 0},
+        "similarity_threshold": {"type": "number", "minimum": 0, "maximum": 1},
+        "title_token_limit": {"type": "integer", "minimum": 1}
+      }
+    },
+    "domains": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kid_safe": {"type": "array", "items": {"type": "string"}},
+        "blocked": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "sections": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "queries": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+          },
+          "freshness": {
+            "type": ["string", "null"],
+            "enum": [null, "pd", "pw", "pm", "py"]
+          },
+          "count": {"type": "integer", "minimum": 1, "maximum": 50}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "rankingWeights": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_boost": {"type": "number"},
+        "freshness_boost": {"type": "number"},
+        "keyword_match_boost": {"type": "number"},
+        "geography_boost": {"type": "number"},
+        "kid_safe_boost": {"type": "number"},
+        "novelty_penalty": {"type": "number"},
+        "junk_penalty": {"type": "number"},
+        "min_score": {"type": "number"},
+        "max_ranked": {"type": "integer", "minimum": 1},
+        "keywords": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}
