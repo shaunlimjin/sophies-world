@@ -123,3 +123,50 @@ def test_assistant_message_is_dict_in_multiturn():
     assert isinstance(assistant_msg, dict), "assistant message must be a plain dict, not an SDK Pydantic object"
     assert assistant_msg["role"] == "assistant"
     assert "tool_calls" in assistant_msg
+
+
+def _make_stop_response(content="ok"):
+    mock_msg = MagicMock()
+    mock_msg.content = content
+    mock_msg.tool_calls = None
+    return MagicMock(choices=[MagicMock(message=mock_msg, finish_reason="stop")])
+
+
+def _capturing_client(responses):
+    """Return (mock_client, captured_list). captured_list[i] is a snapshot of messages on call i."""
+    captured = []
+
+    def side_effect(**kwargs):
+        captured.append([dict(m) for m in kwargs["messages"]])
+        return responses[len(captured) - 1]
+
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.side_effect = side_effect
+    return mock_client, captured
+
+
+def test_system_prompt_prepended_as_first_message():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+    mock_client, captured = _capturing_client([_make_stop_response("newsletter content")])
+    provider.client = mock_client
+
+    provider.generate("Write the newsletter.", system_prompt="You are a newsletter writer for children.")
+
+    first_call_messages = captured[0]
+    assert len(first_call_messages) == 2
+    assert first_call_messages[0]["role"] == "system"
+    assert first_call_messages[0]["content"] == "You are a newsletter writer for children."
+    assert first_call_messages[1]["role"] == "user"
+    assert first_call_messages[1]["content"] == "Write the newsletter."
+
+
+def test_no_system_prompt_omits_system_message():
+    provider = OpenAIAgenticProvider({"model": "test-model", "api_key": "test-key"})
+    mock_client, captured = _capturing_client([_make_stop_response()])
+    provider.client = mock_client
+
+    provider.generate("prompt")
+
+    first_call_messages = captured[0]
+    assert len(first_call_messages) == 1
+    assert first_call_messages[0]["role"] == "user"

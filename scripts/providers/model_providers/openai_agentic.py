@@ -69,8 +69,8 @@ class OpenAIAgenticProvider(ModelProvider):
         timeout = kwargs.get("timeout", 120)
         max_turns = kwargs.get("max_turns", 10)
         allowed_tools = kwargs.get("allowed_tools", "")
-        
-        # Determine active tools based on the allowed_tools string
+        system_prompt = kwargs.get("system_prompt")
+
         active_tools = []
         if allowed_tools and "WebSearch" in allowed_tools:
             active_tools.append({
@@ -91,7 +91,10 @@ class OpenAIAgenticProvider(ModelProvider):
                 }
             })
 
-        messages = [{"role": "user", "content": prompt}]
+        messages: list = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
 
         for turn in range(max_turns):
             api_kwargs = {
