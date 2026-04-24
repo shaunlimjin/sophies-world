@@ -110,10 +110,22 @@ class OpenAIAgenticProvider(ModelProvider):
             choice = response.choices[0]
             message = choice.message
             
-            # OpenAI python SDK model returns a dict-like or object structure
-            # To append it properly back to messages, we can pass the model object directly in newer SDKs, 
-            # or dump it to a dict.
-            messages.append(message)
+            # Build a plain dict — OpenAI SDK returns Pydantic objects; third-party
+            # endpoints need plain dicts in subsequent turns.
+            msg_dict: dict = {"role": "assistant", "content": message.content}
+            if message.tool_calls:
+                msg_dict["tool_calls"] = [
+                    {
+                        "id": tc.id,
+                        "type": tc.type,
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }
+                    for tc in message.tool_calls
+                ]
+            messages.append(msg_dict)
 
             if choice.finish_reason == "tool_calls" and message.tool_calls:
                 # Execute tools
