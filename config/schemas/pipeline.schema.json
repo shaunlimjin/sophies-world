@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sophies-world/pipeline.schema.json",
+  "title": "Pipeline Configuration",
+  "description": "Pipeline provider wiring and global ranking defaults.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pipeline"],
+  "properties": {
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "research_provider",
+        "ranker_provider",
+        "content_provider",
+        "render_provider"
+      ],
+      "properties": {
+        "research_provider": {"type": "string", "minLength": 1},
+        "ranker_provider": {"type": "string", "minLength": 1},
+        "content_provider": {"type": "string", "minLength": 1},
+        "render_provider": {"type": "string", "minLength": 1},
+        "fallback_content_provider": {"type": "string"}
+      }
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "model"],
+        "properties": {
+          "provider": {"type": "string", "minLength": 1},
+          "model": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "global_domains": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kid_safe": {"type": "array", "items": {"type": "string"}},
+        "blocked": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "global_ranking_defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_boost": {"type": "number"},
+        "freshness_boost": {"type": "number"},
+        "keyword_match_boost": {"type": "number"},
+        "geography_boost": {"type": "number"},
+        "kid_safe_boost": {"type": "number"},
+        "novelty_penalty": {"type": "number"},
+        "junk_penalty": {"type": "number"},
+        "min_score": {"type": "number"},
+        "max_ranked": {"type": "integer", "minimum": 1}
+      }
+    },
+    "novelty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "history_window": {"type": "integer", "minimum": 0},
+        "similarity_threshold": {"type": "number", "minimum": 0, "maximum": 1},
+        "title_token_limit": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

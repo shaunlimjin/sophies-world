@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sophies-world/sections_catalog.schema.json",
+  "title": "Section Catalog (flat)",
+  "description": "Flat catalog under config/sections.yaml — each key is a section ID.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sections"],
+  "properties": {
+    "sections": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "goal", "block_type", "link_style"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1},
+          "goal": {"type": "string", "minLength": 1},
+          "block_type": {
+            "type": "string",
+            "enum": [
+              "fact_list",
+              "story_list",
+              "spotlight",
+              "interest_feature",
+              "challenge"
+            ]
+          },
+          "link_style": {
+            "type": "string",
+            "pattern": "^link-[a-z]+$"
+          },
+          "content_rules": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "source_preferences": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    }
+  }
+}

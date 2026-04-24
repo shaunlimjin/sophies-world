@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sophies-world/theme.schema.json",
+  "title": "Newsletter Theme",
+  "description": "Definition of a theme under config/themes/<id>.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["theme_id", "template_path"],
+  "properties": {
+    "theme_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "template_path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path (relative to repo root) to the HTML template file for this theme."
+    },
+    "section_order_mode": {
+      "type": "string",
+      "enum": ["profile_driven", "fixed", "theme_driven"]
+    }
+  }
+}
