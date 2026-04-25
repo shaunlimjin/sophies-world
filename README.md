@@ -287,6 +287,12 @@ python3 -m pytest -q
 
 Coverage includes config loading, split-config resolution, Mode A/B provider wiring, `--run-tag` routing, deterministic research and ranking (prefilter, dedupe, novelty, freshness, junk penalties), cache reuse, parser robustness, artifact validation, renderer behavior, env overlay resolution, promotion, and the send path.
 
+For the latest manual workflow verification run, see:
+- `docs/testing/test-plan-2026-04-24.md`
+- `docs/testing/test-report-stub-2026-04-24.md`
+
+Those documents cover the CLI/pipeline sanity pass across prod/test, staging, approach overlays, Mode A, Mode B, and research-cache behavior.
+
 ---
 
 ## Known limitations
@@ -295,6 +301,7 @@ Coverage includes config loading, split-config resolution, Mode A/B provider wir
 - issue numbering is derived from file count (fine for now, not fully robust)
 - split config is now present across prod, staging, and `approach-b1`, but legacy monolithic compatibility files still remain pending cleanup
 - research cache keys on config shape, not on broader external retrieval state
+- source-link quality is not yet production-grade; generated newsletters can still emit generic, duplicated, or weakly grounded links unless we add explicit validation/grounding checks
 - `artifacts/` is local-only and fully gitignored
 
 ---
@@ -303,6 +310,8 @@ Coverage includes config loading, split-config resolution, Mode A/B provider wir
 
 - `CLAUDE.md` — operator/developer notes
 - `docs/ideas-backlog.md` — next improvements
+- `docs/testing/test-plan-2026-04-24.md` — latest CLI/pipeline test plan
+- `docs/testing/test-report-stub-2026-04-24.md` — latest execution report
 - `docs/superpowers/specs/` — design specs
 - `docs/superpowers/plans/` — implementation plans
 - `docs/superpowers/evals/` — mode comparison findings
@@ -311,7 +320,7 @@ Coverage includes config loading, split-config resolution, Mode A/B provider wir
 
 ## Recommended next steps
 
-1. Finish moving staging/approach overrides onto the split config model (`sections/` + `pipelines/`) so all environments are structurally aligned
+1. Implement link validation + source grounding so generated newsletter citations are specific, reachable, and traceable to upstream sources
 2. Implement the run-centric artifact/logging model from `docs/superpowers/specs/2026-04-22-issue-generation-output-and-logging-playbook.md`
 3. Keep iterating on B2 with stronger section-specific anti-repeat guidance and better novelty guards
 4. Replace file-count issue numbering with stable state
