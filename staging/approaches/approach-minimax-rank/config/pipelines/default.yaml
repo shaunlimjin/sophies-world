@@ -1,0 +1,15 @@
+pipeline:
+  research_provider: brave_deterministic
+  ranker_provider: hosted_model_ranker
+  content_provider: hosted_packet_synthesis
+  render_provider: local_renderer
+  fallback_content_provider: hosted_integrated_search
+
+models:
+  synthesis:
+    provider: claude
+    model: sonnet
+  ranking:
+    provider: openai_compatible
+    base_url: https://api.minimax.io/v1
+    model: MiniMax-M2.7
