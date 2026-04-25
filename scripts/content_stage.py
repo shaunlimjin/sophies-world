@@ -428,27 +428,42 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
             result = provider.generate(
                 prompt,
                 timeout=timeout_seconds,
-                max_retries=max_retries,
+                max_retries=0,
+                max_turns=3,
                 **kwargs,
             )
             raw_output = result.get("result", "")
-            (debug_dir / f"last-packet-stdout-attempt{attempt}.txt").write_text(raw_output, encoding="utf-8")
-            (debug_dir / "last-packet-stdout.txt").write_text(raw_output, encoding="utf-8")
-            (debug_dir / "last-packet-stderr.txt").write_text(result.get("error", "") or "", encoding="utf-8")
-            if result.get("error") and not raw_output:
-                if attempt < max_retries:
-                    print(f"packet synthesis attempt {attempt + 1} failed (provider error: {result['error']}), retrying...", file=sys.stderr)
-                    continue
-                print(f"packet synthesis provider error: {result['error']}", file=sys.stderr)
-                sys.exit(1)
-            try:
-                parse_content_output(raw_output, repo_root)
-                return raw_output
-            except ValueError as exc:
-                if attempt < max_retries:
-                    print(f"packet synthesis attempt {attempt + 1} returned invalid content ({exc}), retrying...", file=sys.stderr)
-                    continue
-                raise
+            raw_stdout = result.get("stdout", "") or raw_output
+            raw_stderr = result.get("stderr", "") or ""
+            error_text = result.get("error", "") or ""
+
+            (debug_dir / f"last-packet-stdout-attempt{attempt}.txt").write_text(raw_stdout, encoding="utf-8")
+            (debug_dir / f"last-packet-stderr-attempt{attempt}.txt").write_text(raw_stderr or error_text, encoding="utf-8")
+            (debug_dir / "last-packet-stdout.txt").write_text(raw_stdout, encoding="utf-8")
+            (debug_dir / "last-packet-stderr.txt").write_text(raw_stderr or error_text, encoding="utf-8")
+
+            candidate_output = raw_output or raw_stdout
+            if candidate_output:
+                try:
+                    parse_content_output(candidate_output, repo_root)
+                    return candidate_output
+                except ValueError as exc:
+                    if error_text and attempt < max_retries:
+                        print(
+                            f"packet synthesis attempt {attempt + 1} returned provider error with unusable output ({error_text}; parse: {exc}), retrying...",
+                            file=sys.stderr,
+                        )
+                        continue
+                    if attempt < max_retries:
+                        print(f"packet synthesis attempt {attempt + 1} returned invalid content ({exc}), retrying...", file=sys.stderr)
+                        continue
+                    raise
+
+            if attempt < max_retries:
+                print(f"packet synthesis attempt {attempt + 1} failed (provider error: {error_text or 'unknown error'}), retrying...", file=sys.stderr)
+                continue
+            print(f"packet synthesis provider error: {error_text or 'unknown error'}", file=sys.stderr)
+            sys.exit(1)
 
     for attempt in range(max_retries + 1):
         try:

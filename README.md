@@ -83,7 +83,9 @@ The actual selected behavior comes from:
 - optional staging overrides
 - optional approach overrides
 
-**Current recommendation: B1-style execution** as the default baseline. B2 is still experimental and has not yet clearly beaten B1 on coherence + novelty.
+**Current recommendation: B1-style execution** as the default baseline, and prod now defaults to that packet-synthesis path. B2 is still experimental and has not yet clearly beaten B1 on coherence + novelty.
+
+Packet-synthesis hardening note (2026-04-25): the Claude provider path now preserves stderr/raw stdout on failures, logs per-attempt packet stderr artifacts, and lets the packet-synthesis loop own retries so transient provider exits are easier to diagnose.
 
 ### Preferred workflow: encode variants as approaches
 

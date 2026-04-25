@@ -9,6 +9,13 @@ import time
 from .base import ModelProvider
 
 
+def _trim(text: str, limit: int = 800) -> str:
+    text = (text or "").strip()
+    if len(text) <= limit:
+        return text
+    return text[:limit] + "..."
+
+
 class ClaudeProvider(ModelProvider):
     """Uses the `claude -p` CLI subprocess to avoid API billing.
     Implements custom retry with exponential backoff for transient failures.
@@ -54,24 +61,39 @@ class ClaudeProvider(ModelProvider):
                 if attempt < max_retries:
                     time.sleep(base_delay * (2 ** attempt))
                     continue
-                return {"result": "", "error": "timeout"}
+                return {"result": "", "error": "timeout", "stdout": "", "stderr": ""}
+
+            stdout = result.stdout or ""
+            stderr = result.stderr or ""
 
             if result.returncode != 0:
                 if attempt < max_retries:
                     time.sleep(base_delay * (2 ** attempt))
                     continue
-                return {"result": "", "error": f"exit {result.returncode}"}
+                detail = _trim(stderr) or _trim(stdout) or "no stderr/stdout"
+                return {
+                    "result": "",
+                    "error": f"exit {result.returncode}: {detail}",
+                    "returncode": result.returncode,
+                    "stdout": stdout,
+                    "stderr": stderr,
+                }
 
             try:
-                outer = json.loads(result.stdout)
+                outer = json.loads(stdout)
                 result_text = outer.get("result", "")
                 if not result_text:
                     raise ValueError("content provider returned empty result")
-                return {"result": result_text}
-            except (json.JSONDecodeError, KeyError, ValueError):
+                return {"result": result_text, "stdout": stdout, "stderr": stderr}
+            except (json.JSONDecodeError, KeyError, ValueError) as exc:
                 if attempt < max_retries:
                     time.sleep(base_delay * (2 ** attempt))
                     continue
-                return {"result": "", "error": "parse_error"}
+                return {
+                    "result": "",
+                    "error": f"parse_error: {exc}",
+                    "stdout": stdout,
+                    "stderr": stderr,
+                }
 
-        return {"result": "", "error": "exhausted_retries"}
+        return {"result": "", "error": "exhausted_retries", "stdout": "", "stderr": ""}

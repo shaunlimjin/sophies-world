@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sophie's World · April 25, 2026 · Issue #5</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', Arial, sans-serif;
+    background: #f0f4ff;
+    color: #2d2d2d;
+    padding: 20px;
+  }
+
+  .wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #ff6eb4 0%, #ff9a3c 50%, #ffda47 100%);
+    border-radius: 24px 24px 0 0;
+    padding: 36px 32px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: "✨🌍✨";
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 6px;
+  }
+  .header h1 {
+    font-size: 40px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 3px 0 rgba(0,0,0,0.15);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.92);
+    margin-top: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .header .date-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 50px;
+    padding: 5px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── GREETING BAND ── */
+  .greeting {
+    background: #fff;
+    border-left: 5px solid #ff6eb4;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1.6;
+  }
+  .greeting span { color: #ff6eb4; }
+
+  /* ── SECTION CARDS ── */
+  .card {
+    background: #fff;
+    padding: 24px 28px;
+    margin-top: 3px;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-wbt   { border-top: 4px solid #a78bfa; }
+  .label-wbt  { background: #ede9fe; color: #6d28d9; }
+
+  .card-world { border-top: 4px solid #34d399; }
+  .label-world{ background: #d1fae5; color: #065f46; }
+
+  .card-sg    { border-top: 4px solid #f472b6; }
+  .label-sg   { background: #fce7f3; color: #9d174d; }
+
+  .card-usa   { border-top: 4px solid #60a5fa; }
+  .label-usa  { background: #dbeafe; color: #1e40af; }
+
+  .card-interest  { border-top: 4px solid #f9a8d4; }
+  .label-interest { background: #fdf2f8; color: #be185d; }
+
+  .card-money { border-top: 4px solid #fbbf24; }
+  .label-money{ background: #fef3c7; color: #92400e; }
+
+  .card-challenge { border-top: 4px solid #fb923c; background: #fff7ed; }
+  .label-challenge{ background: #ffedd5; color: #9a3412; }
+
+  .card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.2;
+    color: #1a1a2e;
+  }
+  .card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #3d3d3d;
+    margin-bottom: 10px;
+  }
+  .card p:last-child { margin-bottom: 0; }
+  .section-intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #5b5563;
+    margin: -2px 0 14px;
+  }
+
+  /* ── LEARN MORE LINKS ── */
+  .learn-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .learn-more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 5px 13px;
+    border-radius: 50px;
+    border: 2px solid;
+    transition: opacity 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .learn-more a:hover { opacity: 0.8; }
+  .link-green  { color: #065f46; border-color: #34d399; background: #d1fae5; }
+  .link-purple { color: #5b21b6; border-color: #a78bfa; background: #ede9fe; }
+  .link-pink   { color: #9d174d; border-color: #f472b6; background: #fce7f3; }
+  .link-blue   { color: #1e40af; border-color: #60a5fa; background: #dbeafe; }
+  .link-rose   { color: #be185d; border-color: #f9a8d4; background: #fdf2f8; }
+  .link-amber  { color: #92400e; border-color: #fbbf24; background: #fef3c7; }
+  .link-orange { color: #9a3412; border-color: #fb923c; background: #ffedd5; }
+
+  /* ── FACT PILLS ── */
+  .fact-list { display: block; margin-top: 4px; }
+  .fact-item {
+    display: block;
+    background: #f5f3ff;
+    border-left: 4px solid #a78bfa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #3d3d3d;
+    margin-bottom: 12px;
+  }
+  .fact-item:last-child { margin-bottom: 0; }
+  .fact-item strong { color: #6d28d9; }
+
+  /* ── WORLD WATCH STORIES ── */
+  .world-stories { display: block; margin-top: 4px; }
+  .world-story {
+    display: block;
+    background: #f0fdf4;
+    border-left: 4px solid #34d399;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .world-story:last-child { margin-bottom: 0; }
+  .world-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #065f46;
+    margin-bottom: 6px;
+  }
+  .world-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .world-story p:last-of-type { margin-bottom: 0; }
+  .world-story .analogy {
+    background: #dcfce7;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: #166534;
+    margin-top: 8px;
+  }
+  .world-story .story-links { margin-top: 10px; }
+
+  /* ── SG SPOTS ── */
+  .sg-spots { display: block; margin-top: 4px; }
+  .sg-spot {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f472b6;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .sg-spot:last-child { margin-bottom: 0; }
+  .sg-spot h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .sg-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  .usa-spots { display: block; margin-top: 4px; }
+  .usa-spot {
+    display: block;
+    background: #eff6ff;
+    border-left: 4px solid #60a5fa;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .usa-spot:last-child { margin-bottom: 0; }
+  .usa-spot h3 { font-size: 15px; font-weight: 800; color: #1d4ed8; margin-bottom: 4px; }
+  .usa-spot p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  /* ── INTEREST FEATURE ── */
+  .interest-grid { display: block; margin-top: 4px; }
+  .interest-item {
+    display: block;
+    background: #fdf2f8;
+    border-left: 4px solid #f9a8d4;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .interest-item:last-child { margin-bottom: 0; }
+  .interest-item h3 { font-size: 15px; font-weight: 800; color: #be185d; margin-bottom: 4px; }
+  .interest-item p  { font-size: 14px; line-height: 1.65; color: #4a4a4a; margin: 0 0 8px; }
+
+  .money-stories { display: block; margin-top: 4px; }
+  .money-story {
+    display: block;
+    background: #fffbeb;
+    border-left: 4px solid #fbbf24;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .money-story:last-child { margin-bottom: 0; }
+  .money-story h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #b45309;
+    margin-bottom: 6px;
+  }
+  .money-story p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #3d3d3d;
+    margin-bottom: 6px;
+  }
+  .money-story p:last-of-type { margin-bottom: 0; }
+
+  /* ── MONEY HIGHLIGHT ── */
+  .money-highlight {
+    background: #fffbeb;
+    border: 2px dashed #fbbf24;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3d3d3d;
+  }
+  .money-highlight strong { color: #b45309; }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-q {
+    background: #fff;
+    border: 3px solid #fb923c;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .challenge-intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #7c5a35;
+    margin-bottom: 12px;
+  }
+  .challenge-q {
+    white-space: pre-line;
+  }
+  .challenge-bonus {
+    background: #fff;
+    border: 2px dashed #fdba74;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #9a3412;
+    font-weight: 700;
+  }
+  .challenge-hint {
+    text-align: center;
+    font-size: 13px;
+    color: #9a6a3e;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .footer .hearts {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+  .footer strong { color: #ff6eb4; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #ff6eb4, #ff9a3c, #ffda47, #34d399, #60a5fa, #a78bfa);
+    border-radius: 3px;
+    margin: 3px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Sophie's World</h1>
+    <div class="subtitle">Your weekly dose of wow, fun &amp; big ideas</div>
+    <div class="date-badge">📅 April 25, 2026 · Issue #5</div>
+  </div>
+
+  <!-- GREETING -->
+  <div class="greeting">Hey Sophie! 👋 this week <span>Sophie's World</span> is packed with eyeball-licking lizards, a giant climate meeting in Colombia, a Michelin-starred hawker stall, and a math puzzle that's all about energy. 🌎✨</div>
+
+  <div class="divider"></div>
+
+  <!-- WEIRD BUT TRUE -->
+  <div class="card card-wbt">
+    <div class="section-label label-wbt">🤯 Weird But True</div>
+    <h2>Three Brain-Bending Facts</h2><p class="section-intro">Buckle up — these are 100% real and 100% weird.</p><div class="fact-list"><div class="fact-item"><strong>Geckos lick their own eyeballs 👅</strong> Geckos don't have eyelids, so they can't blink like you and me. To keep their eyes clean and wet, they use their long, stretchy tongue as a built-in windshield wiper. Imagine licking your own eyeball — gross, but genius!</div><div class="fact-item"><strong>Some animals sleep almost ALL day 😴</strong> You might sleep about 8 hours a night, but koalas snooze up to 22 hours every single day. Their leafy diet doesn't give them much energy, so napping is basically their full-time job.</div><div class="fact-item"><strong>There's no "space goo" between the stars 🌌</strong> Long ago, scientists believed space was filled with an invisible substance called "ether." In 1887, two American physicists ran a super-precise experiment to find it… and detected absolutely nothing. That "oops!" moment helped pave the way for Einstein's wild ideas about light and time.</div></div><div class="learn-more"><a href="https://kids.nationalgeographic.com/weird-but-true/article/animals" class="link-purple">Nat Geo Kids: Weird But True!</a><a href="https://kids.britannica.com/students/article/physics/276413" class="link-purple">Britannica Kids: physics</a></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WORLD WATCH -->
+  <div class="card card-world">
+    <div class="section-label label-world">🌍 World Watch</div>
+    <h2>What's Happening on Planet Earth</h2><p class="section-intro">Two big stories shaping the world this week — explained in human (and 4th-grader) language.</p><div class="world-stories"><div class="world-story"><h3>World leaders meet in Colombia to talk about quitting fossil fuels</h3><p>On April 24, governments, scientists, and Indigenous leaders gathered in Colombia for a high-stakes summit. Their goal: figure out how to slowly stop using fossil fuels like oil, coal, and gas — the stuff that powers most of our cars, planes, and factories.</p><p>Burning fossil fuels heats up the planet, so leaders are racing to switch to cleaner energy like solar and wind. The tricky part? Fossil fuels are tangled up with jobs, money, and how people get around every day, so the change has to be careful.</p><div class="analogy">Imagine your whole school runs on one giant chocolate-cake oven. The cake's tasty, but it's also making the gym too hot. Switching to a brand new oven that uses sunshine sounds great — but you have to make sure the cafeteria still works while you swap them out!</div><div class="story-links learn-more"><a href="https://www.globalissues.org/news/2026" class="link-green">Global Issues: 2026 news</a></div></div><div class="world-story"><h3>Earth Day 2026: worry, hope, and a planet that needs us</h3><p>April 22 was Earth Day, and NewsForKids put out a big report on how the planet is doing. The good news: more countries are using clean energy and protecting wildlife. The hard news: wars in places like Ukraine, Sudan, and the Middle East are also hurting the environment, leaving behind pollution and destroyed land.</p><p>Scientists say small actions still matter — saving water, eating less food waste, and learning about climate are all helpful. The biggest changes come when many people (and governments) work together.</p><div class="analogy">Earth is like a giant shared classroom. If one kid spills paint, it's no big deal. But if everyone spills, the floor turns into a swamp — and it takes the whole class to clean it up.</div><div class="story-links learn-more"><a href="https://newsforkids.net/articles/2026/04/22/earth-day-2026-reasons-for-concern-hope/" class="link-green">NewsForKids: Earth Day 2026</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SINGAPORE SPOTLIGHT -->
+  <div class="card card-sg">
+    <div class="section-label label-sg">🇸🇬 Singapore Spotlight</div>
+    <h2>From Tiny Islands to Michelin Plates</h2><p class="section-intro">Singapore packs a LOT of cool into a small space. Here are two reasons why.</p><div class="sg-spots"><div class="sg-spot"><h3>Singapore is one main island… plus 62 little ones! 🏝️</h3><p>When people say "Singapore," they usually picture the big main island, called Pulau Ujong, which stretches about 30 miles across. But surrounding it are 62 smaller islands — some are nature reserves, some have beach resorts, and a few are completely empty.</p><p>Tucked between Malaysia (to the north) and Indonesia (to the south), Singapore is so small you could drive from one end to the other in less than an hour. Yet it's home to over 5 million people and one of the busiest ports in the world.</p></div><div class="sg-spot"><h3>The world's cheapest Michelin-starred meal is… chicken rice 🍗🍚</h3><p>Singapore's hawker centres are open-air food courts where chefs cook up amazing dishes for just a few dollars. In 2016, a hawker stall called Hong Kong Soya Sauce Chicken Rice and Noodle became one of the first street food spots in the world to earn a Michelin star — the same fancy award given to top restaurants.</p><p>Even cooler: that chicken rice plate cost only a couple of bucks, making it the world's cheapest Michelin-starred meal. In 2018, UNESCO even added Singapore's hawker culture to its list of important world traditions.</p></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- USA CORNER -->
+  <div class="card card-usa">
+    <div class="section-label label-usa">🇺🇸 USA Corner</div>
+    <h2>California Tries to Make the Internet Safer for Kids</h2><p class="section-intro">Big tech debates are heating up right here in your home state.</p><div class="usa-spots"><div class="usa-spot"><h3>California pushes to ban social media for kids under 16</h3><p>California lawmakers are moving forward with a bill that could stop kids under 16 from making social media accounts in the country's most populous state. They say apps are designed to be "addictive" — pulling kids in for hours and hurting sleep, focus, and mood.</p><p>If it passes, it would be one of the strictest rules in the country. Some families cheer the idea; others worry it goes too far. The conversation will keep going as the bill moves through the state legislature.</p></div><div class="usa-spot"><h3>New rules to keep AI chatbots safer for kids</h3><p>On April 22, California committees advanced two bills that would create the country's strongest protections around AI chatbots and kids. Lawmakers worry that some chatbots can give kids unsafe advice or pretend to be a human friend.</p><p>The new rules would require companies to be clearer when kids are talking to a bot (not a person) and add safety guardrails. California often sets the pace for the rest of the U.S. on tech laws — so other states are watching closely.</p></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INTEREST FEATURE -->
+  <div class="card card-interest">
+    <div class="section-label label-interest">⭐ Interest Corner</div>
+    <h2>Big Routines, Big Brains</h2><p class="section-intro">Gymnasts aren't just strong — they're scholars too.</p><div class="interest-grid"><div class="interest-item"><h3>Clemson's Brie Clark: "Make little Brie proud" 🐅</h3><p>Brie Clark just made history at Clemson University. She became the very first Clemson gymnast ever to qualify for the NCAA Championships, the program's first All-American, and part of its first ACC title-winning team.</p><p>As she gets ready for the final routine of her college career, Brie says her motivation is simple: make the little kid version of herself — the one who first fell in love with gymnastics — really proud. That's a powerful goal for anyone who loves a sport.</p><div class="story-links learn-more"><a href="https://www.olympics.com/en/news/brie-clark-reflects-final-routine-college-career" class="link-rose">Olympics.com: Brie Clark's story</a></div></div><div class="interest-item"><h3>California gymnasts star on the 2026 ACC Academic Team 📚</h3><p>The Atlantic Coast Conference just named its 2026 Gymnastics All-ACC Academic Team — and the California Golden Bears showed up in a big way. To make the list, athletes need at least a 3.20 GPA AND must compete in half of their team's meets.</p><p>Cal gymnasts on the list are studying everything from Environmental Engineering to Molecular & Cell Biology to Psychology. Translation: you can flip on the beam AND ace your bio test. Brains and balance — that's the gymnast superpower.</p><div class="story-links learn-more"><a href="https://theacc.com/news/2026/4/22/2026-gymnastics-all-acc-academic-teams-announced.aspx" class="link-rose">ACC: 2026 All-Academic Team</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- MONEY MOVES -->
+  <div class="card card-money">
+    <div class="section-label label-money">💰 Money Moves</div>
+    <h2>Save Smart, Earn Smarter</h2><p class="section-intro">Build a saving habit and meet kids who turned ideas into real money.</p><div class="money-stories"><div class="money-story"><h3>These teens earned about $10,000 — by thinking like entrepreneurs</h3><p>A mom in Business Insider shared how she's been teaching her kids to think like entrepreneurs ever since they were little. She didn't just hand them money — she helped them spot small problems people would pay to solve, then taught them how to budget and save what they earned.</p><p>By their teenage years, her kids had earned about $10,000 between them. The big secret wasn't a magic business idea. It was the habit of asking "How can I help someone, and how can I save what I earn?"</p><div class="money-highlight"><strong>🪙 Try the Match Game: ask a parent to match every $5 you save (up to a limit). It instantly turns saving into a fun challenge — and your money grows twice as fast.</strong></div><div class="story-links learn-more"><a href="https://www.businessinsider.com/teaching-kids-entrepreneurship-money-lessons-2024-11" class="link-amber">Business Insider: teaching kids entrepreneurship</a><a href="https://www.entrepreneur.com/money-finance/5-ways-to-build-your-kids-financial-literacy/367183" class="link-amber">Entrepreneur: build kids' money habits</a></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SOPHIE'S CHALLENGE -->
+  <div class="card card-challenge">
+    <div class="section-label label-challenge">🧠 Sophie's Challenge</div>
+    <h2>The Colombia Climate Summit Math Mission</h2><p class="challenge-intro">This week's World Watch told us about world leaders meeting in Colombia to plan how to use less fossil fuel. Let's turn that into a math mission!</p><div class="challenge-q">Sophieville uses 200 units of energy every day. Right now, 3/4 of that energy comes from fossil fuels (oil, coal, gas), and the rest is clean energy (solar and wind). How many units come from fossil fuels, and how many come from clean energy?</div><div class="challenge-bonus">⭐ Bonus: Sophieville's mayor wants to cut fossil fuel use IN HALF and replace it with clean energy. After the change, how many units of clean energy will Sophieville use each day?</div><div class="challenge-hint">To find 3/4 of 200, first split 200 into 4 equal groups (200 ÷ 4 = 50). Then count 3 of those groups. The leftover group is the clean energy.</div><div class="learn-more"><a href="https://www.globalissues.org/news/2026" class="link-orange">Global Issues: 2026 climate summit</a></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer" style="background:#fff;border-radius:0 0 24px 24px;margin-top:3px;"><span class="hearts">💖 🌏 💖</span><strong>Sophie's World</strong> · Issue #5 · April 25, 2026<br>Made with love by Dad & Claude 🤖❤️<br><span style="font-size:12px;color:#bbb;">Fremont, California ↔ Singapore</span></div>
+
+</div>
+</body>
+</html>

@@ -228,3 +228,37 @@ def test_claude_provider_generate_error_on_exhausted_retries():
             result = provider.generate("test prompt", max_retries=0, base_delay=0.01)
             assert "error" in result
             assert result["result"] == ""
+            assert "exit 1" in result["error"]
+            assert result["stderr"] == ""
+            assert result["stdout"] == ""
+
+
+def test_claude_provider_generate_returns_stderr_details_on_exit_failure():
+    provider = ClaudeProvider({"model": "sonnet"})
+    mock_fail = MagicMock()
+    mock_fail.returncode = 1
+    mock_fail.stdout = ""
+    mock_fail.stderr = "temporary upstream failure"
+
+    with patch("subprocess.run", return_value=mock_fail):
+        with patch("time.sleep"):
+            result = provider.generate("test prompt", max_retries=0, base_delay=0.01)
+            assert result["result"] == ""
+            assert result["returncode"] == 1
+            assert "temporary upstream failure" in result["error"]
+            assert result["stderr"] == "temporary upstream failure"
+
+
+def test_claude_provider_generate_returns_raw_stdout_on_parse_error():
+    provider = ClaudeProvider({"model": "sonnet"})
+    mock_bad = MagicMock()
+    mock_bad.returncode = 0
+    mock_bad.stdout = '{"unexpected": true}'
+    mock_bad.stderr = ""
+
+    with patch("subprocess.run", return_value=mock_bad):
+        with patch("time.sleep"):
+            result = provider.generate("test prompt", max_retries=0, base_delay=0.01)
+            assert result["result"] == ""
+            assert "parse_error" in result["error"]
+            assert result["stdout"] == '{"unexpected": true}'
