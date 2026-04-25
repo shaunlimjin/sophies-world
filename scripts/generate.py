@@ -124,7 +124,7 @@ def run_mode_a(today: date, issue_num: int, config: dict, recent_headlines: List
     """Mode A: hosted provider with integrated search (baseline path)."""
     from providers.model_providers import make_provider
     synthesis_provider_cfg = config.get("pipeline", {}).get("models", {}).get("synthesis")
-    synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
+    synthesis_provider = make_provider(synthesis_provider_cfg, repo_root=repo_root) if synthesis_provider_cfg else None
 
     print("Mode A: hosted provider with integrated search")
     prompt = build_content_prompt(today, issue_num, config, recent_headlines)
@@ -158,7 +158,7 @@ def run_mode_b(
     """Mode B: deterministic retrieval + configurable ranking + hosted packet synthesis."""
     from providers.model_providers import make_provider
     synthesis_provider_cfg = config.get("pipeline", {}).get("models", {}).get("synthesis")
-    synthesis_provider = make_provider(synthesis_provider_cfg) if synthesis_provider_cfg else None
+    synthesis_provider = make_provider(synthesis_provider_cfg, repo_root=repo_root) if synthesis_provider_cfg else None
 
     from research_stage import (
         build_research_plan, run_research,

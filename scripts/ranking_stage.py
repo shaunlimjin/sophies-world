@@ -93,7 +93,7 @@ def rank_candidates(
                 "hosted_model_ranker requires 'providers.ranking' in config. "
                 "Example:\n  providers:\n    ranking:\n      provider: claude\n      model: sonnet"
             )
-        provider = make_provider(provider_cfg)
+        provider = make_provider(provider_cfg, repo_root=repo_root)
         from providers.llm_providers import model_rank_candidates
         return model_rank_candidates(filtered_pool, config, repo_root, provider=provider)
     raise ValueError(f"Unknown ranker_provider: '{ranker_provider}'")

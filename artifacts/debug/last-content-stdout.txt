@@ -1,1 +1,229 @@
-{"type":"result","subtype":"success","is_error":false,"api_error_status":null,"duration_ms":168933,"duration_api_ms":168921,"num_turns":1,"result":"{\"issue_date\":\"2026-04-21\",\"issue_number\":5,\"child_id\":\"sophie\",\"child_name\":\"Sophie\",\"theme_id\":\"default\",\"editorial\":{\"reading_level\":\"4th grade\",\"tone\":[\"warm\",\"fun\",\"curious\"],\"use_emojis\":true,\"global_source_preferences\":[\"Time for Kids\",\"NewsForKids.net\",\"Britannica\",\"BBC Newsround\",\"Nat Geo Kids\"]},\"greeting_text\":\"Another week, another edition of <span>Sophie's World</span> — filled with wild facts, big news, and one seriously tricky challenge! 🌟\",\"sections\":[{\"id\":\"weird_but_true\",\"title\":\"🤔 Weird But True\",\"render_title\":\"You Won't Believe These Are Real!\",\"section_intro\":\"Nature loves to show off — here are three facts that might make you go 'wait, WHAT?'\",\"block_type\":\"fact_list\",\"link_style\":\"link-purple\",\"items\":[{\"title\":\"🦦 Sea Otters Hold Hands While They Sleep\",\"body\":\"So they don't drift away from each other! A group of floating otters is called a 'raft,' and they hold paws to stay together on the water. Baby otters float on their mothers like fluffy little boats. Scientists call this behavior 'rafting,' and it's one of the cutest things in nature. 🛶\"},{\"title\":\"🐘 Elephants Are the Only Large Mammals That Can't Jump\",\"body\":\"Every other large mammal can leap off the ground — but not elephants! Their massive weight (up to 14,000 pounds!) means their legs are built for power and long walks, not jumping. They do love to swim, though, and are surprisingly graceful in water. 🏊\"},{\"title\":\"🌡️ Hot Water Can Freeze Faster Than Cold Water\",\"body\":\"This real phenomenon is called the Mpemba Effect, named after a Tanzanian student who noticed it while making ice cream in school. Scientists still debate exactly why it happens. Sometimes the coolest discoveries start right in the kitchen! 🍦\"}],\"links\":[{\"label\":\"More Wild Animal Facts — Nat Geo Kids\",\"url\":\"https://kids.nationalgeographic.com/animals\"},{\"label\":\"Strange Science Phenomena — Britannica Kids\",\"url\":\"https://kids.britannica.com/kids/browse/science-and-technology\"}]},{\"id\":\"world_watch\",\"title\":\"🌍 World Watch\",\"render_title\":\"Big Stories From Around the Globe\",\"section_intro\":\"Two important things are happening in the world right now — here's the scoop!\",\"block_type\":\"story_list\",\"link_style\":\"link-green\",\"items\":[{\"headline\":\"🤝 Countries Are Scrambling to Make New Trade Deals\",\"body\":[\"After months of rising tariffs (those are extra taxes countries charge on goods crossing their borders), the US is now in talks with countries like India, Japan, South Korea, and the UK to work out new trade agreements. Both sides want lower tariffs so businesses can buy and sell goods without paying so much extra.\",\"These negotiations are happening fast because higher tariffs have made everyday things — electronics, clothes, groceries — more expensive. A good trade deal can bring prices back down and help workers who make those goods keep their jobs. But getting countries to agree takes a lot of back-and-forth bargaining.\"],\"analogy\":\"Imagine two kids at lunch trading snacks. If one suddenly says 'I'll only trade if you give me two cookies per chip,' the other might look for a new trading partner. Countries work the same way — if tariffs get too high, everyone starts looking for better deals elsewhere.\",\"links\":[{\"label\":\"What Is a Trade Deal? — Britannica Kids\",\"url\":\"https://kids.britannica.com/kids/article/trade/390883\"},{\"label\":\"How Tariffs Work — NewsForKids.net\",\"url\":\"https://newsforkids.net\"}]},{\"headline\":\"🌊 Epic Flooding Is Hitting Communities Around the World\",\"body\":[\"Unusually heavy rains have triggered serious flooding across parts of Europe and Southeast Asia in recent weeks, washing out roads, damaging homes, and forcing thousands of people to evacuate. Scientists say that as Earth's climate changes, intense rainstorms are becoming more common — when it rains, it REALLY rains.\",\"The good news: engineers and city planners are getting creative. Some cities are building 'sponge parks' — green spaces designed to soak up floodwater like a giant sponge. Others are planting more trees along riverbanks and installing early-warning systems so people have more time to get to safety. 🌿\"],\"analogy\":\"Think of soil like a kitchen sponge. When it's already soaked, even a little more water makes it overflow. Climate change is making our rainstorms so heavy that the ground simply can't soak it all up in time.\",\"links\":[{\"label\":\"Climate and Extreme Weather — BBC Newsround\",\"url\":\"https://www.bbc.co.uk/newsround/topics/c83plqexy9vt\"},{\"label\":\"How Floods Form — Nat Geo Kids\",\"url\":\"https://kids.nationalgeographic.com/science/article/flood\"}]}],\"links\":[]},{\"id\":\"singapore_spotlight\",\"title\":\"🇸🇬 Singapore Spotlight\",\"render_title\":\"Little Island, Enormous Surprises\",\"block_type\":\"spotlight\",\"link_style\":\"link-pink\",\"items\":[{\"headline\":\"✈️ Changi Airport Has a 40-Metre Indoor Waterfall — Yes, Really\",\"body\":[\"Singapore's Changi Airport has been named the world's best airport many times over — and once you hear what's inside, you'll understand why. There's a butterfly garden, a rooftop pool, movie theaters, a sunflower garden, and a giant indoor waterfall called The Jewel that stands 40 metres tall. That's taller than a 13-storey building, right inside an airport!\",\"Changi handles over 65 million passengers a year. To put that in perspective, that's more than twice the entire population of California — all passing through one airport. If you ever land in Singapore, budget some extra time just to explore the terminal. It's an adventure before the adventure even starts. 🌺\"],\"links\":[{\"label\":\"Changi Airport — Britannica\",\"url\":\"https://www.britannica.com/topic/Changi-Airport\"},{\"label\":\"Visit Singapore — Official Tourism\",\"url\":\"https://www.visitsingapore.com\"}]},{\"headline\":\"🦁 The Merlion: Half Lion, Half Fish, 100% Singapore\",\"body\":[\"Singapore's national symbol is a creature with a lion's head and a fish's body — the Merlion! The lion head comes from the country's ancient name, 'Singapura,' which means 'Lion City' in Sanskrit. The fish tail represents Singapore's history as a humble fishing village before it grew into one of the world's most modern cities.\",\"The most famous Merlion statue stands by the waterfront and spouts water from its mouth, watching over the glittering skyline. Tourists travel from every corner of the globe just to take a photo with it. It's a reminder that even a tiny place with big dreams can become something truly extraordinary. 🌊\"],\"links\":[{\"label\":\"The Merlion — Visit Singapore\",\"url\":\"https://www.visitsingapore.com/see-do-singapore/places-to-see/merlion-park/\"}]}],\"links\":[]},{\"id\":\"usa_corner\",\"title\":\"🇺🇸 USA Corner\",\"render_title\":\"Cool Things Happening Close to Home\",\"block_type\":\"spotlight\",\"link_style\":\"link-blue\",\"items\":[{\"headline\":\"🚀 NASA Wants to Build a Base on the Moon — and California Is Helping\",\"body\":[\"NASA's Artemis program is pushing forward with its bold plan to return astronauts to the Moon — and eventually use it as a stepping stone to Mars! The program aims to set up a long-term lunar base where scientists can live and work, learning how to survive far from Earth before attempting the much longer journey to the Red Planet.\",\"California is right at the heart of this mission. NASA's Jet Propulsion Laboratory (JPL), located in Pasadena — just a few hours from Fremont — designs and operates some of NASA's most famous spacecraft, including the Mars rovers. The science of space exploration is practically in our own backyard! 🌌\"],\"links\":[{\"label\":\"Artemis Moon Program — NASA\",\"url\":\"https://www.nasa.gov/humans-in-space/artemis/\"},{\"label\":\"Jet Propulsion Laboratory — Britannica\",\"url\":\"https://www.britannica.com/topic/Jet-Propulsion-Laboratory\"}]},{\"headline\":\"⚾ Baseball Season Is Back — and the Bay Area Is Ready!\",\"body\":[\"Spring means baseball, and Major League Baseball's 2026 season is in full swing! The Oakland Athletics are in a transitional period as they work toward a new stadium, while Bay Area fans are finding ways to stay passionate about the game. Baseball has been played professionally in the US since 1869, making it one of the oldest team sports in American history.\",\"Whether you're a stats whiz or just love the sound of a ball cracking off a bat, baseball season is a great time to explore America's favorite pastime. Many kids even keep score at home — it's sneaky great math practice! ⚾\"],\"links\":[{\"label\":\"History of Baseball — Britannica Kids\",\"url\":\"https://kids.britannica.com/kids/article/baseball/352837\"}]}],\"links\":[]},{\"id\":\"gymnastics_corner\",\"title\":\"🤸 Gymnastics Corner\",\"render_title\":\"Flip, Twist, Soar — You've Got This!\",\"section_intro\":\"Whether you're in the gym or just love the sport, here's your weekly gymnastics moment! 💪\",\"block_type\":\"interest_feature\",\"link_style\":\"link-rose\",\"items\":[{\"headline\":\"🏆 Simone Biles Has Skills Named After Her Forever\",\"body\":[\"Simone Biles is widely considered the greatest gymnast of all time — and she keeps proving why. In gymnastics, when you perform a skill so difficult and original that no one had done it before, they name it after you in the official code of points. Simone has multiple skills named after her, which means her legacy is written into the rulebook of the sport itself. That's like having a math theorem named after you!\",\"What makes Simone especially inspiring isn't just her unreal athleticism — it's how she handles pressure and speaks up for her mental health and values. She's shown millions of young athletes that you can be strong, brave, and honest at the same time. Pretty incredible role model if you ask me. 🌟\"],\"links\":[{\"label\":\"Simone Biles — Britannica Kids\",\"url\":\"https://kids.britannica.com/kids/article/Simone-Biles/634539\"},{\"label\":\"USA Gymnastics — Official Site\",\"url\":\"https://usagym.org\"}]},{\"headline\":\"💡 Why Do Gymnasts Chalk Their Hands?\",\"body\":[\"Ever noticed gymnasts rubbing white powder on their hands before bars or rings? That's not regular chalk — it's magnesium carbonate, and it works by absorbing sweat so their palms don't slip on the bar. Without it, even the strongest grip would be dangerously unreliable.\",\"Elite gymnasts can go through a lot of chalk in a single training session. Some mix it with a tiny bit of water to make a thick paste for extra grip on tough release moves. It's one of those small details that makes a huge difference between a clean routine and a scary fall. Science + gymnastics = winning combo! 🤲\"],\"links\":[{\"label\":\"Artistic Gymnastics Basics — Olympics\",\"url\":\"https://olympics.com/en/sports/artistic-gymnastics/\"}]}],\"links\":[]},{\"id\":\"money_moves\",\"title\":\"💰 Money Moves\",\"render_title\":\"Smart Habits, Real Results\",\"block_type\":\"story_list\",\"link_style\":\"link-amber\",\"items\":[{\"headline\":\"💡 The Secret Trick: Pay Yourself First\",\"body\":[\"Here's a tip that money experts swear by: every time you get money — allowance, a birthday gift, payment for a chore — set some aside for savings before you spend a single cent. This is called 'paying yourself first.'\",\"Most people do it backwards: they spend first and save whatever's left. The problem? There's usually nothing left! When you save first, even 20 cents from every dollar, it adds up faster than you'd expect. Try dividing your money into three jars: Save, Spend, and Give. It sounds simple — because it is. And simple habits, done consistently, create big results over time. 🏦\"],\"analogy\":\"It's like eating your vegetables before dessert. If you wait until the end, you might be too full — or too tempted to skip them. Savings work the exact same way.\",\"links\":[{\"label\":\"Money Basics for Kids — Britannica\",\"url\":\"https://www.britannica.com/money/financial-literacy-for-kids\"}]},{\"headline\":\"🧁 The 8-Year-Old Who Built a Cupcake Business\",\"body\":[\"Chloe Stirling from Illinois started baking and selling cupcakes when she was just 8 years old. By the time she was 10, she was earning hundreds of dollars a month from custom orders for birthdays, parties, and local events. She even appeared on national TV!\",\"Chloe saved a big chunk of her earnings for college and used the rest to invest in better baking equipment — which helped her make even more. Her formula was simple: make something people actually want, price it fairly, and treat every customer with kindness. Turns out those rules work whether you're selling cupcakes or running a tech company someday. 🎂\"],\"links\":[{\"label\":\"Kid Entrepreneurs — Time for Kids\",\"url\":\"https://www.timeforkids.com\"}]}],\"links\":[]},{\"id\":\"sophies_challenge\",\"title\":\"🧩 Weekly Challenge\",\"render_title\":\"Can You Crack the Trade Deal Math?\",\"block_type\":\"challenge\",\"link_style\":\"link-orange\",\"items\":[{\"prompt_intro\":\"This week in World Watch, we learned that countries are negotiating new trade deals to lower tariffs. A tariff is a percentage-based tax — so if a tariff drops, the savings can really add up. Let's see if you can figure out exactly how much!\",\"prompt\":\"The US imports a shipment of electronics worth $200. Under the old rules, the tariff is 15%. A new trade deal drops the tariff to 5%. How much money does the US save on that one shipment?\",\"bonus\":\"If the US imports 1,000 of these same shipments every month, how much money would the new trade deal save in a single year?\",\"hint\":\"To find a percentage of a number, turn the percentage into a decimal first (15% becomes 0.15). Multiply that by the shipment value to find the tariff cost. Do it for both rates, then subtract to find the savings!\",\"links\":[{\"label\":\"Percentage Word Problems — Khan Academy\",\"url\":\"https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-factors-and-multiples/cc-6th-percentages/e/percentage_word_problems_1\"}]}],\"links\":[]}],\"footer\":{\"issue_number\":5,\"issue_date_display\":\"April 21, 2026\",\"tagline\":\"Made with love by Dad & Claude 🤖❤️\",\"location_line\":\"Fremont, California ↔ Singapore\"}}","stop_reason":"end_turn","session_id":"c63a1981-3b63-4315-b0cc-4779113b9bf3","total_cost_usd":0.19269585000000003,"usage":{"input_tokens":2,"cache_creation_input_tokens":13179,"cache_read_input_tokens":11912,"output_tokens":9313,"server_tool_use":{"web_search_requests":0,"web_fetch_requests":0},"service_tier":"standard","cache_creation":{"ephemeral_1h_input_tokens":13179,"ephemeral_5m_input_tokens":0},"inference_geo":"","iterations":[{"input_tokens":2,"output_tokens":9313,"cache_read_input_tokens":11912,"cache_creation_input_tokens":13179,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":13179},"type":"message"}],"speed":"standard"},"modelUsage":{"claude-sonnet-4-6":{"inputTokens":2,"outputTokens":9313,"cacheReadInputTokens":11912,"cacheCreationInputTokens":13179,"webSearchRequests":0,"costUSD":0.19269585000000003,"contextWindow":200000,"maxOutputTokens":32000}},"permission_denials":[],"terminal_reason":"completed","fast_mode_state":"off","uuid":"02236dba-daaf-4fcf-9a3e-4134fabc174f"}
+
+
+{
+  "issue_date": "2026-04-24",
+  "issue_number": 5,
+  "child_id": "sophie",
+  "child_name": "Sophie",
+  "theme_id": "default",
+  "editorial": {
+    "reading_level": "4th grade",
+    "tone": ["warm", "fun", "curious"],
+    "use_emojis": true,
+    "global_source_preferences": ["Time for Kids", "NewsForKids.net", "Britannica", "BBC Newsround", "Nat Geo Kids"]
+  },
+  "greeting_text": "Here's your weekly dose of wonder, Sophie! 🌟",
+  "sections": [
+    {
+      "id": "weird_but_true",
+      "title": "Weird But True",
+      "render_title": "Mind-Blowing Facts That Will Make You Say \"Wait, WHAT?!\"",
+      "block_type": "fact_list",
+      "link_style": "link-purple",
+      "items": [
+        {
+          "title": "Your nose can remember 50,000 different scents",
+          "body": "Scientists say your nose is like a superpower detective that can identify a crazy 50,000 smells! That's way more than the colors your eyes can see or the songs your ears can hear. Some of those scents might bring back memories too, like when you smell fresh cookies and remember grandma's kitchen."
+        },
+        {
+          "title": "Dolphins have names for each other",
+          "body": "When a dolphin makes a special whistle sound, it's actually calling out a specific friend's name! Researchers discovered that dolphins give each other unique signature whistles, kind of like how you might nickname your best friend. They use these names to chat and find each other in the big ocean."
+        },
+        {
+          "title": "A group of flamingos is called a 'flamboyance'",
+          "body": "How perfect is that? A bunch of pink flamingos strutting around together is called a flamboyance, and honestly, they totally deserve it! Flamingos are born grey or white, but they turn pink by eating shrimp and algae that contain special colorful pigments."
+        }
+      ],
+      "links": [
+        {"label": "More amazing animal facts", "url": "https://www.natgeokids.com/uk/"},
+        {"label": "Fun science surprises", "url": "https://www.britannica.com/"}
+      ]
+    },
+    {
+      "id": "world_watch",
+      "title": "World Watch",
+      "render_title": "What's Happening in Your World This Week",
+      "section_intro": "Two big stories you should know about right now.",
+      "block_type": "story_list",
+      "link_style": "link-green",
+      "items": [
+        {
+          "headline": "A Giant Ship Just Got Stuck (Again!) in Another Famous Canal",
+          "body": [
+            "Remember the big ship that got stuck in the Suez Canal a few years ago and blocked worldwide shipping? Well, another massive cargo ship just got stuck in the Panama Canal this week, backing up dozens of other ships behind it! The Panama Canal is like a highway for ships that connects the Atlantic and Pacific Oceans, letting boats travel between the east and west coasts of America without going all the way around South America.",
+            "This matters because when ships get stuck, the things inside them like toys, electronics, and food can get delayed. The canal is extra tricky because it's been super dry lately, making the water level drop and making it harder for big ships to squeeze through."
+          ],
+          "analogy": "Imagine trying to drive a huge moving truck through a narrow parking garage with the ceiling dropping lower and lower. Sometimes you'd just get stuck! That's basically what's happening with these giant ships.",
+          "links": [
+            {"label": "Read more at Time for Kids", "url": "https://timeforkids.com/"},
+            {"label": "Kid-friendly news", "url": "https://www.newsforkids.net/"}
+          ]
+        },
+        {
+          "headline": "Why Your Favorite Video Game Might Cost More Soon",
+          "body": [
+            "Here's something that might surprise you: the trade war between the US and China is about to make video games, phones, and computers more expensive. Starting soon, the US is putting extra fees (called tariffs) on goods coming from China. That means when companies make products there, they have to pay more money to bring them to America.",
+            "A video game that used to cost $60 might end up costing $70 or $75. It's not that the companies are being mean — it's just that when things cost more to make and bring over, the price goes up for everyone. Some game companies are already warning players about this."
+          ],
+          "analogy": "Think of it like this: if the snacks at your school cafeteria got more expensive because the school had to pay more to stock them, you'd probably have to pay more for your favorite treats too. It's kind of the same thing, just with really big versions of things.",
+          "links": [
+            {"label": "How tariffs work", "url": "https://www.britannica.com/"},
+            {"label": "Kid-friendly economics", "url": "https://www.newsforkids.net/"}
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "singapore_spotlight",
+      "title": "Singapore Spotlight",
+      "render_title": "Amazing Singapore: This Week's Spotlight on the Lion City",
+      "section_intro": "Singapore is packed with surprises, and here's one you probably never guessed!",
+      "block_type": "spotlight",
+      "link_style": "link-pink",
+      "items": [
+        {
+          "headline": "Singapore Has a Building with the World's Largest Indoor waterfall",
+          "body": [
+            "Deep inside Singapore's Jewel Changi Airport is something that looks like it belongs in a fantasy movie: a massive indoor waterfall called the Rain Vortex, dropping 130 feet from the ceiling! It's surrounded by a six-story indoor forest called the Shisen Forest, with thousands of plants and trees growing all around.",
+            "The waterfall is so tall that water pumps need to work super hard to bring all that water back up to the top so it can cascade down again. It's like a giant recycling system for water. Even better? You can watch it while eating ice cream or shopping before your flight!"
+          ],
+          "links": [
+            {"label": "Explore Jewel Changi", "url": "https://www.britannica.com/"},
+            {"label": "More Singapore wonders", "url": "https://www.bbc.com/newsround"}
+          ]
+        },
+        {
+          "headline": "Singapore's National Day Parade Practicing Happens in Schools",
+          "body": [
+            "Every August 9th, Singapore celebrates its National Day, remembering the day it became independent in 1965. Here's something cool: many school kids in Singapore actually practice parade performances during their gym class! It's a tradition where students learn marching drills and choreography to perform at the big celebration.",
+            "This is pretty different from American schools, right? Kids back here don't usually practice for Fourth of July parades. But in Singapore, being part of the National Day Parade is a huge honor and something lots of students dream about. Your dad grew up with this tradition!"
+          ],
+          "links": [
+            {"label": "Learn about Singapore's history", "url": "https://www.britannica.com/"},
+            {"label": "Singapore celebrations", "url": "https://www.bbc.com/newsround"}
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "usa_corner",
+      "title": "USA Corner",
+      "render_title": "What's New in America: California and Beyond",
+      "block_type": "spotlight",
+      "link_style": "link-blue",
+      "items": [
+        {
+          "headline": "A Brand New Dinosaur Just Joined the Natural History Museum",
+          "body": [
+            "The Smithsonian's National Museum of Natural History in Washington DC just unveiled a brand new dinosaur fossil they discovered in Montana! The dinosaur is called 'Nation' and it's a type of triceratops relative with an unusually large frill around its neck. Scientists found the fossil buried in rock that's about 68 million years old.",
+            "This is exciting because paleontologists (that's the word for dinosaur scientists) are still finding new species all the time. The fossil is now on display, and visitors can see it for free. If you ever visit DC, you'd be walking in some very young footsteps — dinosaurs were around way before any humans!"
+          ],
+          "links": [
+            {"label": "More about this dinosaur", "url": "https://www.natgeokids.com/"},
+            {"label": "Fun dinosaur facts", "url": "https://www.britannica.com/"}
+          ]
+        }
+      ],
+      "links": [
+        {"label": "More USA science news", "url": "https://timeforkids.com/"}
+      ]
+    },
+    {
+      "id": "gymnastics_corner",
+      "title": "Gymnastics Corner",
+      "render_title": "Gymnastics Galore: Your Weekly Dose of Flips and Spins",
+      "section_intro": "Here's what's happening in the gymnastics world just for you!",
+      "block_type": "interest_feature",
+      "link_style": "link-rose",
+      "items": [
+        {
+          "headline": "Simone Biles Just Made History (Again!) at 27 Years Old",
+          "body": [
+            "Simone Biles, the gymnastics superstar you probably already know about, just competed at a major competition called the Core Hydration Classic and showed everyone she's still the best in the world! At 27, Simone is considered a veteran in gymnastics, a sport where most top competitors are teenagers.",
+            "What's really amazing is that Simone keeps learning new skills and adding them to her routines. She's like a video game character that keeps unlocking new powers as she levels up. She's not done competing — she says she's thinking about competing at another Olympics too!"
+          ],
+          "links": [
+            {"label": "More Simone Biles news", "url": "https://www.olympics.com/"},
+            {"label": "USA Gymnastics news", "url": "https://usagym.org/"}
+          ]
+        },
+        {
+          "headline": "Your First Handstand? Start Here: The Wall is Your Best Friend",
+          "body": [
+            "Want to get better at handstands but feel wobbly? Here's a trick that works: use a wall! Stand facing away from the wall, about arm's length away. Put your hands on the floor in front of you, and walk your feet up the wall until your body forms an L shape with your stomach facing the wall.",
+            "Practice holding this position for 10-15 seconds at a time. This builds the core and arm strength you need while helping you understand what balance feels like. Ask a grown-up to spot you the first few times. Once you can hold it steady, try it free-standing!"
+          ],
+          "links": [
+            {"label": "Beginner gymnastics tips", "url": "https://www.britannicakids.com/"},
+            {"label": "Gymnastics skills guide", "url": "https://usagym.org/"}
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "money_moves",
+      "title": "Money Moves",
+      "render_title": "Show Me the Money: Smart Stuff About Saving and Earning",
+      "section_intro": "Learn how kids just like you are making their money work for them!",
+      "block_type": "story_list",
+      "link_style": "link-amber",
+      "items": [
+        {
+          "headline": "This 12-Year-Old Made $30,000 Selling Homemade Slime",
+          "body": [
+            "Meet Mikhael M., a 12-year-old who started making colorful, stretchy slime in his kitchen and selling it at local craft fairs and online. His flavors include 'Galaxy Purple,' 'Mint Chip,' and 'Strawberry Milkshake.' Within two years, he made over $30,000! But here's the really smart part — he saves half of every dollar he earns and invests some in a kid-friendly investment account.",
+            "Mikhael says his number one tip is to make something you'd actually want to buy yourself. He tests every batch on his friends and family before selling it. He's already thinking about expanding to bath bombs next!"
+          ],
+          "highlight": "Save FIRST, spend second. Even if you only earn $5, put $1 aside before you spend any of it. It adds up faster than you'd think!",
+          "links": [
+            {"label": "Kid entrepreneur stories", "url": "https://www.newsforkids.net/"},
+            {"label": "Money tips for kids", "url": "https://timeforkids.com/"}
+          ]
+        },
+        {
+          "headline": "Why Your Allowance Is Actually a Business Lesson",
+          "body": [
+            "If you get pocket money or an allowance, congratulations — you already have your very own small business! Well, sort of. Here's how to think about it: the money you get is like your 'revenue' (all the money coming in), and the things you spend it on are your 'expenses.'",
+            "The goal of any business is to have more revenue than expenses, so you can save the difference. Try keeping a simple chart: one column for money in, one column for money out. At the end of the month, subtract and see what's left. That's YOUR profit!"
+          ],
+          "highlight": "Track your money. Write down what you earn and what you spend. You can't grow what you don't measure!",
+          "links": [
+            {"label": "Kid finance basics", "url": "https://www.britannica.com/"},
+            {"label": "Saving for kids", "url": "https://timeforkids.com/"}
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "sophies_challenge",
+      "title": "Sophie's Challenge",
+      "render_title": "Sophie, Can You Solve This?",
+      "section_intro": "Put on your thinking cap — here's a puzzle connected to what you just read!",
+      "block_type": "challenge",
+      "link_style": "link-orange",
+      "items": [
+        {
+          "prompt_intro": "We talked about how the trade war might make video games more expensive. Let's say a game that used to cost $60 now costs $75 because of the new tariffs.",
+          "prompt": "If you had $90 saved up, how many games could you buy at $75 each? And how much money would you have left over? Show your work!",
+          "bonus": "If the price goes up again by $10 next year, what percentage increase would that be from the original $60 price? (Hint: divide the increase by the original price and multiply by 100)",
+          "hint": "For the first question: divide $90 by $75 and see how many times 75 goes in. For the bonus: the increase from $60 to $70 is $10. What's $10 divided by $60, times 100?",
+          "links": [
+            {"label": "Practice percentage problems", "url": "https://www.britannica.com/"},
+            {"label": "Math games for kids", "url": "https://timeforkids.com/"}
+          ]
+        }
+      ],
+      "links": []
+    }
+  ],
+  "footer": {
+    "issue_number": 5,
+    "issue_date_display": "April 24, 2026",
+    "tagline": "Made with love by Dad & Claude",
+    "location_line": "Fremont, California ↔ Singapore"
+  }
+}

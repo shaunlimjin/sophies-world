@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 from scripts.providers.model_providers.base import ModelProvider
 from scripts.providers.model_providers.claude import ClaudeProvider
@@ -70,6 +71,13 @@ def test_make_provider_openai_compatible():
         "base_url": "http://localhost:1234/v1",
     })
     assert provider.name == "openai_compatible"
+
+
+def test_make_provider_passes_repo_root():
+    fake_cls = MagicMock(return_value=MagicMock(name="claude"))
+    with patch.dict("scripts.providers.model_providers.PROVIDER_MAP", {"claude": fake_cls}, clear=False):
+        make_provider({"provider": "claude", "model": "sonnet"}, repo_root=Path("/tmp/repo"))
+        fake_cls.assert_called_once_with({"provider": "claude", "model": "sonnet"}, repo_root=Path("/tmp/repo"))
 
 
 def test_model_provider_is_abc():

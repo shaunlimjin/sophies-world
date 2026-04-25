@@ -1,5 +1,8 @@
 """model_providers: pluggable model provider factory."""
 
+from pathlib import Path
+from typing import Optional
+
 from .base import ModelProvider
 from .claude import ClaudeProvider
 from .openai_compatible import OpenAICompatibleProvider
@@ -12,7 +15,7 @@ PROVIDER_MAP = {
 }
 
 
-def make_provider(config: dict) -> ModelProvider:
+def make_provider(config: dict, repo_root: Optional[Path] = None) -> ModelProvider:
     """Instantiate a ModelProvider from a config dict.
 
     Config must contain:
@@ -34,7 +37,15 @@ def make_provider(config: dict) -> ModelProvider:
             f"Unknown provider '{provider_type}'. "
             f"Available: {list(PROVIDER_MAP.keys())}"
         )
-    return PROVIDER_MAP[provider_type](config)
+    provider_cls = PROVIDER_MAP[provider_type]
+    if repo_root is None:
+        return provider_cls(config)
+    try:
+        return provider_cls(config, repo_root=repo_root)
+    except TypeError as exc:
+        if "repo_root" not in str(exc):
+            raise
+        return provider_cls(config)
 
 
 __all__ = ["ModelProvider", "ClaudeProvider", "OpenAICompatibleProvider", "OpenAIAgenticProvider", "make_provider", "PROVIDER_MAP"]
