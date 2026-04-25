@@ -4,6 +4,7 @@ __pycache__/
 .pytest_cache/
 logs/
 newsletters/test/
+newsletters/staging/
 artifacts/
 artifacts/*
 .DS_Store
