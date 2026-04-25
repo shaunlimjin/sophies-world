@@ -6,7 +6,7 @@
 
 **Architecture:** FastAPI imports existing stage modules directly (`research_stage`, `ranking_stage`, `content_stage`, `render_stage`) and exposes each stage as its own endpoint with SSE streaming. Existing CLI scripts (`generate.py`, `promote.py`) are refactored to call the same stage functions, keeping CLI and UI in sync. React (Vite) lives in `web/ui/`; FastAPI lives in `web/api/`; filesystem is the source of truth (no database).
 
-**Tech Stack:** Python 3.11+, FastAPI, uvicorn, Pydantic v2, React 18, Vite, TypeScript
+**Tech Stack:** Python 3.9+, FastAPI, uvicorn, Pydantic v2, React 18, Vite, TypeScript
 
 ---
 
@@ -34,7 +34,7 @@ sophies-world/
         runs.py            # GET /api/runs, POST /api/runs
         stages.py          # POST /api/runs/{name}/stages/{stage}, SSE stream, artifact fetch
         compare.py         # GET /api/compare — artifact fetch for two runs/stage
-        promote.py         # POST /api/runs/{name}/promote
+        promote.py         # POST /api/runs/{name}/promote/preview, POST /api/runs/{name}/promote/apply
       services/
         config_service.py  # YAML read/write, file enumeration
         run_service.py     # run state, artifact path resolution
@@ -86,12 +86,14 @@ Run state is derived entirely from the filesystem — no database. A run exists 
 
 | Stage | Artifact path |
 |---|---|
-| Research | `artifacts/approaches/<name>/research/sophie-YYYY-MM-DD-raw.json` (new — raw candidates before ranking) |
+| Research | `artifacts/approaches/<name>/research/sophie-YYYY-MM-DD-raw.json` (new — raw candidates before ranking; **requires implementation**: current `run_research_stage` does not currently persist this file; the stage function must be updated to write it) |
 | Ranking | `artifacts/approaches/<name>/research/sophie-YYYY-MM-DD.json` (existing path — ranked packet) |
 | Synthesis | `artifacts/approaches/<name>/issues/sophie-YYYY-MM-DD.json` |
 | Render | `artifacts/approaches/<name>/newsletters/sophies-world-YYYY-MM-DD.html` |
 
 **Note on stage separation:** The current `run_mode_b` bundles research + ranking into a single call. The stage module refactor must split these: `run_research_stage` returns raw candidates (written to `-raw.json`), and `run_ranking_stage` reads that file and writes the ranked packet to the existing path. This preserves backward compatibility with the CLI (which can call both in sequence) while giving the UI fine-grained control.
+
+**Note on compare when a stage hasn't run:** If one of the two runs doesn't have the selected stage artifact yet, `GET /api/compare` returns `{"left": null, "right": artifact}` or `{"left": artifact, "right": null}`. The UI renders a "Stage not run yet" placeholder for the missing side. The Promote button is hidden when either side is incomplete for the requested stage.
 
 `run_service.py` reads these paths and returns a `RunState` Pydantic model with `stages: list[StageState]` where each `StageState` has `status: pending | running | done | failed` and `artifact_path: str | None`.
 
@@ -108,8 +110,8 @@ POST /api/runs/{name}/stages/{stage}      → trigger stage, returns 202
 GET  /api/runs/{name}/stages/{stage}/stream  → SSE: text/event-stream, lines of log output
 GET  /api/runs/{name}/stages/{stage}/artifact → raw artifact (JSON or HTML)
 GET  /api/compare?a={name}&b={name}&stage={stage} → { left: artifact, right: artifact }
-POST /api/runs/{name}/promote             → { to: "staging" | "prod" } → diff preview
-PUT  /api/runs/{name}/promote             → apply promotion (after confirmation)
+POST /api/runs/{name}/promote/preview  → { to: "staging" | "prod" } → structured diff JSON
+POST /api/runs/{name}/promote/apply    → { to: "staging" | "prod", confirmed: true } → apply promotion
 ```
 
 Config file keys map to paths:
@@ -120,7 +122,38 @@ Config file keys map to paths:
 
 ### SSE streaming
 
-Stage functions accept a `log: Callable[[str], None]` parameter and call it for each progress line. `stage_runner.py` bridges this into an `asyncio.Queue` fed to FastAPI's `EventSourceResponse`. The client `useSSE` hook in React appends lines to local state.
+Stage functions accept a `log: Callable[[str], None]` parameter and call it for each progress line. `stage_runner.py` bridges this into an `asyncio.Queue` fed to FastAPI's `EventSourceResponse`.
+
+Each SSE event carries **structured JSON** in the `data:` field. The event type is conveyed both as an `event:` line and as a `type` field inside the JSON payload:
+
+```
+event: stage
+data: {"type": "stage", "stage": "research", "status": "running"}
+
+event: line
+data: {"type": "line", "text": "Running Brave research stage..."}
+
+event: line
+data: {"type": "line", "text": "fetching 20 candidates for world_watch"}
+
+event: line
+data: {"type": "line", "text": "cached research packet valid — using existing research"}
+
+event: artifact
+data: {"type": "artifact", "path": "artifacts/approaches/my-run/research/sophie-2026-04-25-raw.json"}
+
+event: done
+data: {"type": "done", "stage": "research", "success": true}
+```
+
+Error events:
+
+```
+event: error
+data: {"type": "error", "message": "Brave API rate limited", "stage": "research"}
+```
+
+The React `useSSE` hook parses the JSON payload and dispatches by `type` to local state. The UI should explicitly surface the `"cached research packet valid"` line as a "Using cached research" badge — so users understand why no Brave API call was made.
 
 ### CORS / dev setup
 
@@ -152,7 +185,7 @@ Tabs across the top for each config file (Child Profile, Pipeline, Research, and
 
 Two run-picker dropdowns at top left, shared stage tab selector at top right (Research | Ranking | Synthesis | Render). Selecting a stage fetches both artifacts via `GET /api/compare`. Below: split two-panel layout. For Render stage: two `<iframe>` panels. For other stages: two scrollable code blocks.
 
-"Promote [run name] → Staging" button appears when a run is selected in either picker. Clicking it calls `POST /api/runs/{name}/promote` to get a diff, shows the diff in a modal with Confirm/Cancel, then `PUT` to apply.
+"Promote [run name] → Staging" button appears when a run is selected in either picker. Clicking it calls `POST /api/runs/{name}/promote/preview` to get the diff, shows the diff in a modal with Confirm/Cancel, then `POST /api/runs/{name}/promote/apply` to apply. Promote button is hidden if the selected run hasn't completed at least the Synthesis stage.
 
 ---
 
@@ -167,7 +200,7 @@ The UI populates provider dropdowns from a static list (no discovery endpoint ne
 | Synthesis | `hosted_packet_synthesis`, `hosted_integrated_search` |
 | Render | `local_renderer` |
 
-Model overrides (synthesis model, ranking model) are editable fields in the New Run form: provider name + model name (e.g. `claude` / `opus`).
+Model overrides (synthesis model, ranking model) are editable fields in the New Run form: provider name + model name text inputs (e.g. `claude` / `opus`). These write directly to `models.synthesis.provider`, `models.synthesis.model`, `models.ranking.provider`, and `models.ranking.model` in the pipeline config at run-creation time. Invalid model names surface as stage failures rather than form errors — acceptable for MVP.
 
 ---
 
