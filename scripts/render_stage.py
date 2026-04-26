@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 
 def render_links(links: List[Dict[str, str]], link_style: str, extra_class: str = "learn-more") -> str:
@@ -162,3 +162,37 @@ def render_issue_html(template_html: str, issue: Dict[str, Any]) -> str:
 
 def load_template(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def run_render_stage(
+    config: dict,
+    today: date,
+    repo_root: Path,
+    artifacts_root: Path,
+    log: Callable[[str], None] = print,
+) -> Path:
+    """Render HTML from issue artifact. Returns output path."""
+    from issue_schema import get_issue_artifact_path, load_issue_artifact
+
+    issue_path = get_issue_artifact_path(
+        repo_root, "sophie", today.isoformat(), artifacts_root=artifacts_root
+    )
+    if not issue_path.exists():
+        raise FileNotFoundError(
+            f"Issue artifact not found: {issue_path}. Run synthesis stage first."
+        )
+    log(f"Loading issue artifact...")
+    issue = load_issue_artifact(issue_path)
+
+    theme = config.get("theme", {})
+    template_path = repo_root / theme.get("template_path", "scripts/template.html")
+    template_html = load_template(template_path)
+
+    html = render_issue_html(template_html, issue)
+
+    newsletters_dir = artifacts_root / "newsletters"
+    newsletters_dir.mkdir(parents=True, exist_ok=True)
+    output_path = newsletters_dir / f"sophies-world-{today.isoformat()}.html"
+    output_path.write_text(html, encoding="utf-8")
+    log(f"Newsletter rendered: {output_path}")
+    return output_path

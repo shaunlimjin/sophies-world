@@ -458,3 +458,52 @@ def test_is_blocked_subdomain():
 
 def test_is_blocked_no_match():
     assert not ranking_stage._is_blocked("bbc.co.uk", {"reddit.com"})
+
+
+# ---------------------------------------------------------------------------
+# ranking_stage: run_ranking_stage
+# ---------------------------------------------------------------------------
+
+def test_run_ranking_stage_reads_raw_and_writes_ranked(tmp_path, monkeypatch):
+    """run_ranking_stage reads -raw.json, ranks, writes ranked packet."""
+    today = date(2026, 4, 26)
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    raw_path = artifacts_root / "research" / f"sophie-{today.isoformat()}-raw.json"
+    raw_path.parent.mkdir(parents=True)
+
+    raw_packet = {
+        "issue_date": today.isoformat(),
+        "recent_headlines": [],
+        "sections": [],
+        "config_hash": "abc123",
+    }
+    research_stage.save_research_packet(raw_packet, raw_path)
+
+    config = {
+        "profile": {"newsletter": {"active_sections": []}},
+        "sections": {},
+        "pipeline": {
+            "global_domains": {"kid_safe": [], "blocked": []},
+            "global_ranking_defaults": {"min_score": 0, "max_ranked": 5},
+            "novelty": {"history_window": 3, "similarity_threshold": 0.4},
+        },
+    }
+    result = ranking_stage.run_ranking_stage(
+        config=config, today=today, repo_root=tmp_path,
+        artifacts_root=artifacts_root, ranker_provider="heuristic_ranker",
+    )
+    ranked_path = artifacts_root / "research" / f"sophie-{today.isoformat()}.json"
+    assert ranked_path.exists()
+    assert result["issue_date"] == today.isoformat()
+
+
+def test_run_ranking_stage_raises_if_no_raw_packet(tmp_path):
+    """run_ranking_stage raises FileNotFoundError if -raw.json is missing."""
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    artifacts_root.mkdir(parents=True)
+    config = {"profile": {"newsletter": {"active_sections": []}}, "sections": {}, "pipeline": {}}
+    with pytest.raises(FileNotFoundError, match="raw.json"):
+        ranking_stage.run_ranking_stage(
+            config=config, today=date(2026, 4, 26), repo_root=tmp_path,
+            artifacts_root=artifacts_root, ranker_provider="heuristic_ranker",
+        )

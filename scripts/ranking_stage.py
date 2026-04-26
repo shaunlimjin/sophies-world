@@ -6,7 +6,7 @@ import json
 import re
 from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from research_stage import DERIVED_SECTIONS
 
@@ -97,6 +97,41 @@ def rank_candidates(
         from providers.llm_providers import model_rank_candidates
         return model_rank_candidates(filtered_pool, config, repo_root, provider=provider)
     raise ValueError(f"Unknown ranker_provider: '{ranker_provider}'")
+
+
+def run_ranking_stage(
+    config: dict,
+    today: date,
+    repo_root: Path,
+    artifacts_root: Path,
+    ranker_provider: str,
+    log: Callable[[str], None] = print,
+) -> dict:
+    """Read -raw.json, prefilter + rank, persist ranked packet, return it."""
+    from research_stage import (
+        get_raw_research_artifact_path,
+        get_research_artifact_path,
+        load_research_packet,
+        save_research_packet,
+    )
+    raw_path = get_raw_research_artifact_path(repo_root, today, artifacts_root)
+    if not raw_path.exists():
+        raise FileNotFoundError(
+            f"Raw research packet not found: {raw_path}. Run research stage first."
+        )
+    log(f"Loading raw research packet...")
+    raw_packet = load_research_packet(raw_path)
+
+    log("Prefiltering candidates...")
+    filtered = prefilter_candidates(raw_packet, config)
+
+    log(f"Ranking with {ranker_provider}...")
+    ranked = rank_candidates(filtered, config, ranker_provider, repo_root)
+
+    ranked_path = get_research_artifact_path(repo_root, today, artifacts_root=artifacts_root)
+    save_research_packet(ranked, ranked_path)
+    log(f"Ranked packet saved: {ranked_path}")
+    return ranked
 
 
 # ---------------------------------------------------------------------------
