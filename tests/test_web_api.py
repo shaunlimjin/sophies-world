@@ -106,3 +106,40 @@ def test_get_run_state_returns_all_stages_pending(client):
     assert body["name"] == "fresh-run"
     assert len(body["stages"]) == 4
     assert all(s["status"] == "pending" for s in body["stages"])
+
+
+# ---------------------------------------------------------------------------
+# Stage endpoints
+# ---------------------------------------------------------------------------
+
+def test_trigger_stage_409_if_already_running(client, repo_root):
+    client.post("/api/runs", json={"name": "run-a"})
+    # Create a running sentinel manually
+    sentinel = repo_root / "artifacts" / "approaches" / "run-a" / ".stage-research.running"
+    sentinel.parent.mkdir(parents=True, exist_ok=True)
+    sentinel.touch()
+    resp = client.post("/api/runs/run-a/stages/research", json={})
+    assert resp.status_code == 409
+
+
+def test_trigger_stage_404_if_run_missing(client):
+    resp = client.post("/api/runs/nope/stages/research", json={})
+    assert resp.status_code == 404
+
+
+def test_artifact_endpoint_404_if_missing(client):
+    client.post("/api/runs", json={"name": "run-b"})
+    resp = client.get("/api/runs/run-b/stages/research/artifact")
+    assert resp.status_code == 404
+
+
+def test_artifact_endpoint_returns_json(client, repo_root):
+    from datetime import date
+    today = date.today()
+    client.post("/api/runs", json={"name": "run-c"})
+    ar = repo_root / "artifacts" / "approaches" / "run-c" / "research"
+    ar.mkdir(parents=True)
+    (ar / f"sophie-{today.isoformat()}-raw.json").write_text('{"issue_date": "test"}')
+    resp = client.get("/api/runs/run-c/stages/research/artifact")
+    assert resp.status_code == 200
+    assert "issue_date" in resp.text
