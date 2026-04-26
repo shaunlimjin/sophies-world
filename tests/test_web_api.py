@@ -143,3 +143,77 @@ def test_artifact_endpoint_returns_json(client, repo_root):
     resp = client.get("/api/runs/run-c/stages/research/artifact")
     assert resp.status_code == 200
     assert "issue_date" in resp.text
+
+
+# ---------------------------------------------------------------------------
+# Compare endpoint
+# ---------------------------------------------------------------------------
+
+def test_compare_returns_null_for_missing_artifact(client, repo_root):
+    from datetime import date
+    today = date.today()
+    client.post("/api/runs", json={"name": "left-run"})
+    client.post("/api/runs", json={"name": "right-run"})
+    # Only create right artifact
+    ar = repo_root / "artifacts" / "approaches" / "right-run" / "research"
+    ar.mkdir(parents=True)
+    (ar / f"sophie-{today.isoformat()}-raw.json").write_text('{"issue_date": "test"}')
+
+    resp = client.get("/compare?a=left-run&b=right-run&stage=research")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["left"] is None
+    assert body["right"] is not None
+
+
+def test_compare_returns_both_artifacts(client, repo_root):
+    from datetime import date
+    today = date.today()
+    for name in ("run-x", "run-y"):
+        client.post("/api/runs", json={"name": name})
+        ar = repo_root / "artifacts" / "approaches" / name / "research"
+        ar.mkdir(parents=True)
+        (ar / f"sophie-{today.isoformat()}-raw.json").write_text(f'{{"run": "{name}"}}')
+    resp = client.get("/compare?a=run-x&b=run-y&stage=research")
+    assert resp.status_code == 200
+    assert "run-x" in resp.json()["left"]
+    assert "run-y" in resp.json()["right"]
+
+
+# ---------------------------------------------------------------------------
+# Promote endpoint
+# ---------------------------------------------------------------------------
+
+def test_promote_preview_shows_add_action(client, repo_root):
+    from datetime import date
+    today = date.today()
+    client.post("/api/runs", json={"name": "winner"})
+    ar = repo_root / "artifacts" / "approaches" / "winner" / "newsletters"
+    ar.mkdir(parents=True)
+    (ar / f"sophies-world-{today.isoformat()}.html").write_text("<html>winner</html>")
+
+    resp = client.post("/api/runs/winner/promote/preview", json={"to": "staging"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["to"] == "staging"
+    assert len(body["changes"]) == 1
+    assert body["changes"][0]["action"] in ("add", "replace")
+
+
+def test_promote_apply_copies_newsletter(client, repo_root):
+    from datetime import date
+    today = date.today()
+    client.post("/api/runs", json={"name": "winner2"})
+    ar = repo_root / "artifacts" / "approaches" / "winner2" / "newsletters"
+    ar.mkdir(parents=True)
+    html_content = "<html>winner newsletter</html>"
+    (ar / f"sophies-world-{today.isoformat()}.html").write_text(html_content)
+
+    resp = client.post(
+        "/api/runs/winner2/promote/apply",
+        json={"to": "staging", "confirmed": True}
+    )
+    assert resp.status_code == 200
+    dest = repo_root / "newsletters" / "staging" / f"sophies-world-{today.isoformat()}.html"
+    assert dest.exists()
+    assert dest.read_text() == html_content
