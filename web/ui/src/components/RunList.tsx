@@ -1,4 +1,4 @@
-import { RunSummary } from '../api/client'
+import type { RunSummary } from '../api/client'
 
 const STATUS_ICON: Record<string, string> = {
   done: '✓', running: '▶', failed: '✗', pending: '○',

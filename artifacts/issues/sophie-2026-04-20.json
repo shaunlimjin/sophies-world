@@ -1,264 +1,88 @@
 {
   "issue_date": "2026-04-20",
-  "issue_number": 5,
+  "issue_number": 1,
   "child_id": "sophie",
   "child_name": "Sophie",
   "theme_id": "default",
-  "editorial": {
-    "reading_level": "4th grade",
-    "tone": [
-      "warm",
-      "fun",
-      "curious"
-    ],
-    "use_emojis": true,
-    "global_source_preferences": [
-      "Time for Kids",
-      "NewsForKids.net",
-      "Britannica",
-      "BBC Newsround",
-      "Nat Geo Kids"
-    ]
-  },
-  "greeting_text": "Issue #5 of <span>Sophie's World</span> is here — packed with gymnastics champions, a Moon mission splashdown, and the wildest animal facts you've ever heard! 🎉",
+  "editorial": {},
+  "greeting_text": "Here's what's happening in your world this week!",
   "sections": [
     {
-      "id": "weird_but_true",
-      "title": "🤔 Weird But True",
-      "render_title": "Nature's Strangest Superpowers",
-      "block_type": "fact_list",
-      "link_style": "link-purple",
+      "id": "world_watch",
+      "title": "World Watch",
+      "render_title": "What's Happening in Your World",
+      "block_type": "story_list",
+      "link_style": "pill",
       "items": [
         {
-          "title": "A blue whale's tongue weighs as much as an elephant 🐋",
-          "body": "Blue whales are the biggest animals on Earth, and their tongues are seriously massive — each one can weigh around 5,400 pounds, about the same as a full-grown elephant. Just the tongue alone! Imagine trying to brush that before school."
+          "headline": "Something Big Is Moving in the Ocean",
+          "body": [
+            "Scientists recently detected something unusual deep in the Pacific Ocean — a massive underwater mountain that's actually a volcano moving across the seafloor! This isn't a tiny shift; researchers say it's one of the biggest geological movements they've ever witnessed underwater.",
+            "Imagine a mountain walking around on the ocean floor, slowly but surely. That's basically what's happening right now, miles beneath the waves where no one can see it."
+          ],
+          "analogy": "Think of it like a giant turtle slowly swimming underwater — except the turtle is as big as three football fields stacked on top of each other!",
+          "links": [
+            {
+              "label": "Learn More About Ocean Discovery",
+              "url": "https://www.newsforstudents.net"
+            }
+          ]
         },
         {
-          "title": "Snails can grow back a lost eye 🐌",
-          "body": "If a garden snail loses one of its eye stalks, it can actually grow a brand-new one! Scientists call this regeneration. It makes snails some of the most impressive healers in the animal world — and pretty good at hide-and-seek too."
-        },
-        {
-          "title": "Kangaroos can only hop forward — never backward 🦘",
-          "body": "A kangaroo's powerful back legs and heavy tail make it physically impossible to hop in reverse. They are literally built to always move forward! Australia actually chose the kangaroo for its national coat of arms partly because of this — a symbol of a country that never goes backward."
+          "headline": "A Country Planted Millions of Trees in Just One Year",
+          "body": [
+            "One small country in Africa just broke a world record: they planted over 10 million trees in a single year! The goal is to bring back forests that were cut down long ago and help fix climate change.",
+            "Trees are like the Earth's lungs — they breathe in carbon dioxide (the stuff that makes the planet warmer) and breathe out clean oxygen for us to breathe."
+          ],
+          "links": [
+            {
+              "label": "Read About Forest Restoration",
+              "url": "https://www.timeforKids.com"
+            }
+          ]
         }
       ],
       "links": [
         {
-          "label": "Weird But True: Animals",
-          "url": "https://kids.nationalgeographic.com/weird-but-true/article/animals"
+          "label": "Time for Kids",
+          "url": "https://www.timeforkids.com"
         },
         {
-          "label": "300+ Animal Facts for Kids",
-          "url": "https://www.weareteachers.com/animal-facts/"
+          "label": "News for Kids",
+          "url": "https://www.newsforstudents.net"
         }
       ]
     },
     {
-      "id": "world_watch",
-      "title": "🌍 World Watch",
-      "render_title": "Big Stories From Around the Globe",
-      "section_intro": "Two major things happened in the world this week — one high above the Earth and one deep underground.",
-      "block_type": "story_list",
-      "link_style": "link-green",
+      "id": "weird_but_true",
+      "title": "Weird But True",
+      "render_title": "Seriously Strange (But Totally Real!)",
+      "block_type": "fact_list",
+      "link_style": "pill",
       "items": [
         {
-          "headline": "NASA's Artemis II Crew Splashes Down Safely 🚀",
-          "body": [
-            "On April 18, NASA's Artemis II mission ended with a splash — literally! The Orion spacecraft carrying four astronauts splashed down safely in the Pacific Ocean after flying all the way around the Moon. It was the first time humans had traveled that far from Earth since the Apollo 17 mission back in 1972, more than 50 years ago.",
-            "This mission was a giant step toward landing people on the Moon again. The crew didn't land this time — they were testing all the spacecraft's systems to make sure future missions can do it safely. Everything worked perfectly."
-          ],
-          "analogy": "Think of Artemis II like a test drive before a big road trip. You don't just hop in a new car and drive across the country — first you take it around the block to make sure the brakes work and nothing rattles. NASA did exactly that: a loop around the Moon to prove the ship is ready for the real thing.",
-          "links": [
-            {
-              "label": "Artemis II on NewsForKids",
-              "url": "https://newsforkids.net/category/all_news/science/"
-            },
-            {
-              "label": "2026 in Science",
-              "url": "https://en.wikipedia.org/wiki/2026_in_science"
-            }
-          ]
+          "title": "There's a lake that looks like it's boiling",
+          "body": "In a faraway place called Dallol, Ethiopia, there's a lake filled with acid so hot and strange that nothing can survive in it — not even bacteria! It looks like a colorful soup bubbling away on an alien planet."
         },
         {
-          "headline": "Powerful Earthquake Shakes Northern Japan 🌊",
-          "body": [
-            "Today — April 20 — a major earthquake with a magnitude of 7.7 struck off the northern coast of Japan. Tsunami warnings went out right away, telling people near the coast to move to higher ground as fast as possible. The warnings were later downgraded, but officials are still urging caution in some areas while they check for damage.",
-            "Japan sits on the 'Ring of Fire,' a zone around the Pacific Ocean where giant slabs of the Earth's crust meet and grind against each other. This makes Japan one of the most earthquake-prone places on Earth. Because of this, Japanese people practice earthquake drills regularly and have some of the world's best early-warning systems."
-          ],
-          "analogy": "Imagine the Earth's surface like a giant cracked eggshell slowly floating on thick, gooey liquid. When two pieces of the shell bump or scrape against each other, the energy bursts outward as shaking — that's an earthquake. Japan sits right at one of those cracks.",
-          "links": [
-            {
-              "label": "Japan Earthquake Updates",
-              "url": "https://www.theguardian.com/world/live/2026/apr/20/japan-tsunami-earthquake-sanriku-latest-news-updates"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "singapore_spotlight",
-      "title": "🇸🇬 Singapore Spotlight",
-      "render_title": "The Little Red Dot's Big Surprises",
-      "block_type": "spotlight",
-      "link_style": "link-pink",
-      "items": [
-        {
-          "headline": "Singapore Is Named After a Lion Nobody Ever Saw",
-          "body": [
-            "The name 'Singapore' comes from the Malay words 'Singa' (lion) and 'Pura' (city) — meaning Lion City. Legend says a prince once spotted a lion on the island and named it in honor of the sighting. Here's the twist: lions have never actually lived in Singapore! Historians believe he most likely spotted a tiger or a large wild cat.",
-            "What makes it even more surprising? Real tigers did roam Singapore in the wild up until around 1930. So the island actually had tigers — but got named after a lion it never had. Possibly the most accidentally cool naming story in history."
-          ],
-          "links": [
-            {
-              "label": "Singapore Facts for Kids",
-              "url": "https://worldoftravelswithkids.com/interesting-singapore-facts-for-kids/"
-            },
-            {
-              "label": "Nat Geo Kids: Singapore",
-              "url": "https://kids.nationalgeographic.com/geography/countries/article/singapore"
-            }
-          ]
+          "title": "Some frogs freeze solid in winter and come back to life",
+          "body": "Wood frogs in Alaska and Canada actually freeze completely during winter. Their bodies turn into little frog-cicles! When spring arrives, they thaw out and hop away like nothing happened."
         },
         {
-          "headline": "9,234 Students Set a World Record — By Falling Down",
-          "body": [
-            "Students in Singapore once formed the world's longest human domino chain: 9,234 people lying down one after another in a line stretching 4.2 kilometers — about 2.6 miles long. When the first person tipped over backward, the wave traveled all the way down the line to the very last student.",
-            "This is just one of several world records Singaporean students have broken together. It's a reminder that with great teamwork and planning, even the most impossible-looking goals are achievable — one person at a time."
-          ],
-          "links": [
-            {
-              "label": "Cool Singapore Facts",
-              "url": "https://www.kids-world-travel-guide.com/singapore-facts.html"
-            }
-          ]
+          "title": "Honey never spoils — ancient honey is still edible",
+          "body": "Archaeologists have found honey in Egyptian tombs that's over 3,000 years old and still good to eat! Honey's special makeup keeps it fresh forever, as long as it's kept dry."
         }
-      ]
-    },
-    {
-      "id": "usa_corner",
-      "title": "🇺🇸 USA Corner",
-      "render_title": "What's Happening in America Right Now",
-      "block_type": "spotlight",
-      "link_style": "link-blue",
-      "items": [
+      ],
+      "links": [
         {
-          "headline": "Free Entry to All National Parks — Today! 🏕️",
-          "body": [
-            "It's National Park Week, and today — April 20 — every US National Park is free to enter. No ticket, no fee. That includes amazing California parks like Yosemite, Muir Woods, and the Golden Gate National Recreation Area, all just a short drive from Fremont. Rangers are hosting hikes, outdoor theater, and special kids' programs all week long.",
-            "The US has 63 national parks protecting some of the most stunning landscapes on Earth — from giant redwood forests to deep canyons to wild coastlines. National Park Week is the perfect reminder that these places belong to everyone."
-          ],
-          "links": [
-            {
-              "label": "National Park Week in California",
-              "url": "https://www.visitcalifornia.com/experience/april-events-california/"
-            }
-          ]
-        },
-        {
-          "headline": "California Kids Get a Brand-New Nature Playground 🌿",
-          "body": [
-            "The California Botanic Garden in Claremont just opened the Children's Woodland — a whole outdoor space designed just for kids to explore California's native plants up close. Families traveled from across Southern California for the opening weekend, and kids got to discover the incredible plants that have grown here for thousands of years.",
-            "California has some of the most unique ecosystems in the world, from coastal redwoods to desert wildflowers. The Children's Woodland is a reminder that one of the planet's most remarkable natural environments is right in our own backyard."
-          ],
-          "links": [
-            {
-              "label": "Children's Woodland Opens",
-              "url": "https://www.dailybulletin.com/2026/04/16/california-botanic-garden-in-claremont-opens-new-space-for-children/"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gymnastics_corner",
-      "title": "🤸 Gymnastics Corner",
-      "render_title": "Champions, Perfect Tens, and Rising Stars",
-      "section_intro": "What a week in gymnastics! From a nail-biting college championship to a teenage phenom taking Japan by storm — the gymnastics world is delivering.",
-      "block_type": "interest_feature",
-      "link_style": "link-rose",
-      "items": [
-        {
-          "headline": "Oklahoma Wins the 2026 NCAA Championship by a Razor-Thin Margin 🏆",
-          "body": [
-            "The University of Oklahoma claimed the 2026 NCAA Women's Gymnastics Championship in Fort Worth, Texas — but just barely! Their winning score of 198.1625 beat out LSU's 198.0750 by less than one tenth of a point. The crowd was on the edge of their seats until the very last score went up.",
-            "In an unforgettable highlight, LSU's Kailin Chio became the first gymnast in LSU history to earn a perfect 10 on vault at the NCAA Championships. A perfect 10 means every single element — the sprint, the launch, the flip, and the landing — was absolutely flawless. Even in second place, that moment will be remembered forever."
-          ],
-          "links": [
-            {
-              "label": "NCAA Championship Results",
-              "url": "https://www.ncaa.com/news/gymnastics-women/article/2026-04-16/2026-ncaa-womens-gymnastics-championships-bracket-schedule-results"
-            },
-            {
-              "label": "Live Highlights and Scores",
-              "url": "https://gymnastics-now.com/2026-ncaa-womens-gymnastics-championships-final-live-updates-scores-results/"
-            }
-          ]
-        },
-        {
-          "headline": "15-Year-Old Misa Nishiyama Is Turning Heads in Japan 🌟",
-          "body": [
-            "At just 15 years old, Nishiyama Misa showed up at the All-Japan Gymnastics All-Around Championships and surprised everyone — including the older, more experienced athletes — by taking the lead in women's qualification on April 16. Nobody expected the youngest competitor in the field to be sitting at the top of the scoreboard.",
-            "Misa's story is proof that age really is just a number in gymnastics. Hard work, dedication, and believing in yourself matter far more than how many years you've been alive. Keep that in mind next time you're working on a new skill! 💪"
-          ],
-          "links": [
-            {
-              "label": "Misa Nishiyama's Story",
-              "url": "https://www.olympics.com/en/news/all-japan-all-around-championships-2026-women-qualification"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "money_moves",
-      "title": "💰 Money Moves",
-      "render_title": "How to Turn What You Love Into Something That Earns",
-      "block_type": "story_list",
-      "link_style": "link-amber",
-      "items": [
-        {
-          "headline": "The Best Businesses Start With Something You Care About 💡",
-          "body": [
-            "Here's a big money idea: the most successful kid entrepreneurs didn't start by asking 'how do I make money?' — they started by asking 'what problem do I want to solve?' When you genuinely care about what you're building, your energy is real, your ideas are better, and customers can feel the difference.",
-            "Meet Simone Hufana, a young entrepreneur who noticed that kids like her didn't have many coloring books that showed women who looked like them. So she created Color Herstory — a series of coloring books celebrating influential women of color. Her books found an audience, her message spread, and she eventually landed a job at a nonprofit empowering young girls. It all started with one idea she believed in — and the courage to act on it."
-          ],
-          "links": [
-            {
-              "label": "Business Ideas for Kids",
-              "url": "https://www.shopify.com/blog/business-ideas-for-kids"
-            },
-            {
-              "label": "Kidpreneurs",
-              "url": "https://kidpreneurs.org/"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "sophies_challenge",
-      "title": "🧩 Weekly Challenge",
-      "render_title": "Can You Solve This Space Math?",
-      "block_type": "challenge",
-      "link_style": "link-orange",
-      "items": [
-        {
-          "prompt_intro": "This week in World Watch, we learned about NASA's Artemis II mission — four astronauts who flew all the way around the Moon and splashed down safely in the Pacific Ocean. The Moon is about 240,000 miles from Earth. The Artemis II spacecraft traveled from Earth, looped around the Moon, and returned — covering about 480,000 miles in total. The journey took 10 days.",
-          "prompt": "1. How many miles did the spacecraft travel each day on average?\n2. There are 24 hours in a day. Based on your answer to Question 1, how many miles per hour did the spacecraft travel on average?",
-          "bonus": "If the mission used 1 gallon of fuel for every 50 miles traveled, how many gallons of fuel did the entire 480,000-mile journey use?",
-          "hint": "For Question 1, divide 480,000 by 10. For Question 2, divide your answer by 24. For the bonus, divide 480,000 by 50.",
-          "links": [
-            {
-              "label": "Artemis II on NewsForKids",
-              "url": "https://newsforkids.net/category/all_news/science/"
-            }
-          ]
+          "label": "More Weird Facts",
+          "url": "https://www.natgeokids.com"
         }
       ]
     }
   ],
   "footer": {
-    "issue_number": 5,
+    "issue_number": 1,
     "issue_date_display": "April 20, 2026",
     "tagline": "Made with love by Dad & Claude 🤖❤️",
     "location_line": "Fremont, California ↔ Singapore"

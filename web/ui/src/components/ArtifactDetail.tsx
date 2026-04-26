@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, useSSE, stageStreamUrl, SSEEvent, StageStatus } from '../api/client'
+import { api, useSSE, stageStreamUrl, type SSEEvent, type StageStatus } from '../api/client'
 
 interface Props {
   runName: string
@@ -69,12 +69,12 @@ export default function ArtifactDetail({ runName, stage, status }: Props) {
         stage === 'render' ? (
           <iframe
             srcDoc={artifact}
-            style={{ flex: 1, border: '1px solid #313244', borderRadius: 4, minHeight: 400 }}
+            style={{ flex: 1, border: '1px solid #313244', borderRadius: 4, minHeight: '80vh' }}
             title="Rendered newsletter"
           />
         ) : (
           <pre style={{ flex: 1, background: '#11111b', padding: 12, borderRadius: 4,
-                        fontSize: 12, overflow: 'auto', color: '#cdd6f4', margin: 0 }}>
+                        fontSize: 12, overflow: 'auto', color: '#cdd6f4', margin: 0, textAlign: 'left' }}>
             {JSON.stringify(JSON.parse(artifact), null, 2)}
           </pre>
         )

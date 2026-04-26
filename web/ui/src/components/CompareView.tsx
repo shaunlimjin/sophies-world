@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, RunSummary, CompareResult } from '../api/client'
+import { api, type RunSummary, type CompareResult } from '../api/client'
 import PromoteButton from './PromoteButton'
 
 const STAGES = ['research', 'ranking', 'synthesis', 'render']
@@ -38,12 +38,12 @@ export default function CompareView() {
       <iframe
         key={side}
         srcDoc={content}
-        style={{ flex: 1, border: '1px solid #313244', borderRadius: 4 }}
+        style={{ flex: 1, border: '1px solid #313244', borderRadius: 4, minHeight: '80vh' }}
         title={`${side} render`}
       />
     ) : (
       <pre style={{ flex: 1, background: '#11111b', padding: 10, borderRadius: 4,
-                    fontSize: 11, overflow: 'auto', color: '#cdd6f4', margin: 0 }}>
+                    fontSize: 11, overflow: 'auto', color: '#cdd6f4', margin: 0, textAlign: 'left' }}>
         {JSON.stringify(JSON.parse(content), null, 2)}
       </pre>
     )

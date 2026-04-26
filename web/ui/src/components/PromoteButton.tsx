@@ -47,7 +47,7 @@ export default function PromoteButton({ runName, synthesisComplete }: Props) {
         </button>
       ) : (
         <div style={{ background: '#11111b', borderRadius: 6, padding: 12, fontSize: 13 }}>
-          <pre style={{ margin: '0 0 8px', color: '#cdd6f4', overflow: 'auto' }}>
+          <pre style={{ margin: '0 0 8px', color: '#cdd6f4', overflow: 'auto', textAlign: 'left' }}>
             {JSON.stringify(preview, null, 2)}
           </pre>
           <div style={{ display: 'flex', gap: 8 }}>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, RunSummary } from '../api/client'
+import { api, type RunSummary } from '../api/client'
 import RunList from '../components/RunList'
 import RunDetail from '../components/RunDetail'
 

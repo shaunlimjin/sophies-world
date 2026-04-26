@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { api, RunState } from '../api/client'
+import { api, type RunState } from '../api/client'
 import StagePanel from './StagePanel'
 import ArtifactDetail from './ArtifactDetail'
 

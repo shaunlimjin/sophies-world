@@ -8,5 +8,5 @@ cd "$REPO_ROOT/web/ui"
 npx concurrently \
   --names "api,ui" \
   --prefix-colors "blue,green" \
-  "cd \"$REPO_ROOT\" && uvicorn web.api.main:app --reload --port 8000" \
+  "cd \"$REPO_ROOT\" && python3 -m uvicorn web.api.main:app --reload --port 8000" \
   "npm run dev"

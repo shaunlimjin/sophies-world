@@ -1,4 +1,4 @@
-import { StageState } from '../api/client'
+import type { StageState } from '../api/client'
 
 const ICON: Record<string, string> = { done: '✓', running: '▶', failed: '✗', pending: '○' }
 const COLOR: Record<string, string> = {
