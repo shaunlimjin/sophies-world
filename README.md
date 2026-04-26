@@ -297,6 +297,100 @@ Those documents cover the CLI/pipeline sanity pass across prod/test, staging, ap
 
 ---
 
+## Web UI (Admin Console)
+
+A local-only React + FastAPI admin console is included for managing runs, editing configs, and promoting newsletters — an alternative to CLI-driven workflows.
+
+### Quick start
+
+```bash
+# Install frontend deps (Node 18+)
+cd web/ui && npm install && cd ../..
+
+# Start both servers concurrently
+bash web/dev.sh
+# → FastAPI on http://localhost:8000
+# → Vite dev server on http://localhost:5173
+```
+
+Open `http://localhost:5173` in your browser.
+
+### What each page does
+
+| Page | What it does |
+|---|---|
+| **Runs** | List all approach runs, create new runs with provider override dropdowns, open a run to see stage status |
+| **Run detail** | Trigger individual stages or "Run All", stream live SSE logs, view JSON artifacts or rendered HTML in an iframe |
+| **Configs** | Browse and edit YAML config files (child profile, pipeline, research, per-section) with Save/Discard and inline YAML validation |
+| **Compare** | Select two runs and a stage to view side-by-side artifacts; Promote button appears when synthesis is done |
+
+### Backend API
+
+| Endpoint | Method | What |
+|---|---|---|
+| `/api/configs` | GET | List config file keys |
+| `/api/configs/{key}` | GET/PUT | Read or write a YAML config file |
+| `/api/runs` | GET/POST | List runs, create a new approach run |
+| `/api/runs/{name}` | GET | Get run state with all 4 stage statuses |
+| `/api/runs/{name}/stages/{stage}` | POST | Trigger a stage (research/ranking/synthesis/render) |
+| `/api/runs/{name}/stages/{stage}/stream` | GET | SSE stream of stage log lines |
+| `/api/runs/{name}/stages/{stage}/artifact` | GET | Fetch stage output (JSON or HTML) |
+| `/api/runs/{name}/promote/preview` | POST | Preview promotion diff |
+| `/api/runs/{name}/promote/apply` | POST | Apply promotion to staging |
+| `/api/compare?a=&b=&stage=` | GET | Fetch artifacts for two runs at the same stage |
+
+### SSE events
+
+The stage stream emits structured events:
+
+```
+event: stage  data: {"type": "stage", "stage": "research", "status": "running"}
+event: line   data: {"type": "line", "text": "Running Brave research stage..."}
+event: line   data: {"type": "line", "text": "fetching 10 candidates for world_watch"}
+event: artifact data: {"type": "artifact", "path": "...sophie-2026-04-26-raw.json"}
+event: done   data: {"type": "done", "stage": "research", "success": true}
+```
+
+### Stage runner architecture
+
+The stage runner (`web/api/services/stage_runner.py`) bridges synchronous stage functions to async SSE:
+
+- Each stage run creates sentinel files under `artifacts/approaches/{name}/` (`.stage-{stage}.running`, `.stage-{stage}.failed`) for crash-safe state
+- A background thread runs the stage; log lines are sent via `asyncio.Queue` to SSE clients
+- If a stage is already done when a client connects, the stream immediately returns the done event
+
+### Files
+
+```
+web/
+  api/
+    main.py              FastAPI app factory
+    deps.py              repo_root dependency injection
+    requirements.txt
+    routers/
+      configs.py         GET/PUT /api/configs/{key}
+      runs.py            GET/POST /api/runs
+      stages.py          POST trigger, GET stream, GET artifact
+      compare.py         GET /api/compare
+      promote.py         POST preview + apply
+    services/
+      config_service.py  YAML config read/write
+      run_service.py     Run state (filesystem-backed)
+      stage_runner.py    Sync→async SSE bridge
+  ui/                   React 18 + Vite + TypeScript frontend
+    src/
+      api/client.ts     Typed API client + useSSE hook
+      components/        StagePanel, ArtifactDetail, RunDetail, ConfigEditor, etc.
+      pages/            RunsPage, ConfigsPage, ComparePage
+    dev.sh              Starts FastAPI + Vite concurrently
+```
+
+---
+
+
+
+---
+
 ## Known limitations
 
 - `generate.py` still loads `config/children/sophie.yaml` directly — multi-child selection (e.g. `--child`) is not yet exposed
@@ -305,6 +399,7 @@ Those documents cover the CLI/pipeline sanity pass across prod/test, staging, ap
 - research cache keys on config shape, not on broader external retrieval state
 - source-link quality is not yet production-grade; generated newsletters can still emit generic, duplicated, or weakly grounded links unless we add explicit validation/grounding checks
 - `artifacts/` is local-only and fully gitignored
+- Web UI is local-only (no auth); intended for development use only
 
 ---
 
@@ -314,6 +409,7 @@ Those documents cover the CLI/pipeline sanity pass across prod/test, staging, ap
 - `docs/ideas-backlog.md` — next improvements
 - `docs/testing/test-plan-2026-04-24.md` — latest CLI/pipeline test plan
 - `docs/testing/test-report-stub-2026-04-24.md` — latest execution report
+- `docs/superpowers/plans/2026-04-26-web-ui-mvp.md` — Web UI implementation plan (built this)
 - `docs/superpowers/specs/` — design specs
 - `docs/superpowers/plans/` — implementation plans
 - `docs/superpowers/evals/` — mode comparison findings
@@ -323,7 +419,6 @@ Those documents cover the CLI/pipeline sanity pass across prod/test, staging, ap
 ## Recommended next steps
 
 1. Implement link validation + source grounding so generated newsletter citations are specific, reachable, and traceable to upstream sources
-2. Implement the run-centric artifact/logging model from `docs/superpowers/specs/2026-04-22-issue-generation-output-and-logging-playbook.md`
-3. Keep iterating on B2 with stronger section-specific anti-repeat guidance and better novelty guards
-4. Replace file-count issue numbering with stable state
-5. Add explicit multi-child selection
+2. Keep iterating on B2 with stronger section-specific anti-repeat guidance and better novelty guards
+3. Replace file-count issue numbering with stable state
+4. Add explicit multi-child selection
