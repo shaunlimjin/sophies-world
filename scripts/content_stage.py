@@ -8,7 +8,7 @@ import subprocess
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 
 def build_profile_summary(profile: Dict[str, Any]) -> Dict[str, Any]:
@@ -218,7 +218,7 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
         (debug_dir / "last-content-stderr.txt").write_text(result.get("error", "") or "", encoding="utf-8")
         if "error" in result and not raw_output:
             print(result["error"], file=sys.stderr)
-            sys.exit(1)
+            raise RuntimeError(f"content provider returned error: {result['error']}")
         return raw_output
 
     try:
@@ -240,7 +240,7 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
     if result.returncode != 0:
         print(f"claude exited with code {result.returncode}", file=sys.stderr)
         print(result.stderr, file=sys.stderr)
-        sys.exit(1)
+        raise RuntimeError(f"claude content provider exited with code {result.returncode}")
     return result.stdout
 
 
@@ -463,7 +463,7 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
                 print(f"packet synthesis attempt {attempt + 1} failed (provider error: {error_text or 'unknown error'}), retrying...", file=sys.stderr)
                 continue
             print(f"packet synthesis provider error: {error_text or 'unknown error'}", file=sys.stderr)
-            sys.exit(1)
+            raise RuntimeError(f"packet synthesis provider failed: {error_text or 'unknown error'}")
 
     for attempt in range(max_retries + 1):
         try:
@@ -491,7 +491,7 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
                 continue
             print(f"claude exited with code {result.returncode}", file=sys.stderr)
             print(stderr, file=sys.stderr)
-            sys.exit(1)
+            raise RuntimeError(f"packet synthesis claude exited with code {result.returncode}")
 
         # Validate JSON parse before returning — retry on invalid output
         try:
@@ -504,6 +504,53 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
             raise
 
     raise RuntimeError("packet synthesis provider failed all attempts")  # unreachable
+
+
+def run_synthesis_stage(
+    config: dict,
+    today: date,
+    issue_num: int,
+    recent_headlines: List[str],
+    repo_root: Path,
+    artifacts_root: Path,
+    synthesis_provider_name: str,
+    log: Callable[[str], None] = print,
+) -> dict:
+    """Synthesize newsletter issue. Returns issue dict."""
+    from providers.model_providers import make_provider
+    from issue_schema import validate_issue_artifact, write_issue_artifact
+
+    synthesis_cfg = config.get("pipeline", {}).get("models", {}).get("synthesis")
+    provider = make_provider(synthesis_cfg, repo_root=repo_root) if synthesis_cfg else None
+
+    log(f"Running synthesis stage (provider: {synthesis_provider_name})...")
+
+    if synthesis_provider_name == "hosted_packet_synthesis":
+        from research_stage import get_research_artifact_path, load_research_packet
+        ranked_path = get_research_artifact_path(repo_root, today, artifacts_root=artifacts_root)
+        if not ranked_path.exists():
+            raise FileNotFoundError(
+                f"Ranked research packet not found: {ranked_path}. Run ranking stage first."
+            )
+        packet = load_research_packet(ranked_path)
+        prompt = build_packet_synthesis_prompt(today, issue_num, config, packet)
+        log("Calling packet synthesis provider...")
+        raw_output = run_packet_synthesis_provider(prompt, repo_root, provider=provider)
+    elif synthesis_provider_name == "hosted_integrated_search":
+        prompt = build_content_prompt(today, issue_num, config, recent_headlines)
+        log("Calling integrated search provider...")
+        raw_output = run_content_provider(
+            prompt, repo_root, provider=provider,
+            allowed_tools="WebSearch,WebFetch", max_turns=10,
+        )
+    else:
+        raise ValueError(f"Unknown synthesis provider: {synthesis_provider_name}")
+
+    issue = parse_content_output(raw_output, repo_root)
+    validate_issue_artifact(issue)
+    write_issue_artifact(repo_root, issue, artifacts_root=artifacts_root)
+    log("Issue artifact written.")
+    return issue
 
 
 def parse_content_output(json_str: str, repo_root: Path | None = None) -> Dict[str, Any]:

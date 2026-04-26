@@ -46,3 +46,45 @@ def test_run_packet_synthesis_provider_uses_raw_stdout_when_provider_parse_fails
     result = run_packet_synthesis_provider("prompt", tmp_path, provider=mock_provider)
     assert result == '{"test": true}'
     assert (tmp_path / "artifacts" / "debug" / "last-packet-stderr-attempt0.txt").read_text() == "provider parse failed"
+
+
+def test_run_synthesis_stage_raises_if_missing_ranked_packet(tmp_path, monkeypatch):
+    """run_synthesis_stage raises FileNotFoundError if ranked packet is missing."""
+    import pytest
+    from datetime import date
+    from scripts import content_stage
+
+    config = {
+        "profile": {"newsletter": {"active_sections": []}},
+        "sections": {},
+        "pipeline": {"models": {}},
+    }
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    artifacts_root.mkdir(parents=True)
+
+    monkeypatch.setattr("providers.model_providers.make_provider", lambda cfg, repo_root=None: None)
+
+    with pytest.raises(FileNotFoundError, match="Ranked research packet not found"):
+        content_stage.run_synthesis_stage(
+            config=config, today=date(2026, 4, 26), issue_num=1,
+            recent_headlines=[], repo_root=tmp_path,
+            artifacts_root=artifacts_root,
+            synthesis_provider_name="hosted_packet_synthesis",
+        )
+
+
+def test_run_render_stage_raises_if_missing_issue_artifact(tmp_path, monkeypatch):
+    """run_render_stage raises FileNotFoundError if issue artifact is missing."""
+    import pytest
+    from datetime import date
+    from scripts.render_stage import run_render_stage
+
+    config = {"theme": {}}
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    artifacts_root.mkdir(parents=True)
+
+    with pytest.raises(FileNotFoundError, match="Issue artifact not found"):
+        run_render_stage(
+            config=config, today=date(2026, 4, 26),
+            repo_root=tmp_path, artifacts_root=artifacts_root,
+        )

@@ -674,9 +674,19 @@ def test_run_mode_b_wires_provider():
             "result": json.dumps({"greeting_text": "Hi Sophie", "sections": []})
         })
 
-    with patch.object(generate, 'run_packet_synthesis_provider', side_effect=capture_run_packet_synthesis_provider):
-        with patch.object(generate, 'parse_content_output', return_value={"greeting_text": "Hi Sophie", "sections": []}):
-            with patch.object(generate, 'validate_issue_artifact'):
+    with patch.object(content_stage, 'run_packet_synthesis_provider', side_effect=capture_run_packet_synthesis_provider):
+        with patch.object(content_stage, 'parse_content_output', return_value={
+            "issue_date": "2026-04-26",
+            "issue_number": 1,
+            "child_id": "sophie",
+            "theme_id": "default",
+            "editorial": {},
+            "child_name": "Sophie",
+            "greeting_text": "Hi Sophie",
+            "sections": [],
+            "footer": {"issue_number": 1, "issue_date_display": "April 26, 2026", "tagline": "x", "location_line": "y"}
+        }):
+            with patch("issue_schema.validate_issue_artifact"):
                 with patch("research_stage.run_research", return_value={"sections": []}):
                     with patch("scripts.ranking_stage.prefilter_candidates", return_value={"sections": []}):
                         with patch("scripts.ranking_stage.rank_candidates", return_value={"sections": []}):

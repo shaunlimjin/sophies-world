@@ -176,6 +176,92 @@ def test_get_research_artifact_path_with_artifacts_root(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# run_research_stage
+# ---------------------------------------------------------------------------
+
+def test_run_research_stage_cache_miss_saves_raw_file(tmp_path, monkeypatch):
+    """Cache miss: calls run_research and writes -raw.json."""
+    fake_packet = {
+        "issue_date": "2026-04-26",
+        "recent_headlines": [],
+        "sections": [],
+    }
+    monkeypatch.setattr(research_stage, "run_research", lambda plan, repo_root: fake_packet)
+    monkeypatch.setattr(research_stage, "_load_brave_api_key", lambda repo_root: "fake")
+
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    artifacts_root.mkdir(parents=True)
+    config = {
+        "profile": {"newsletter": {"active_sections": []}},
+        "sections": {},
+    }
+    result = research_stage.run_research_stage(
+        config=config,
+        today=date(2026, 4, 26),
+        repo_root=tmp_path,
+        artifacts_root=artifacts_root,
+    )
+    raw_path = artifacts_root / "research" / "sophie-2026-04-26-raw.json"
+    assert raw_path.exists()
+    assert result["issue_date"] == "2026-04-26"
+    assert "config_hash" in result
+
+
+def test_run_research_stage_cache_hit_skips_research(tmp_path, monkeypatch):
+    """Cache hit: reuses -raw.json without calling run_research."""
+    called = []
+    monkeypatch.setattr(research_stage, "run_research", lambda *a: called.append(1) or {})
+
+    config = {"profile": {"newsletter": {"active_sections": []}}, "sections": {}}
+    config_hash = research_stage.compute_research_config_hash(config)
+    cached = {"issue_date": "2026-04-26", "sections": [], "config_hash": config_hash}
+
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    raw_path = artifacts_root / "research" / "sophie-2026-04-26-raw.json"
+    raw_path.parent.mkdir(parents=True)
+    research_stage.save_research_packet(cached, raw_path)
+
+    research_stage.run_research_stage(
+        config=config, today=date(2026, 4, 26),
+        repo_root=tmp_path, artifacts_root=artifacts_root,
+    )
+    assert called == [], "run_research should not be called on cache hit"
+
+
+def test_run_research_stage_refresh_bypasses_cache(tmp_path, monkeypatch):
+    """refresh=True always calls run_research even when cache is valid."""
+    called = []
+    fake_packet = {"issue_date": "2026-04-26", "sections": [], "recent_headlines": []}
+    monkeypatch.setattr(research_stage, "run_research", lambda *a: (called.append(1), fake_packet)[1])
+    monkeypatch.setattr(research_stage, "_load_brave_api_key", lambda r: "k")
+
+    config = {"profile": {"newsletter": {"active_sections": []}}, "sections": {}}
+    config_hash = research_stage.compute_research_config_hash(config)
+    cached = {"issue_date": "2026-04-26", "sections": [], "config_hash": config_hash}
+
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    raw_path = artifacts_root / "research" / "sophie-2026-04-26-raw.json"
+    raw_path.parent.mkdir(parents=True)
+    research_stage.save_research_packet(cached, raw_path)
+
+    research_stage.run_research_stage(
+        config=config, today=date(2026, 4, 26),
+        repo_root=tmp_path, artifacts_root=artifacts_root,
+        refresh=True,
+    )
+    assert called == [1]
+
+
+def test_get_raw_research_artifact_path(tmp_path):
+    path = research_stage.get_raw_research_artifact_path(
+        tmp_path, date(2026, 4, 26),
+        artifacts_root=tmp_path / "artifacts" / "approaches" / "my-run"
+    )
+    assert path.name == "sophie-2026-04-26-raw.json"
+    assert "research" in str(path)
+
+
+# ---------------------------------------------------------------------------
 # ranking_stage: tokenize and jaccard
 # ---------------------------------------------------------------------------
 
@@ -372,3 +458,52 @@ def test_is_blocked_subdomain():
 
 def test_is_blocked_no_match():
     assert not ranking_stage._is_blocked("bbc.co.uk", {"reddit.com"})
+
+
+# ---------------------------------------------------------------------------
+# ranking_stage: run_ranking_stage
+# ---------------------------------------------------------------------------
+
+def test_run_ranking_stage_reads_raw_and_writes_ranked(tmp_path, monkeypatch):
+    """run_ranking_stage reads -raw.json, ranks, writes ranked packet."""
+    today = date(2026, 4, 26)
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    raw_path = artifacts_root / "research" / f"sophie-{today.isoformat()}-raw.json"
+    raw_path.parent.mkdir(parents=True)
+
+    raw_packet = {
+        "issue_date": today.isoformat(),
+        "recent_headlines": [],
+        "sections": [],
+        "config_hash": "abc123",
+    }
+    research_stage.save_research_packet(raw_packet, raw_path)
+
+    config = {
+        "profile": {"newsletter": {"active_sections": []}},
+        "sections": {},
+        "pipeline": {
+            "global_domains": {"kid_safe": [], "blocked": []},
+            "global_ranking_defaults": {"min_score": 0, "max_ranked": 5},
+            "novelty": {"history_window": 3, "similarity_threshold": 0.4},
+        },
+    }
+    result = ranking_stage.run_ranking_stage(
+        config=config, today=today, repo_root=tmp_path,
+        artifacts_root=artifacts_root, ranker_provider="heuristic_ranker",
+    )
+    ranked_path = artifacts_root / "research" / f"sophie-{today.isoformat()}.json"
+    assert ranked_path.exists()
+    assert result["issue_date"] == today.isoformat()
+
+
+def test_run_ranking_stage_raises_if_no_raw_packet(tmp_path):
+    """run_ranking_stage raises FileNotFoundError if -raw.json is missing."""
+    artifacts_root = tmp_path / "artifacts" / "approaches" / "test-run"
+    artifacts_root.mkdir(parents=True)
+    config = {"profile": {"newsletter": {"active_sections": []}}, "sections": {}, "pipeline": {}}
+    with pytest.raises(FileNotFoundError, match="raw.json"):
+        ranking_stage.run_ranking_stage(
+            config=config, today=date(2026, 4, 26), repo_root=tmp_path,
+            artifacts_root=artifacts_root, ranker_provider="heuristic_ranker",
+        )
