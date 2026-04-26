@@ -218,7 +218,7 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
         (debug_dir / "last-content-stderr.txt").write_text(result.get("error", "") or "", encoding="utf-8")
         if "error" in result and not raw_output:
             print(result["error"], file=sys.stderr)
-            sys.exit(1)
+            raise RuntimeError(f"content provider returned error: {result['error']}")
         return raw_output
 
     try:
@@ -240,7 +240,7 @@ def run_content_provider(prompt: str, repo_root: Path, timeout_seconds: int = 30
     if result.returncode != 0:
         print(f"claude exited with code {result.returncode}", file=sys.stderr)
         print(result.stderr, file=sys.stderr)
-        sys.exit(1)
+        raise RuntimeError(f"claude content provider exited with code {result.returncode}")
     return result.stdout
 
 
@@ -463,7 +463,7 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
                 print(f"packet synthesis attempt {attempt + 1} failed (provider error: {error_text or 'unknown error'}), retrying...", file=sys.stderr)
                 continue
             print(f"packet synthesis provider error: {error_text or 'unknown error'}", file=sys.stderr)
-            sys.exit(1)
+            raise RuntimeError(f"packet synthesis provider failed: {error_text or 'unknown error'}")
 
     for attempt in range(max_retries + 1):
         try:
@@ -491,7 +491,7 @@ def run_packet_synthesis_provider(prompt: str, repo_root: Path, timeout_seconds:
                 continue
             print(f"claude exited with code {result.returncode}", file=sys.stderr)
             print(stderr, file=sys.stderr)
-            sys.exit(1)
+            raise RuntimeError(f"packet synthesis claude exited with code {result.returncode}")
 
         # Validate JSON parse before returning — retry on invalid output
         try:
