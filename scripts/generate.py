@@ -156,49 +156,46 @@ def run_mode_b(
     artifacts_root: Optional[Path] = None,
 ) -> dict:
     """Mode B: deterministic retrieval + configurable ranking + hosted packet synthesis."""
-    from providers.model_providers import make_provider
-    synthesis_provider_cfg = config.get("pipeline", {}).get("models", {}).get("synthesis")
-    synthesis_provider = make_provider(synthesis_provider_cfg, repo_root=repo_root) if synthesis_provider_cfg else None
+    from research_stage import run_research_stage
+    from ranking_stage import run_ranking_stage
+    from content_stage import run_synthesis_stage
+    from env_resolver import get_artifacts_root as resolve_artifacts_root
 
-    from research_stage import (
-        build_research_plan, run_research,
-        load_research_packet, save_research_packet,
-        get_research_artifact_path, compute_research_config_hash,
-    )
-    from ranking_stage import prefilter_candidates, rank_candidates
+    _artifacts_root = artifacts_root if artifacts_root is not None else resolve_artifacts_root(REPO_ROOT, "prod")
 
     print(f"Mode B: deterministic retrieval + {ranker_provider} + hosted packet synthesis")
 
-    artifact_path = get_research_artifact_path(repo_root, today, run_tag, artifacts_root)
-    config_hash = compute_research_config_hash(config)
+    run_research_stage(
+        config=config,
+        today=today,
+        repo_root=repo_root,
+        artifacts_root=_artifacts_root,
+        log=print,
+        refresh=refresh_research,
+    )
+    run_ranking_stage(
+        config=config,
+        today=today,
+        repo_root=repo_root,
+        artifacts_root=_artifacts_root,
+        ranker_provider=ranker_provider,
+        log=print,
+    )
 
-    needs_research = True
-    if not refresh_research and artifact_path.exists():
-        cached = load_research_packet(artifact_path)
-        if cached.get("config_hash") == config_hash:
-            print(f"Reusing cached research packet: {artifact_path}")
-            packet = cached
-            needs_research = False
-        else:
-            print(
-                f"Research packet config hash mismatch — rerunning research "
-                f"(cached={cached.get('config_hash', 'none')}, current={config_hash})"
-            )
-
-    if needs_research:
-        print("Running Brave research stage...")
-        plan = build_research_plan(today, config, recent_headlines)
-        raw_candidates = run_research(plan, repo_root)
-        filtered = prefilter_candidates(raw_candidates, config)
-        packet = rank_candidates(filtered, config, ranker_provider, repo_root)
-        packet["config_hash"] = config_hash
-        save_research_packet(packet, artifact_path)
-        print(f"Research packet saved: {artifact_path}")
-
-    prompt = build_packet_synthesis_prompt(today, issue_num, config, packet)
-    raw_output = run_packet_synthesis_provider(prompt, repo_root, provider=synthesis_provider)
-    issue = parse_content_output(raw_output, repo_root)
-    validate_issue_artifact(issue)
+    pipeline_cfg = config.get("pipeline", {})
+    synthesis_provider = pipeline_cfg.get(
+        "content_provider", CONTENT_PROVIDER_PACKET
+    )
+    issue = run_synthesis_stage(
+        config=config,
+        today=today,
+        issue_num=issue_num,
+        recent_headlines=recent_headlines,
+        repo_root=repo_root,
+        artifacts_root=_artifacts_root,
+        synthesis_provider_name=synthesis_provider,
+        log=print,
+    )
     return issue
 
 
