@@ -7,7 +7,7 @@ import hashlib
 import json
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 ARTIFACTS_DIR_NAME = "artifacts"
 RESEARCH_DIR_NAME = "research"
@@ -305,3 +305,45 @@ def save_research_packet(packet: Dict[str, Any], path: Path) -> None:
 
 def load_research_packet(path: Path) -> Dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def get_raw_research_artifact_path(
+    repo_root: Path,
+    issue_date: date,
+    artifacts_root: Optional[Path] = None,
+) -> Path:
+    filename = f"sophie-{issue_date.isoformat()}-raw.json"
+    root = artifacts_root if artifacts_root is not None else repo_root / ARTIFACTS_DIR_NAME
+    return root / RESEARCH_DIR_NAME / filename
+
+
+def run_research_stage(
+    config: dict,
+    today: date,
+    repo_root: Path,
+    artifacts_root: Path,
+    log: Callable[[str], None] = print,
+    refresh: bool = False,
+) -> dict:
+    """Fetch Brave candidates, persist -raw.json, return raw packet."""
+    raw_path = get_raw_research_artifact_path(repo_root, today, artifacts_root)
+    config_hash = compute_research_config_hash(config)
+
+    if not refresh and raw_path.exists():
+        cached = load_research_packet(raw_path)
+        if cached.get("config_hash") == config_hash:
+            log("cached research packet valid — using existing research")
+            return cached
+        log(f"research packet config hash mismatch — rerunning research "
+            f"(cached={cached.get('config_hash', 'none')}, current={config_hash})")
+
+    log("Running Brave research stage...")
+    plan = build_research_plan(today, config, [])
+    for sp in plan["section_plans"]:
+        if sp.get("queries"):
+            log(f"fetching {sp.get('count', 10)} candidates for {sp['section_id']}")
+    raw_packet = run_research(plan, repo_root)
+    raw_packet["config_hash"] = config_hash
+    save_research_packet(raw_packet, raw_path)
+    log(f"research packet saved: {raw_path}")
+    return raw_packet
