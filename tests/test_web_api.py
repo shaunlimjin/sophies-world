@@ -64,3 +64,45 @@ def test_put_config_rejects_invalid_yaml(client):
     resp = client.put("/api/configs/child", json={"content": "key: [unclosed"})
     assert resp.status_code == 400
     assert "YAML" in resp.json()["detail"]
+
+
+# ---------------------------------------------------------------------------
+# Runs endpoints
+# ---------------------------------------------------------------------------
+
+def test_list_runs_empty_when_no_approaches(client):
+    resp = client.get("/api/runs")
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+def test_create_run_and_list(client):
+    resp = client.post("/api/runs", json={"name": "approach-a"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["name"] == "approach-a"
+    assert body["stage_statuses"]["research"] == "pending"
+
+    resp2 = client.get("/api/runs")
+    assert any(r["name"] == "approach-a" for r in resp2.json())
+
+
+def test_create_run_409_on_collision(client):
+    client.post("/api/runs", json={"name": "dup-run"})
+    resp = client.post("/api/runs", json={"name": "dup-run"})
+    assert resp.status_code == 409
+
+
+def test_get_run_state_404_for_missing_run(client):
+    resp = client.get("/api/runs/nonexistent")
+    assert resp.status_code == 404
+
+
+def test_get_run_state_returns_all_stages_pending(client):
+    client.post("/api/runs", json={"name": "fresh-run"})
+    resp = client.get("/api/runs/fresh-run")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["name"] == "fresh-run"
+    assert len(body["stages"]) == 4
+    assert all(s["status"] == "pending" for s in body["stages"])
