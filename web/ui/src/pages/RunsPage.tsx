@@ -25,8 +25,15 @@ export default function RunsPage() {
     if (!newName.trim()) return
     setCreating(true)
     setError(null)
+    
+    const fullOverrides: Record<string, string> = { ...overrides }
+    for (const [stage, opts] of Object.entries(PROVIDER_OPTIONS)) {
+      const key = `${stage}_provider`
+      if (!fullOverrides[key]) fullOverrides[key] = opts[0]
+    }
+
     try {
-      await api.runs.create(newName.trim(), overrides)
+      await api.runs.create(newName.trim(), fullOverrides)
       setNewName('')
       setOverrides({})
       await refresh()

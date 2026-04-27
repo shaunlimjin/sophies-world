@@ -57,22 +57,34 @@ export default function RunDetail({ runName }: Props) {
   const activeStageState = runState.stages.find(s => s.name === activeStage)
 
   return (
-    <div style={{ display: 'flex', height: '100%' }}>
-      <StagePanel
-        stages={runState.stages}
-        active={activeStage}
-        onSelect={setActiveStage}
-        onRunAll={handleRunAll}
-        onRerun={triggerStage}
-      />
-      {activeStageState && (
-        <ArtifactDetail
-          key={`${runName}-${activeStage}`}
-          runName={runName}
-          stage={activeStage}
-          status={activeStageState.status}
-        />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {runState.settings && Object.keys(runState.settings).length > 0 && (
+        <div style={{ padding: '0 24px 12px', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 12, color: '#6c7086' }}>Settings:</span>
+          {Object.entries(runState.settings).map(([k, v]) => (
+            <span key={k} style={{ fontSize: 11, background: '#313244', color: '#a6adc8', padding: '2px 8px', borderRadius: 4 }}>
+              {k}: {v}
+            </span>
+          ))}
+        </div>
       )}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        <StagePanel
+          stages={runState.stages}
+          active={activeStage}
+          onSelect={setActiveStage}
+          onRunAll={handleRunAll}
+          onRerun={triggerStage}
+        />
+        {activeStageState && (
+          <ArtifactDetail
+            key={`${runName}-${activeStage}`}
+            runName={runName}
+            stage={activeStage}
+            status={activeStageState.status}
+          />
+        )}
+      </div>
     </div>
   )
 }

@@ -28,7 +28,18 @@ export default function RunList({ runs, onOpen }: Props) {
       <tbody>
         {runs.map(run => (
           <tr key={run.name} style={{ borderBottom: '1px solid #1e1e2e' }}>
-            <td style={{ padding: '8px' }}>{run.name}</td>
+            <td style={{ padding: '8px' }}>
+              <div>{run.name}</div>
+              {run.settings && Object.keys(run.settings).length > 0 && (
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+                  {Object.entries(run.settings).map(([k, v]) => (
+                    <span key={k} style={{ fontSize: 10, background: '#313244', color: '#a6adc8', padding: '2px 6px', borderRadius: 4 }}>
+                      {k}: {v}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </td>
             <td style={{ padding: '8px' }}>
               {['research', 'ranking', 'synthesis', 'render'].map(s => {
                 const status = run.stage_statuses[s] ?? 'pending'

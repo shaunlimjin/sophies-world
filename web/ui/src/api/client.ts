@@ -11,12 +11,14 @@ export interface RunState {
   name: string
   created_at: string
   stages: StageState[]
+  settings?: Record<string, string>
 }
 
 export interface RunSummary {
   name: string
   created_at: string
   stage_statuses: Record<string, string>
+  settings?: Record<string, string>
 }
 
 export interface SSEEvent {

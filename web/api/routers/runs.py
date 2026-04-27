@@ -25,7 +25,7 @@ def list_runs(repo_root: Path = Depends(get_repo_root)):
 def create_run(body: CreateRunBody, repo_root: Path = Depends(get_repo_root)):
     from web.api.services.run_service import create_run as _create
     try:
-        return _create(repo_root, body.name)
+        return _create(repo_root, body.name, body.provider_overrides)
     except FileExistsError:
         raise HTTPException(status_code=409, detail=f"Run already exists: {body.name}")
 
