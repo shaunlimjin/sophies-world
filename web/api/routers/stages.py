@@ -36,9 +36,14 @@ async def trigger_stage(
     ar = repo_root / "artifacts" / "approaches" / name
     if not ar.exists():
         raise HTTPException(status_code=404, detail=f"Run not found: {name}")
+    overrides = body.provider_overrides
+    if not overrides:
+        from web.api.services.run_service import _read_settings
+        overrides = _read_settings(ar)
+
     runner = _get_runner(request, repo_root)
     try:
-        runner.trigger(name, stage, body.provider_overrides)
+        runner.trigger(name, stage, overrides)
     except RuntimeError as exc:
         raise HTTPException(status_code=409, detail=str(exc))
     return {"accepted": True, "run": name, "stage": stage}
