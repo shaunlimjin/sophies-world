@@ -217,3 +217,64 @@ def test_promote_apply_copies_newsletter(client, repo_root):
     dest = repo_root / "newsletters" / "staging" / f"sophies-world-{today.isoformat()}.html"
     assert dest.exists()
     assert dest.read_text() == html_content
+
+
+def test_trigger_stage_merges_settings_json_into_overrides(client, repo_root):
+    """The trigger endpoint should pass settings.json values to the runner."""
+    import json
+    captured = {}
+
+    class FakeRunner:
+        def __init__(self, *a, **kw): pass
+        def trigger(self, name, stage, overrides):
+            captured["overrides"] = overrides
+        def is_running(self, name, stage): return False
+
+    from web.api.services import stage_runner as sr_module
+    original = sr_module.StageRunner
+    sr_module.StageRunner = FakeRunner
+
+    try:
+        ar = repo_root / "artifacts" / "approaches" / "test-run"
+        ar.mkdir(parents=True)
+        (ar / "settings.json").write_text(json.dumps({
+            "synthesis_provider": "hosted_packet_synthesis",
+            "synthesis_model": "minimax-m2",
+        }))
+
+        resp = client.post("/api/runs/test-run/stages/synthesis", json={"provider_overrides": {}})
+        assert resp.status_code == 200
+        assert captured["overrides"]["synthesis_model"] == "minimax-m2"
+        assert captured["overrides"]["synthesis_provider"] == "hosted_packet_synthesis"
+    finally:
+        sr_module.StageRunner = original
+
+
+def test_trigger_stage_request_overrides_win_over_settings(client, repo_root):
+    """When the trigger body sets a key, it overrides settings.json."""
+    import json
+    captured = {}
+
+    class FakeRunner:
+        def __init__(self, *a, **kw): pass
+        def trigger(self, name, stage, overrides):
+            captured["overrides"] = overrides
+        def is_running(self, name, stage): return False
+
+    from web.api.services import stage_runner as sr_module
+    original = sr_module.StageRunner
+    sr_module.StageRunner = FakeRunner
+
+    try:
+        ar = repo_root / "artifacts" / "approaches" / "test-run"
+        ar.mkdir(parents=True)
+        (ar / "settings.json").write_text(json.dumps({"synthesis_model": "claude-opus"}))
+
+        resp = client.post(
+            "/api/runs/test-run/stages/synthesis",
+            json={"provider_overrides": {"synthesis_model": "minimax-m2"}},
+        )
+        assert resp.status_code == 200
+        assert captured["overrides"]["synthesis_model"] == "minimax-m2"
+    finally:
+        sr_module.StageRunner = original
