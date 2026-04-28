@@ -5,12 +5,8 @@ pipeline:
   render_provider: local_renderer
   fallback_content_provider: hosted_packet_synthesis
 models:
-  synthesis:
-    provider: claude
-    model: opus
-  ranking:
-    provider: claude
-    model: sonnet
+  synthesis: claude-opus
+  ranking: claude-sonnet
 global_domains:
   kid_safe:
   - kids.nationalgeographic.com
