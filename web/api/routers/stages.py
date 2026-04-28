@@ -1,6 +1,7 @@
 """Stage trigger, SSE stream, and artifact fetch endpoints."""
 from __future__ import annotations
 
+import json
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse, PlainTextResponse
@@ -36,14 +37,20 @@ async def trigger_stage(
     ar = repo_root / "artifacts" / "approaches" / name
     if not ar.exists():
         raise HTTPException(status_code=404, detail=f"Run not found: {name}")
-    overrides = body.provider_overrides
-    if not overrides:
-        from web.api.services.run_service import _read_settings
-        overrides = _read_settings(ar)
+
+    # Merge persisted settings.json with request-time overrides; request wins.
+    settings: dict = {}
+    settings_path = ar / "settings.json"
+    if settings_path.exists():
+        try:
+            settings = json.loads(settings_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            settings = {}
+    merged = {**settings, **body.provider_overrides}
 
     runner = _get_runner(request, repo_root)
     try:
-        runner.trigger(name, stage, overrides)
+        runner.trigger(name, stage, merged)
     except RuntimeError as exc:
         raise HTTPException(status_code=409, detail=str(exc))
     return {"accepted": True, "run": name, "stage": stage}

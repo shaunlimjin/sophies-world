@@ -24,12 +24,13 @@ def create_app(repo_root: Path = REPO_ROOT) -> FastAPI:
         allow_headers=["*"],
     )
 
-    from web.api.routers import configs, runs, stages, compare, promote
+    from web.api.routers import configs, runs, stages, compare, promote, model_presets
     app.include_router(configs.router)
     app.include_router(runs.router)
     app.include_router(stages.router)
     app.include_router(compare.router)
     app.include_router(promote.router)
+    app.include_router(model_presets.router)
 
     ui_dist = repo_root / "web" / "ui" / "dist"
     if ui_dist.exists():

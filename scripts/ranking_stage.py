@@ -81,19 +81,26 @@ def rank_candidates(
     config: dict,
     ranker_provider: str,
     repo_root: Path,
+    model_override: str | None = None,
 ) -> Dict[str, Any]:
     """Dispatch to the configured ranker and return the research packet."""
     if ranker_provider == "heuristic_ranker":
         return _heuristic_rank(filtered_pool, config, repo_root)
     if ranker_provider == "hosted_model_ranker":
         from providers.model_providers import make_provider
-        provider_cfg = config.get("pipeline", {}).get("models", {}).get("ranking")
-        if not provider_cfg:
+        from providers.model_presets import load_presets, resolve_model_config
+        raw_cfg = (
+            model_override
+            or config.get("pipeline", {}).get("models", {}).get("ranking")
+        )
+        if not raw_cfg:
             raise ValueError(
-                "hosted_model_ranker requires 'providers.ranking' in config. "
-                "Example:\n  providers:\n    ranking:\n      provider: claude\n      model: sonnet"
+                "hosted_model_ranker requires a model preset. "
+                "Set 'pipeline.models.ranking' in config or pass model_override."
             )
-        provider = make_provider(provider_cfg, repo_root=repo_root)
+        presets = load_presets(repo_root) if isinstance(raw_cfg, str) else {}
+        resolved = resolve_model_config(raw_cfg, presets)
+        provider = make_provider(resolved, repo_root=repo_root)
         from providers.llm_providers import model_rank_candidates
         return model_rank_candidates(filtered_pool, config, repo_root, provider=provider)
     raise ValueError(f"Unknown ranker_provider: '{ranker_provider}'")
@@ -105,6 +112,7 @@ def run_ranking_stage(
     repo_root: Path,
     artifacts_root: Path,
     ranker_provider: str,
+    model_override: str | None = None,
     log: Callable[[str], None] = print,
 ) -> dict:
     """Read -raw.json, prefilter + rank, persist ranked packet, return it."""
@@ -126,7 +134,7 @@ def run_ranking_stage(
     filtered = prefilter_candidates(raw_packet, config)
 
     log(f"Ranking with {ranker_provider}...")
-    ranked = rank_candidates(filtered, config, ranker_provider, repo_root)
+    ranked = rank_candidates(filtered, config, ranker_provider, repo_root, model_override=model_override)
 
     ranked_path = get_research_artifact_path(repo_root, today, artifacts_root=artifacts_root)
     save_research_packet(ranked, ranked_path)

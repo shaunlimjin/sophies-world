@@ -514,14 +514,21 @@ def run_synthesis_stage(
     repo_root: Path,
     artifacts_root: Path,
     synthesis_provider_name: str,
+    model_override: str | None = None,
     log: Callable[[str], None] = print,
 ) -> dict:
     """Synthesize newsletter issue. Returns issue dict."""
     from providers.model_providers import make_provider
+    from providers.model_presets import load_presets, resolve_model_config
     from issue_schema import validate_issue_artifact, write_issue_artifact
 
-    synthesis_cfg = config.get("pipeline", {}).get("models", {}).get("synthesis")
-    provider = make_provider(synthesis_cfg, repo_root=repo_root) if synthesis_cfg else None
+    raw_cfg = (
+        model_override
+        or config.get("pipeline", {}).get("models", {}).get("synthesis")
+    )
+    presets = load_presets(repo_root) if isinstance(raw_cfg, str) else {}
+    resolved = resolve_model_config(raw_cfg, presets) if raw_cfg else None
+    provider = make_provider(resolved, repo_root=repo_root) if resolved else None
 
     log(f"Running synthesis stage (provider: {synthesis_provider_name})...")
 

@@ -1,8 +1,8 @@
 """Run state management — filesystem as source of truth."""
 from __future__ import annotations
 
-from datetime import date
 import json
+from datetime import date
 from pathlib import Path
 from typing import Optional
 from pydantic import BaseModel
@@ -109,6 +109,8 @@ def create_run(repo_root: Path, name: str, overrides: dict[str, str] = None) -> 
     ar = _artifacts_root(repo_root, name)
     if ar.exists():
         raise FileExistsError(f"Run already exists: {name}")
+    if overrides:
+        _validate_model_overrides(repo_root, overrides)
     ar.mkdir(parents=True)
     if overrides:
         (ar / "settings.json").write_text(json.dumps(overrides), encoding="utf-8")
@@ -118,3 +120,34 @@ def create_run(repo_root: Path, name: str, overrides: dict[str, str] = None) -> 
         stage_statuses={s: "pending" for s in STAGES},
         settings=overrides or {},
     )
+
+
+def _validate_model_overrides(repo_root: Path, overrides: dict) -> None:
+    """Raise ValueError if any model preset name is unknown or strategy-incompatible."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "scripts"))
+    from providers.model_presets import load_presets, STRATEGY_REQUIRES_TOOLS
+
+    pairs = [
+        ("synthesis_model", "synthesis_provider"),
+        ("ranking_model", "ranker_provider"),
+    ]
+    relevant = [(m, s) for m, s in pairs if m in overrides]
+    if not relevant:
+        return
+
+    presets = load_presets(repo_root)
+    for model_key, strategy_key in relevant:
+        name = overrides[model_key]
+        if name not in presets:
+            raise ValueError(
+                f"Unknown model preset: {name!r}. "
+                f"Available: {sorted(presets.keys())}"
+            )
+        strategy = overrides.get(strategy_key)
+        if strategy and STRATEGY_REQUIRES_TOOLS.get(strategy):
+            if not presets[name].get("supports_tools"):
+                raise ValueError(
+                    f"Preset {name!r} is incompatible with strategy {strategy!r} "
+                    f"(tool-calling required)."
+                )

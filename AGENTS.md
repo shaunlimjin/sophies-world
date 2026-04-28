@@ -1,11 +1,11 @@
 # Sophie's World — Newsletter Project
 
 ## What this is
-A weekly HTML email newsletter for Sophie (Shaun's daughter), generated with Claude and sent automatically each week.
+A weekly HTML email newsletter for Sophie (Shaun's daughter), generated with Codex and sent automatically each week.
 
 ## Setup
 - Install Python dependencies with `pip3 install -r requirements.txt`
-- Dependencies: `PyYAML` for config loading, `openai>=1.0.0` for OpenAI-compatible provider support
+- Current dependency list is intentionally tiny; right now the main extra dependency is `PyYAML` for config loading
 
 ## Sophie's profile
 - **Age:** 4th grade (~9–10 years old)
@@ -40,90 +40,48 @@ A weekly HTML email newsletter for Sophie (Shaun's daughter), generated with Cla
 - Each section gets 1–2 "Learn More" links (pill-style buttons in HTML)
 - Links should prefer kid-friendly sources: Time for Kids, NewsForKids.net, Britannica, BBC Newsround, Nat Geo Kids
 - Challenge should tie back to World Watch content (percentages, fractions, basic reasoning)
-- Footer: "Made with love by Dad & Claude 🤖❤️" + "Fremont, California ↔ Singapore"
+- Footer: "Made with love by Dad & Codex 🤖❤️" + "Fremont, California ↔ Singapore"
 - Title format: "Sophie's World · [Date] · Issue #N"
 
 ## Repo structure
 ```
 sophies-world/
-  CLAUDE.md                        # this file
+  AGENTS.md                        # this file
   .env                             # credentials (gitignored)
   .env.example                     # template for credentials
   config/
     children/
       sophie.yaml                  # child profile: interests, active sections, theme, editorial defaults, generation mode
-    pipelines/
-      default.yaml                 # pipeline defaults: providers, models, global domains, ranking weights, novelty config
-    sections/                      # per-section configs (one YAML per section ID)
-      weird_but_true.yaml
-      world_watch.yaml
-      singapore_spotlight.yaml
-      usa_corner.yaml
-      gymnastics_corner.yaml
-      money_moves.yaml
-      sophies_challenge.yaml
-      kpop_corner.yaml
-    sections.yaml                  # legacy section catalog (kept for compatibility)
+    sections.yaml                  # section catalog: all reusable section definitions
     themes/
       default.yaml                 # theme metadata
-    research.yaml                  # query templates, per-section overrides (domains/keywords now in pipelines/default.yaml)
+    research.yaml                  # query templates, ranking weights, domain lists, novelty window
   newsletters/
-    sophies-world-YYYY-MM-DD.html  # prod issues
-    staging/
-      sophies-world-YYYY-MM-DD.html  # staging issues
+    sophies-world-YYYY-MM-DD.html  # one file per issue
   scripts/
-    generate.py                    # orchestrates pipeline: env/approach resolution, research, ranking, content, render
+    generate.py                    # orchestrates pipeline: mode selection, research, ranking, content, render
     content_stage.py               # Mode A (integrated search) and Mode B (packet synthesis) content providers
     research_stage.py              # deterministic Brave retrieval stage + artifact persistence
     ranking_stage.py               # deterministic prefilter + pluggable ranker dispatch
-    render_stage.py                # deterministic local HTML renderer
+    render_stage.py                # deterministic local HTML renderer (unchanged)
     issue_schema.py                # structured issue artifact helpers
-    env_resolver.py                # overlay resolution for prod/staging/approach environments
-    promote.py                     # promotes approach → staging → prod (diffs and applies config/script changes)
     send.py                        # sends newsletter via Gmail SMTP
     run.sh                         # wrapper: runs generate + send, logs to logs/run.log
-    run_three_modes.sh             # runs all three modes back-to-back for comparison
-    run_three_modes_tagged.sh      # same, but tags output with approach labels
-    migrate_config_architecture.py # one-time migration helper for config restructuring
     template.html                  # HTML skeleton with placeholder comments
     providers/
       brave_search.py              # Brave Web Search API client with retry/backoff
-      llm_providers.py             # hosted model-ranker for Mode B2 (replaces hosted_llm_provider.py)
-      model_providers/             # pluggable model provider implementations
-        base.py                    # abstract base
-        claude.py                  # Anthropic Claude provider
-        openai_compatible.py       # OpenAI-compatible provider
-        openai_agentic.py          # agentic OpenAI provider
-        _api_key.py                # API key resolver
+      heuristic_ranker.py          # (unused directly; heuristic ranking lives in ranking_stage.py)
+      hosted_llm_provider.py       # hosted model-ranker for Mode B2
   artifacts/
     research/
-      sophie-YYYY-MM-DD.json       # prod research packets (reusable without re-querying Brave)
+      sophie-YYYY-MM-DD.json       # persisted research packets (reusable without re-querying Brave)
     issues/
-      sophie-YYYY-MM-DD.json       # prod structured issue artifacts
-    staging/                       # staging research/issue artifacts
-    approaches/
-      <approach-name>/             # per-approach artifact snapshots
-        research/
-        issues/
-        newsletters/
+      sophie-YYYY-MM-DD.json       # persisted structured issue artifacts
     debug/                         # debug artifacts from content provider calls
-  docs/
-    superpowers/plans/
-      2026-04-26-web-ui-mvp.md     # Web UI MVP implementation plan (not yet built)
   tests/
-    conftest.py
     test_generate.py               # unit tests for generate.py
     test_send.py                   # unit tests for send.py
     test_research_pipeline.py      # tests for research/ranking pipeline
-    test_content_stage.py
-    test_env_resolver.py
-    test_pipeline_integration.py
-    test_promote.py
-    providers/
-      test_api_key.py
-      test_llm_providers.py
-      test_model_providers.py
-      test_openai_agentic.py
   logs/
     run.log                        # execution log (gitignored)
 ```
@@ -141,68 +99,31 @@ sophies-world/
 
 ## Generation modes
 
-`generate.py` supports three modes, controlled by `content_provider` in `config/pipelines/default.yaml` or via `--content-provider`:
+`generate.py` supports three modes, controlled by `newsletter.generation.content_provider` in `config/children/sophie.yaml` or via `--mode`:
 
 | Mode | `content_provider` value | Description |
 |---|---|---|
-| **Mode A** | `hosted_integrated_search` | Claude with integrated web search |
-| **Mode B1** | `hosted_packet_synthesis` | Deterministic Brave retrieval + heuristic ranking + Claude synthesis |
-| **Mode B2** | `hosted_model_ranker` | Deterministic Brave retrieval + model reranking + Claude synthesis |
-
-Default (prod) is **Mode B1** (`hosted_packet_synthesis`).
+| **Mode A** | `hosted_integrated_search` | Current baseline: Codex with integrated web search |
+| **Mode B1** | `hosted_packet_synthesis` | Deterministic Brave retrieval + heuristic ranking + Codex synthesis |
+| **Mode B2** | `hosted_model_ranker` | Deterministic Brave retrieval + model reranking + Codex synthesis |
 
 ### Running a specific mode
 
 `content_provider` and `ranker_provider` are separate controls:
 
 ```sh
-# Prod default (Mode B1, heuristic ranking):
+# Mode A (baseline — default):
 python3 scripts/generate.py --test
 
-# Mode A (Claude integrated search):
-python3 scripts/generate.py --test --content-provider hosted_integrated_search
+# Mode B1 (deterministic retrieval + heuristic ranking):
+python3 scripts/generate.py --test --content-provider hosted_packet_synthesis
 
-# Mode B2 (model reranking):
+# Mode B2 (deterministic retrieval + model reranking):
 python3 scripts/generate.py --test --content-provider hosted_packet_synthesis --ranker hosted_model_ranker
 
-# Force refresh research packet (don't reuse cached Brave results):
+# Mode B1 with forced refresh of the research packet:
 python3 scripts/generate.py --test --content-provider hosted_packet_synthesis --refresh-research
 ```
-
-### Environments and approaches
-
-`generate.py` supports a prod/staging/approach overlay system:
-
-```sh
-# Prod (default):
-python3 scripts/generate.py
-
-# Staging:
-python3 scripts/generate.py --env staging
-
-# Named approach (isolated sandbox, --env staging required):
-python3 scripts/generate.py --env staging --approach approach-b2-v2
-```
-
-- **Prod** reads `config/` directly; outputs to `newsletters/` and `artifacts/`
-- **Staging** overlays `staging/config/` over prod baseline; outputs to `newsletters/staging/` and `artifacts/staging/`
-- **Approach** overlays `staging/approaches/<name>/config/`; outputs to `artifacts/approaches/<name>/`
-
-Config overlay resolution order: approach > staging > prod. Handled by `env_resolver.py`.
-
-### Promote workflow
-
-Promote tested approaches to staging, then staging to prod:
-
-```sh
-# Promote an approach to staging:
-python3 scripts/promote.py --from approach-b2-v2 --to staging
-
-# Promote staging to prod (cannot skip staging):
-python3 scripts/promote.py --from staging --to prod
-```
-
-`promote.py` diffs `scripts/` and `config/` between source and destination, shows the diff, and applies on confirmation.
 
 ### Replaying synthesis from a cached research packet
 
@@ -211,15 +132,8 @@ This lets you iterate on synthesis or ranking without spending Brave API quota.
 
 ### Ranking config
 
-Heuristic ranking weights, domain lists, novelty window are in `config/pipelines/default.yaml`.
-Per-section query overrides are in `config/research.yaml`. Edit those files to tune ranking without touching code.
-
-### Running all three modes for comparison
-
-```sh
-# Run all three modes and write labeled output to artifacts/debug/:
-bash scripts/run_three_modes_tagged.sh
-```
+Heuristic ranking weights, domain lists, novelty window, and per-section query overrides
+are all in `config/research.yaml`. Edit that file to tune ranking without touching code.
 
 ### Required credentials
 
@@ -231,19 +145,14 @@ bash scripts/run_three_modes_tagged.sh
 To swap newsletter sections (e.g. replace Gymnastics Corner with K-pop Corner):
 
 1. Edit `config/children/sophie.yaml` → `newsletter.active_sections`
-2. Add or remove section IDs (must match filenames in `config/sections/`)
-3. To add a new section type, add a `config/sections/<section_id>.yaml` file
-
-Available section configs: `weird_but_true`, `world_watch`, `singapore_spotlight`, `usa_corner`, `gymnastics_corner`, `money_moves`, `sophies_challenge`, `kpop_corner`
+2. Add or remove section IDs (must match keys in `config/sections.yaml`)
+3. To add a new section type, add its definition to `config/sections.yaml` first
 
 Active sections for Sophie are currently: weird_but_true, world_watch, singapore_spotlight, usa_corner, gymnastics_corner, money_moves, sophies_challenge
 
 ## Current limitation
 - The architecture is shaped for multiple child profiles, but the current implementation still loads `config/children/sophie.yaml` directly.
 - A future enhancement should add explicit child selection, for example a `--child` flag.
-
-## Planned: Web UI
-A local-only React + FastAPI admin console is planned (`docs/superpowers/plans/2026-04-26-web-ui-mvp.md`) but not yet built. It will cover config editing, multi-stage pipeline run management with SSE streaming, and side-by-side run comparison with promotion to staging/prod.
 
 ## Gmail CSS notes
 - Use `display: block` + `margin-bottom` for vertically stacked items — Gmail ignores `flex-direction: column`

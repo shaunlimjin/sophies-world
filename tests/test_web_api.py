@@ -217,3 +217,157 @@ def test_promote_apply_copies_newsletter(client, repo_root):
     dest = repo_root / "newsletters" / "staging" / f"sophies-world-{today.isoformat()}.html"
     assert dest.exists()
     assert dest.read_text() == html_content
+
+
+def test_trigger_stage_merges_settings_json_into_overrides(client, repo_root):
+    """The trigger endpoint should pass settings.json values to the runner."""
+    import json
+    captured = {}
+
+    class FakeRunner:
+        def __init__(self, *a, **kw): pass
+        def trigger(self, name, stage, overrides):
+            captured["overrides"] = overrides
+        def is_running(self, name, stage): return False
+
+    from web.api.services import stage_runner as sr_module
+    original = sr_module.StageRunner
+    sr_module.StageRunner = FakeRunner
+
+    try:
+        ar = repo_root / "artifacts" / "approaches" / "test-run"
+        ar.mkdir(parents=True)
+        (ar / "settings.json").write_text(json.dumps({
+            "synthesis_provider": "hosted_packet_synthesis",
+            "synthesis_model": "minimax-m2",
+        }))
+
+        resp = client.post("/api/runs/test-run/stages/synthesis", json={"provider_overrides": {}})
+        assert resp.status_code == 200
+        assert captured["overrides"]["synthesis_model"] == "minimax-m2"
+        assert captured["overrides"]["synthesis_provider"] == "hosted_packet_synthesis"
+    finally:
+        sr_module.StageRunner = original
+
+
+def test_trigger_stage_request_overrides_win_over_settings(client, repo_root):
+    """When the trigger body sets a key, it overrides settings.json."""
+    import json
+    captured = {}
+
+    class FakeRunner:
+        def __init__(self, *a, **kw): pass
+        def trigger(self, name, stage, overrides):
+            captured["overrides"] = overrides
+        def is_running(self, name, stage): return False
+
+    from web.api.services import stage_runner as sr_module
+    original = sr_module.StageRunner
+    sr_module.StageRunner = FakeRunner
+
+    try:
+        ar = repo_root / "artifacts" / "approaches" / "test-run"
+        ar.mkdir(parents=True)
+        (ar / "settings.json").write_text(json.dumps({"synthesis_model": "claude-opus"}))
+
+        resp = client.post(
+            "/api/runs/test-run/stages/synthesis",
+            json={"provider_overrides": {"synthesis_model": "minimax-m2"}},
+        )
+        assert resp.status_code == 200
+        assert captured["overrides"]["synthesis_model"] == "minimax-m2"
+    finally:
+        sr_module.StageRunner = original
+
+
+def test_create_run_accepts_valid_synthesis_model(client, repo_root):
+    """Valid preset name in synthesis_model is accepted."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  claude-opus:\n"
+        "    provider: claude\n"
+        "    model: opus\n"
+        "    supports_tools: true\n"
+    )
+    resp = client.post("/api/runs", json={
+        "name": "valid-run",
+        "provider_overrides": {
+            "synthesis_provider": "hosted_packet_synthesis",
+            "synthesis_model": "claude-opus",
+        },
+    })
+    assert resp.status_code == 200
+
+
+def test_create_run_rejects_unknown_synthesis_model(client, repo_root):
+    """Unknown preset name returns 400."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  claude-opus:\n"
+        "    provider: claude\n"
+        "    model: opus\n"
+        "    supports_tools: true\n"
+    )
+    resp = client.post("/api/runs", json={
+        "name": "bad-run",
+        "provider_overrides": {"synthesis_model": "made-up-preset"},
+    })
+    assert resp.status_code == 400
+    assert "made-up-preset" in resp.json()["detail"]
+
+
+def test_create_run_rejects_incompatible_preset_for_integrated_search(client, repo_root):
+    """A preset without supports_tools cannot pair with hosted_integrated_search."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  minimax-m2:\n"
+        "    provider: openai_compatible\n"
+        "    model: MiniMax-M2\n"
+        "    supports_tools: false\n"
+    )
+    resp = client.post("/api/runs", json={
+        "name": "bad-combo",
+        "provider_overrides": {
+            "synthesis_provider": "hosted_integrated_search",
+            "synthesis_model": "minimax-m2",
+        },
+    })
+    assert resp.status_code == 400
+    assert "tool" in resp.json()["detail"].lower()
+
+
+def test_get_model_presets_returns_catalog(client, repo_root):
+    """The endpoint returns presets, strategy_requirements, and defaults."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  claude-opus:\n"
+        "    label: Claude Opus\n"
+        "    provider: claude\n"
+        "    model: opus\n"
+        "    supports_tools: true\n"
+        "  minimax-m2:\n"
+        "    provider: openai_compatible\n"
+        "    model: MiniMax-M2\n"
+        "    supports_tools: false\n"
+    )
+    (repo_root / "config" / "pipelines" / "default.yaml").write_text(
+        "pipeline:\n"
+        "  content_provider: hosted_packet_synthesis\n"
+        "models:\n"
+        "  synthesis: claude-opus\n"
+        "  ranking: claude-opus\n"
+    )
+    resp = client.get("/api/model-presets")
+    assert resp.status_code == 200
+    body = resp.json()
+    names = [p["name"] for p in body["presets"]]
+    assert "claude-opus" in names
+    assert "minimax-m2" in names
+    # Label fallback when absent
+    minimax = next(p for p in body["presets"] if p["name"] == "minimax-m2")
+    assert minimax["label"] == "minimax-m2"
+    # Strategy requirements present
+    assert body["strategy_requirements"]["hosted_integrated_search"]["requires_tools"] is True
+    # Defaults sourced from pipelines/default.yaml
+    assert body["defaults"]["synthesis"] == "claude-opus"
+    assert body["defaults"]["ranking"] == "claude-opus"

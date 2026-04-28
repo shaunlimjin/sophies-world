@@ -157,22 +157,26 @@ def _dispatch_stage(
     elif stage == "ranking":
         from ranking_stage import run_ranking_stage
         ranker = provider_overrides.get("ranker_provider", "heuristic_ranker")
+        model_override = provider_overrides.get("ranking_model")
         run_ranking_stage(
             config=config, today=today, repo_root=repo_root,
-            artifacts_root=artifacts_root, ranker_provider=ranker, log=log,
+            artifacts_root=artifacts_root, ranker_provider=ranker,
+            model_override=model_override, log=log,
         )
 
     elif stage == "synthesis":
         from content_stage import run_synthesis_stage
         from generate import get_recent_headlines, get_next_issue_number, NEWSLETTERS_DIR
         synthesis_provider = provider_overrides.get("synthesis_provider", "hosted_packet_synthesis")
+        model_override = provider_overrides.get("synthesis_model")
         recent = get_recent_headlines(NEWSLETTERS_DIR, today)
         issue_num = get_next_issue_number(NEWSLETTERS_DIR)
         run_synthesis_stage(
             config=config, today=today, issue_num=issue_num,
             recent_headlines=recent, repo_root=repo_root,
             artifacts_root=artifacts_root,
-            synthesis_provider_name=synthesis_provider, log=log,
+            synthesis_provider_name=synthesis_provider,
+            model_override=model_override, log=log,
         )
 
     elif stage == "render":

@@ -21,6 +21,19 @@ export interface RunSummary {
   settings?: Record<string, string>
 }
 
+export interface ModelPreset {
+  name: string
+  label: string
+  provider: string
+  supports_tools: boolean
+}
+
+export interface ModelPresetCatalog {
+  presets: ModelPreset[]
+  strategy_requirements: Record<string, { requires_tools: boolean }>
+  defaults: { synthesis?: string; ranking?: string }
+}
+
 export interface SSEEvent {
   type: 'stage' | 'line' | 'artifact' | 'done' | 'error'
   text?: string
@@ -92,6 +105,7 @@ export const api = {
   },
   compare: (a: string, b: string, stage: string) =>
     request<CompareResult>(`/compare?a=${a}&b=${b}&stage=${stage}`),
+  modelPresets: () => request<ModelPresetCatalog>('/model-presets'),
 }
 
 // SSE hook helper — returns event source URL for a running stage stream

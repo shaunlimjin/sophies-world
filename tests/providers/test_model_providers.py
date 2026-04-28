@@ -14,6 +14,29 @@ def test_openai_compatible_requires_model():
         assert "model" in str(exc).lower()
 
 
+def test_openai_compatible_loads_api_key_from_env_var(tmp_path, monkeypatch):
+    """When api_key_env is in config, the named env var is read for the key."""
+    monkeypatch.setenv("MY_TEST_KEY", "secret-value")
+    p = OpenAICompatibleProvider({
+        "provider": "openai_compatible",
+        "model": "test-model",
+        "base_url": "https://example.com/v1",
+        "api_key_env": "MY_TEST_KEY",
+    }, repo_root=tmp_path)
+    assert p.client.api_key == "secret-value"
+
+
+def test_openai_compatible_no_minimax_url_special_case(tmp_path, monkeypatch):
+    """Without api_key_env, MiniMax URL no longer triggers implicit key loading."""
+    monkeypatch.delenv("MINIMAX_API_KEY", raising=False)
+    p = OpenAICompatibleProvider({
+        "provider": "openai_compatible",
+        "model": "MiniMax-M2",
+        "base_url": "https://api.minimax.io/v1",
+    }, repo_root=tmp_path)
+    assert p.client.api_key == "not-needed"
+
+
 def test_openai_compatible_name():
     provider = OpenAICompatibleProvider({"model": "llama3"})
     assert provider.name == "openai_compatible"
@@ -172,7 +195,7 @@ def test_claude_provider_generate_retry_on_nonzero_exit():
 
 
 def test_openai_compatible_minimax_key_missing_raises():
-    """OpenAICompatibleProvider raises when MINIMAX_API_KEY is absent from .env and env."""
+    """OpenAICompatibleProvider raises when api_key_env is set but the env var is absent."""
     with patch.dict("os.environ", {}, clear=True):
         with patch(
             "scripts.providers.model_providers._api_key.load_api_key",
@@ -180,7 +203,7 @@ def test_openai_compatible_minimax_key_missing_raises():
         ):
             try:
                 OpenAICompatibleProvider(
-                    {"model": "MiniMax-Text-01", "base_url": "https://api.minimax.io/v1"},
+                    {"model": "MiniMax-Text-01", "base_url": "https://api.minimax.io/v1", "api_key_env": "MINIMAX_API_KEY"},
                     repo_root=None,
                 )
                 raise AssertionError("Expected RuntimeError")
@@ -189,7 +212,7 @@ def test_openai_compatible_minimax_key_missing_raises():
 
 
 def test_openai_compatible_uses_env_key_for_minimax():
-    """When base_url contains minimax.io and key is absent, env var is used."""
+    """When api_key_env is set, the env var is loaded."""
     with patch.dict("os.environ", {"MINIMAX_API_KEY": "env-secret-key"}):
         with patch(
             "scripts.providers.model_providers.openai_compatible.OpenAI"
@@ -205,6 +228,7 @@ def test_openai_compatible_uses_env_key_for_minimax():
                 {
                     "model": "MiniMax-Text-01",
                     "base_url": "https://api.minimax.io/v1",
+                    "api_key_env": "MINIMAX_API_KEY",
                 },
                 repo_root=None,
             )

@@ -28,6 +28,8 @@ def create_run(body: CreateRunBody, repo_root: Path = Depends(get_repo_root)):
         return _create(repo_root, body.name, body.provider_overrides)
     except FileExistsError:
         raise HTTPException(status_code=409, detail=f"Run already exists: {body.name}")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @router.get("/{name}")
