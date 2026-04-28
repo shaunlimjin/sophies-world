@@ -221,7 +221,8 @@ Duplicate `staging/approaches/approach-b1/` as a starting point, edit its `confi
 |---|---|
 | `config/children/sophie.yaml` | child identity, interests, active sections, child-level editorial defaults |
 | `config/sections/*.yaml` | one file per section: display metadata, editorial goal/rules, research config, section-local ranking intent |
-| `config/pipelines/default.yaml` | provider routing, model selection, global domains, global ranking defaults, novelty settings |
+| `config/pipelines/default.yaml` | provider routing, **per-stage model presets**, global domains, global ranking defaults, novelty settings |
+| `config/model_presets.yaml` | named model presets: provider, model, optional base_url/api_key_env, supports_tools flag |
 | `config/themes/default.yaml` | template path + section ordering |
 | `config/research.yaml` / `config/sections.yaml` | legacy monolithic compatibility files still present temporarily; tracked for deletion after transition verification |
 
@@ -236,6 +237,7 @@ config/              prod config baseline
   children/          child profile + editorial defaults
   sections/          per-section config files
   pipelines/         pipeline/model/global ranking config
+  model_presets.yaml  named model preset registry
   themes/            render theme config
 staging/             staging overrides + named approaches
   config/            staging config overrides (partial overlay)
@@ -251,7 +253,7 @@ scripts/
   send.py            Gmail SMTP delivery
   promote.py         approach → staging → prod promotion
   migrate_config_architecture.py  one-off helper for splitting old config shape
-  providers/         brave_search + hosted LLM/provider wrappers
+  providers/         brave_search, llm_providers, model_presets, model_providers/
   template.html      HTML skeleton
   run.sh             cron wrapper
 artifacts/           local generated artifacts (gitignored)
@@ -319,7 +321,7 @@ Open `http://localhost:5173` in your browser.
 
 | Page | What it does |
 |---|---|
-| **Runs** | List all approach runs, create new runs with provider override dropdowns, open a run to see stage status |
+| **Runs** | List all approach runs, create new runs with strategy + model dropdowns per stage, open a run to see stage status and settings chips |
 | **Run detail** | Trigger individual stages or "Run All", stream live SSE logs, view JSON artifacts or rendered HTML in an iframe |
 | **Configs** | Browse and edit YAML config files (child profile, pipeline, research, per-section) with Save/Discard and inline YAML validation |
 | **Compare** | Select two runs and a stage to view side-by-side artifacts; Promote button appears when synthesis is done |
@@ -338,6 +340,7 @@ Open `http://localhost:5173` in your browser.
 | `/api/runs/{name}/promote/preview` | POST | Preview promotion diff |
 | `/api/runs/{name}/promote/apply` | POST | Apply promotion to staging |
 | `/api/compare?a=&b=&stage=` | GET | Fetch artifacts for two runs at the same stage |
+| `/api/model-presets` | GET | Return preset catalog with name/label/provider/supports_tools, strategy requirements, and pipeline defaults |
 
 ### SSE events
 
@@ -373,6 +376,7 @@ web/
       stages.py          POST trigger, GET stream, GET artifact
       compare.py         GET /api/compare
       promote.py         POST preview + apply
+      model_presets.py  GET /api/model-presets
     services/
       config_service.py  YAML config read/write
       run_service.py     Run state (filesystem-backed)
