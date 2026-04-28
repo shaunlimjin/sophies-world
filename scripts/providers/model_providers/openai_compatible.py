@@ -27,8 +27,9 @@ class OpenAICompatibleProvider(ModelProvider):
         self.model = config.get("model")
         if not self.model:
             raise ValueError("OpenAICompatibleProvider requires 'model' in config")
-        if "minimax.io" in base_url and (api_key == "not-needed" or api_key == ""):
-            api_key = load_api_key("MINIMAX_API_KEY", repo_root)
+        api_key_env = config.get("api_key_env")
+        if api_key_env and (api_key == "not-needed" or api_key == ""):
+            api_key = load_api_key(api_key_env, repo_root)
         self.client = OpenAI(base_url=base_url, api_key=api_key)
 
     def generate(self, prompt: str, **kwargs) -> dict:

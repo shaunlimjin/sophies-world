@@ -98,7 +98,7 @@ def rank_candidates(
                 "hosted_model_ranker requires a model preset. "
                 "Set 'pipeline.models.ranking' in config or pass model_override."
             )
-        presets = load_presets(repo_root)
+        presets = load_presets(repo_root) if isinstance(raw_cfg, str) else {}
         resolved = resolve_model_config(raw_cfg, presets)
         provider = make_provider(resolved, repo_root=repo_root)
         from providers.llm_providers import model_rank_candidates
