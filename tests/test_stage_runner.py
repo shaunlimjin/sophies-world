@@ -80,3 +80,54 @@ def test_stream_failed_stage_emits_error_event(runner, tmp_path):
 
     events = asyncio.run(collect_stream(runner, "my-run", "research"))
     assert any('"type": "error"' in e for e in events)
+
+
+def test_dispatch_stage_passes_model_override_to_synthesis(tmp_path, monkeypatch):
+    """When provider_overrides has synthesis_model, it is forwarded to run_synthesis_stage."""
+    captured = {}
+    def fake_run_synthesis(**kwargs):
+        captured.update(kwargs)
+    def fake_recent(*a, **kw): return []
+    def fake_issue_num(*a, **kw): return 1
+
+    monkeypatch.setattr("content_stage.run_synthesis_stage", fake_run_synthesis)
+    monkeypatch.setattr("generate.get_recent_headlines", fake_recent)
+    monkeypatch.setattr("generate.get_next_issue_number", fake_issue_num)
+
+    (tmp_path / "config" / "children").mkdir(parents=True)
+    (tmp_path / "config" / "pipelines").mkdir(parents=True)
+    (tmp_path / "config" / "themes").mkdir(parents=True)
+    (tmp_path / "config" / "children" / "sophie.yaml").write_text("newsletter:\n  active_sections: []\n")
+    (tmp_path / "config" / "pipelines" / "default.yaml").write_text("pipeline: {}\n")
+    (tmp_path / "config" / "themes" / "default.yaml").write_text("template_path: x\n")
+
+    from web.api.services.stage_runner import _dispatch_stage
+    ar = tmp_path / "artifacts" / "approaches" / "my-run"
+    ar.mkdir(parents=True)
+    overrides = {"synthesis_provider": "hosted_packet_synthesis", "synthesis_model": "minimax-m2"}
+    _dispatch_stage("synthesis", tmp_path, ar, overrides, log=lambda _: None)
+    assert captured["model_override"] == "minimax-m2"
+    assert captured["synthesis_provider_name"] == "hosted_packet_synthesis"
+
+
+def test_dispatch_stage_passes_model_override_to_ranking(tmp_path, monkeypatch):
+    """When provider_overrides has ranking_model, it is forwarded to run_ranking_stage."""
+    captured = {}
+    def fake_run_ranking(**kwargs):
+        captured.update(kwargs)
+    monkeypatch.setattr("ranking_stage.run_ranking_stage", fake_run_ranking)
+
+    (tmp_path / "config" / "children").mkdir(parents=True)
+    (tmp_path / "config" / "pipelines").mkdir(parents=True)
+    (tmp_path / "config" / "themes").mkdir(parents=True)
+    (tmp_path / "config" / "children" / "sophie.yaml").write_text("newsletter:\n  active_sections: []\n")
+    (tmp_path / "config" / "pipelines" / "default.yaml").write_text("pipeline: {}\n")
+    (tmp_path / "config" / "themes" / "default.yaml").write_text("template_path: x\n")
+
+    from web.api.services.stage_runner import _dispatch_stage
+    ar = tmp_path / "artifacts" / "approaches" / "my-run"
+    ar.mkdir(parents=True)
+    overrides = {"ranker_provider": "hosted_model_ranker", "ranking_model": "claude-sonnet"}
+    _dispatch_stage("ranking", tmp_path, ar, overrides, log=lambda _: None)
+    assert captured["model_override"] == "claude-sonnet"
+    assert captured["ranker_provider"] == "hosted_model_ranker"
