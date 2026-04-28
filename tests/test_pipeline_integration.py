@@ -209,7 +209,7 @@ def _run_mode_b_patched(config, tmp_path, refresh_research, artifact_path, resea
     rs_mod.run_research = fake_run_research
     rs_mod.run_research_stage = fake_run_research_stage
     rank_mod.prefilter_candidates = lambda pool, cfg: pool
-    rank_mod.rank_candidates = lambda pool, cfg, ranker, repo_root: pool
+    rank_mod.rank_candidates = lambda pool, cfg, ranker, repo_root, model_override=None: pool
     gen_mod.build_packet_synthesis_prompt = lambda *a, **kw: "prompt"
     gen_mod.run_packet_synthesis_provider = lambda prompt, repo_root, provider=None, **kwargs: "raw"
     gen_mod.parse_content_output = lambda raw, repo_root=None: _fake_issue()

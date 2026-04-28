@@ -507,3 +507,46 @@ def test_run_ranking_stage_raises_if_no_raw_packet(tmp_path):
             config=config, today=date(2026, 4, 26), repo_root=tmp_path,
             artifacts_root=artifacts_root, ranker_provider="heuristic_ranker",
         )
+
+
+def test_rank_candidates_uses_model_override(tmp_path, monkeypatch):
+    """When model_override is set, the chosen preset is resolved and used."""
+    captured = {}
+
+    def fake_make_provider(cfg, repo_root=None):
+        captured["cfg"] = cfg
+        class _P:
+            name = cfg["provider"]
+            def generate(self, *a, **kw): return {"result": "{}"}
+        return _P()
+
+    def fake_model_rank(filtered, config, repo_root, provider):
+        captured["used_provider"] = provider.name
+        return {**filtered, "ranked": True}
+
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  claude-sonnet:\n"
+        "    provider: claude\n"
+        "    model: sonnet\n"
+        "    supports_tools: true\n"
+        "  minimax-m2:\n"
+        "    provider: openai_compatible\n"
+        "    model: MiniMax-M2\n"
+        "    supports_tools: false\n"
+    )
+
+    monkeypatch.setattr("providers.model_providers.make_provider", fake_make_provider)
+    monkeypatch.setattr("providers.llm_providers.model_rank_candidates", fake_model_rank)
+
+    config = {"pipeline": {"models": {"ranking": "claude-sonnet"}}}
+    ranking_stage.rank_candidates(
+        filtered_pool={"sections": []},
+        config=config,
+        ranker_provider="hosted_model_ranker",
+        repo_root=tmp_path,
+        model_override="minimax-m2",
+    )
+    assert captured["cfg"]["provider"] == "openai_compatible"
+    assert captured["used_provider"] == "openai_compatible"
