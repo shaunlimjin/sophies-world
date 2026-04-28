@@ -278,3 +278,59 @@ def test_trigger_stage_request_overrides_win_over_settings(client, repo_root):
         assert captured["overrides"]["synthesis_model"] == "minimax-m2"
     finally:
         sr_module.StageRunner = original
+
+
+def test_create_run_accepts_valid_synthesis_model(client, repo_root):
+    """Valid preset name in synthesis_model is accepted."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  claude-opus:\n"
+        "    provider: claude\n"
+        "    model: opus\n"
+        "    supports_tools: true\n"
+    )
+    resp = client.post("/api/runs", json={
+        "name": "valid-run",
+        "provider_overrides": {
+            "synthesis_provider": "hosted_packet_synthesis",
+            "synthesis_model": "claude-opus",
+        },
+    })
+    assert resp.status_code == 200
+
+
+def test_create_run_rejects_unknown_synthesis_model(client, repo_root):
+    """Unknown preset name returns 400."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  claude-opus:\n"
+        "    provider: claude\n"
+        "    model: opus\n"
+        "    supports_tools: true\n"
+    )
+    resp = client.post("/api/runs", json={
+        "name": "bad-run",
+        "provider_overrides": {"synthesis_model": "made-up-preset"},
+    })
+    assert resp.status_code == 400
+    assert "made-up-preset" in resp.json()["detail"]
+
+
+def test_create_run_rejects_incompatible_preset_for_integrated_search(client, repo_root):
+    """A preset without supports_tools cannot pair with hosted_integrated_search."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  minimax-m2:\n"
+        "    provider: openai_compatible\n"
+        "    model: MiniMax-M2\n"
+        "    supports_tools: false\n"
+    )
+    resp = client.post("/api/runs", json={
+        "name": "bad-combo",
+        "provider_overrides": {
+            "synthesis_provider": "hosted_integrated_search",
+            "synthesis_model": "minimax-m2",
+        },
+    })
+    assert resp.status_code == 400
+    assert "tool" in resp.json()["detail"].lower()
