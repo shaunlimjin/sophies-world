@@ -20,6 +20,7 @@ class RunState(BaseModel):
     name: str
     created_at: str
     stages: list[StageState]
+    settings: dict[str, str] = {}
 
 
 class RunSummary(BaseModel):
@@ -27,6 +28,16 @@ class RunSummary(BaseModel):
     created_at: str
     stage_statuses: dict[str, str]
     settings: dict[str, str] = {}
+
+
+def _read_settings(ar: Path) -> dict[str, str]:
+    sf = ar / "settings.json"
+    if sf.exists():
+        try:
+            return json.loads(sf.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
 
 
 def _approaches_dir(repo_root: Path) -> Path:
@@ -77,6 +88,7 @@ def list_runs(repo_root: Path) -> list[RunSummary]:
             name=run_dir.name,
             created_at=str(int(run_dir.stat().st_mtime)),
             stage_statuses={s: _stage_status(ar, s, today)[0] for s in STAGES},
+            settings=_read_settings(ar),
         ))
     return result
 
@@ -90,7 +102,7 @@ def get_run_state(repo_root: Path, name: str) -> RunState:
     for s in STAGES:
         status, artifact_path = _stage_status(ar, s, today)
         stages.append(StageState(name=s, status=status, artifact_path=artifact_path))
-    return RunState(name=name, created_at=str(int(ar.stat().st_mtime)), stages=stages)
+    return RunState(name=name, created_at=str(int(ar.stat().st_mtime)), stages=stages, settings=_read_settings(ar))
 
 
 def create_run(repo_root: Path, name: str, overrides: dict[str, str] = None) -> RunSummary:
