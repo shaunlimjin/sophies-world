@@ -334,3 +334,40 @@ def test_create_run_rejects_incompatible_preset_for_integrated_search(client, re
     })
     assert resp.status_code == 400
     assert "tool" in resp.json()["detail"].lower()
+
+
+def test_get_model_presets_returns_catalog(client, repo_root):
+    """The endpoint returns presets, strategy_requirements, and defaults."""
+    (repo_root / "config" / "model_presets.yaml").write_text(
+        "presets:\n"
+        "  claude-opus:\n"
+        "    label: Claude Opus\n"
+        "    provider: claude\n"
+        "    model: opus\n"
+        "    supports_tools: true\n"
+        "  minimax-m2:\n"
+        "    provider: openai_compatible\n"
+        "    model: MiniMax-M2\n"
+        "    supports_tools: false\n"
+    )
+    (repo_root / "config" / "pipelines" / "default.yaml").write_text(
+        "pipeline:\n"
+        "  content_provider: hosted_packet_synthesis\n"
+        "models:\n"
+        "  synthesis: claude-opus\n"
+        "  ranking: claude-opus\n"
+    )
+    resp = client.get("/api/model-presets")
+    assert resp.status_code == 200
+    body = resp.json()
+    names = [p["name"] for p in body["presets"]]
+    assert "claude-opus" in names
+    assert "minimax-m2" in names
+    # Label fallback when absent
+    minimax = next(p for p in body["presets"] if p["name"] == "minimax-m2")
+    assert minimax["label"] == "minimax-m2"
+    # Strategy requirements present
+    assert body["strategy_requirements"]["hosted_integrated_search"]["requires_tools"] is True
+    # Defaults sourced from pipelines/default.yaml
+    assert body["defaults"]["synthesis"] == "claude-opus"
+    assert body["defaults"]["ranking"] == "claude-opus"
