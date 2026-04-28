@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { api, type RunSummary } from '../api/client'
+import { api, type RunSummary, type ModelPresetCatalog } from '../api/client'
 import RunList from '../components/RunList'
 import RunDetail from '../components/RunDetail'
 
-const PROVIDER_OPTIONS = {
+const PROVIDER_OPTIONS: Record<string, string[]> = {
   research: ['brave_deterministic'],
   ranking: ['heuristic_ranker', 'hosted_model_ranker'],
   synthesis: ['hosted_packet_synthesis', 'hosted_integrated_search'],
@@ -17,18 +17,71 @@ export default function RunsPage() {
   const [overrides, setOverrides] = useState<Record<string, string>>({})
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [catalog, setCatalog] = useState<ModelPresetCatalog | null>(null)
 
   const refresh = () => api.runs.list().then(setRuns)
-  useEffect(() => { refresh() }, [])
+  useEffect(() => {
+    refresh()
+    api.modelPresets().then(setCatalog).catch(e => console.error('preset load failed', e))
+  }, [])
+
+  const synthesisStrategy = overrides.synthesis_provider ?? PROVIDER_OPTIONS.synthesis[0]
+  const rankingStrategy = overrides.ranking_provider ?? PROVIDER_OPTIONS.ranking[0]
+
+  // Filter presets compatible with the selected synthesis strategy.
+  const compatibleSynthesisPresets = (() => {
+    if (!catalog) return []
+    const requiresTools = catalog.strategy_requirements[synthesisStrategy]?.requires_tools
+    return catalog.presets.filter(p => !requiresTools || p.supports_tools)
+  })()
+
+  // Ranking model presets — model_ranker has no tool requirement; show all.
+  const rankingPresets = catalog?.presets ?? []
+
+  // Auto-correct synthesis_model when the strategy changes and current pick is incompatible.
+  useEffect(() => {
+    if (!catalog) return
+    const current = overrides.synthesis_model
+    const stillCompatible = current && compatibleSynthesisPresets.some(p => p.name === current)
+    if (!stillCompatible && compatibleSynthesisPresets.length > 0) {
+      const fallback = catalog.defaults.synthesis && compatibleSynthesisPresets.some(p => p.name === catalog.defaults.synthesis)
+        ? catalog.defaults.synthesis
+        : compatibleSynthesisPresets[0].name
+      setOverrides(prev => ({ ...prev, synthesis_model: fallback }))
+    }
+  }, [synthesisStrategy, catalog])
+
+  // Initialize defaults once catalog arrives.
+  useEffect(() => {
+    if (!catalog) return
+    setOverrides(prev => {
+      const next = { ...prev }
+      if (!next.synthesis_model && catalog.defaults.synthesis) next.synthesis_model = catalog.defaults.synthesis
+      if (!next.ranking_model && catalog.defaults.ranking) next.ranking_model = catalog.defaults.ranking
+      return next
+    })
+  }, [catalog])
 
   const handleCreate = async () => {
     if (!newName.trim()) return
     setCreating(true)
     setError(null)
+
+    const fullOverrides: Record<string, string> = { ...overrides }
+    for (const [stage, opts] of Object.entries(PROVIDER_OPTIONS)) {
+      const key = `${stage}_provider`
+      if (!fullOverrides[key]) fullOverrides[key] = opts[0]
+    }
+
+    // Drop ranking_model when ranking strategy is heuristic (no model used).
+    if (fullOverrides.ranking_provider === 'heuristic_ranker') {
+      delete fullOverrides.ranking_model
+    }
+
     try {
-      await api.runs.create(newName.trim(), overrides)
+      await api.runs.create(newName.trim(), fullOverrides)
       setNewName('')
-      setOverrides({})
+      // Keep current overrides so the next run inherits the same picks.
       await refresh()
       setOpenRun(newName.trim())
     } catch (e: unknown) {
@@ -49,6 +102,8 @@ export default function RunsPage() {
     )
   }
 
+  const showRankingModel = rankingStrategy === 'hosted_model_ranker'
+
   return (
     <div style={{ padding: 24 }}>
       <h2 style={{ marginTop: 0 }}>Runs</h2>
@@ -68,8 +123,10 @@ export default function RunsPage() {
             {creating ? 'Creating…' : 'Create'}
           </button>
         </div>
-        {/* Provider overrides */}
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+
+        {/* Strategy row */}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+          <span style={{ fontSize: 12, color: '#6c7086', alignSelf: 'center' }}>Strategy:</span>
           {Object.entries(PROVIDER_OPTIONS).map(([stage, opts]) => (
             <label key={stage} style={{ fontSize: 12, color: '#6c7086' }}>
               {stage}:&nbsp;
@@ -83,6 +140,40 @@ export default function RunsPage() {
             </label>
           ))}
         </div>
+
+        {/* Model row */}
+        {catalog && (
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, color: '#6c7086' }}>Model:</span>
+            {showRankingModel && (
+              <label style={{ fontSize: 12, color: '#6c7086' }}>
+                ranking:&nbsp;
+                <select
+                  value={overrides.ranking_model ?? catalog.defaults.ranking ?? ''}
+                  onChange={e => setOverrides(prev => ({ ...prev, ranking_model: e.target.value }))}
+                  style={{ background: '#1e1e2e', color: '#cdd6f4', border: '1px solid #313244', borderRadius: 4 }}
+                >
+                  {rankingPresets.map(p => <option key={p.name} value={p.name}>{p.label}</option>)}
+                </select>
+              </label>
+            )}
+            <label style={{ fontSize: 12, color: '#6c7086' }}>
+              synthesis:&nbsp;
+              <select
+                value={overrides.synthesis_model ?? catalog.defaults.synthesis ?? ''}
+                onChange={e => setOverrides(prev => ({ ...prev, synthesis_model: e.target.value }))}
+                style={{ background: '#1e1e2e', color: '#cdd6f4', border: '1px solid #313244', borderRadius: 4 }}
+              >
+                {compatibleSynthesisPresets.map(p => <option key={p.name} value={p.name}>{p.label}</option>)}
+              </select>
+            </label>
+            {synthesisStrategy === 'hosted_integrated_search' && (
+              <span style={{ fontSize: 11, color: '#a6adc8', fontStyle: 'italic' }}>
+                This model also does the search and ranking inline.
+              </span>
+            )}
+          </div>
+        )}
         {error && <div style={{ color: '#f38ba8', fontSize: 13, marginTop: 8 }}>{error}</div>}
       </div>
 
