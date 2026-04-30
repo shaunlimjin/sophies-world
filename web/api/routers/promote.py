@@ -25,10 +25,19 @@ def _newsletter_dest(repo_root: Path, to: str, today: date) -> Path:
     return repo_root / "newsletters" / filename
 
 
-def _newsletter_source(repo_root: Path, name: str, today: date) -> Optional[Path]:
+def _newsletter_source(repo_root: Path, name: str, run_date: date) -> Optional[Path]:
     p = (repo_root / "artifacts" / "approaches" / name / "newsletters"
-         / f"sophies-world-{today.isoformat()}.html")
+         / f"sophies-world-{run_date.isoformat()}.html")
     return p if p.exists() else None
+
+
+def _get_run_date(repo_root: Path, name: str) -> date:
+    ar = repo_root / "artifacts" / "approaches" / name
+    from web.api.services.run_service import _read_run_date
+    rd = _read_run_date(ar)
+    if not rd:
+        raise HTTPException(status_code=400, detail=f"Cannot determine run date for: {name}")
+    return rd
 
 
 def _build_diff(source: Path, dest: Path, repo_root: Path) -> dict:
@@ -53,15 +62,15 @@ def promote_preview(
 ) -> dict:
     if body.to not in ("staging", "prod"):
         raise HTTPException(status_code=400, detail="to must be 'staging' or 'prod'")
-    today = date.today()
-    source = _newsletter_source(repo_root, name, today)
+    run_date = _get_run_date(repo_root, name)
+    source = _newsletter_source(repo_root, name, run_date)
     if source is None:
         raise HTTPException(status_code=400, detail="Render stage not complete for this run")
-    dest = _newsletter_dest(repo_root, body.to, today)
+    dest = _newsletter_dest(repo_root, body.to, run_date)
     return {
         "run": name,
         "to": body.to,
-        "date": today.isoformat(),
+        "date": run_date.isoformat(),
         "changes": [_build_diff(source, dest, repo_root)],
     }
 
@@ -76,11 +85,11 @@ def promote_apply(
         raise HTTPException(status_code=400, detail="to must be 'staging' or 'prod'")
     if not body.confirmed:
         raise HTTPException(status_code=400, detail="confirmed must be true")
-    today = date.today()
-    source = _newsletter_source(repo_root, name, today)
+    run_date = _get_run_date(repo_root, name)
+    source = _newsletter_source(repo_root, name, run_date)
     if source is None:
         raise HTTPException(status_code=400, detail="Render stage not complete for this run")
-    dest = _newsletter_dest(repo_root, body.to, today)
+    dest = _newsletter_dest(repo_root, body.to, run_date)
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source, dest)
     return {"ok": True, "copied_to": str(dest.relative_to(repo_root))}

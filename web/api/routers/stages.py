@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse, PlainTextResponse
 from pathlib import Path
@@ -85,15 +85,15 @@ def get_artifact(
     if stage not in VALID_STAGES:
         raise HTTPException(status_code=400, detail=f"Unknown stage: {stage}")
     ar = repo_root / "artifacts" / "approaches" / name
-    today = date.today()
-    d = today.isoformat()
-    paths = {
-        "research": ar / "research" / f"sophie-{d}-raw.json",
-        "ranking":  ar / "research" / f"sophie-{d}.json",
-        "synthesis": ar / "issues" / f"sophie-{d}.json",
-        "render":   ar / "newsletters" / f"sophies-world-{d}.html",
-    }
-    path = paths.get(stage)
+    if not ar.exists():
+        raise HTTPException(status_code=404, detail=f"Run not found: {name}")
+
+    from web.api.services.run_service import _read_run_date, _stage_artifact_path
+    run_date = _read_run_date(ar)
+    if not run_date:
+        raise HTTPException(status_code=404, detail=f"Cannot determine run date for: {name}")
+
+    path = _stage_artifact_path(ar, stage, run_date)
     if not path or not path.exists():
         raise HTTPException(status_code=404, detail=f"Artifact not found for stage: {stage}")
     content_type = "text/html" if stage == "render" else "application/json"

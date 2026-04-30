@@ -1,7 +1,6 @@
 """Compare endpoint: fetch artifacts for two runs at the same stage."""
 from __future__ import annotations
 
-from datetime import date
 from fastapi import APIRouter, Depends
 from pathlib import Path
 from typing import Optional
@@ -15,14 +14,11 @@ def _read_artifact(repo_root: Path, run_name: str, stage: str) -> Optional[str]:
     ar = repo_root / "artifacts" / "approaches" / run_name
     if not ar.exists():
         return None
-    d = date.today().isoformat()
-    paths = {
-        "research": ar / "research" / f"sophie-{d}-raw.json",
-        "ranking":  ar / "research" / f"sophie-{d}.json",
-        "synthesis": ar / "issues" / f"sophie-{d}.json",
-        "render":   ar / "newsletters" / f"sophies-world-{d}.html",
-    }
-    path = paths.get(stage)
+    from web.api.services.run_service import _read_run_date, _stage_artifact_path
+    run_date = _read_run_date(ar)
+    if not run_date:
+        return None
+    path = _stage_artifact_path(ar, stage, run_date)
     if path and path.exists():
         return path.read_text(encoding="utf-8")
     return None
