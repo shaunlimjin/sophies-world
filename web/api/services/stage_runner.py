@@ -102,7 +102,12 @@ class StageRunner:
         queue = self._queues.get((name, stage))
         if queue is None:
             ar = self._ar(name)
-            ap = _artifact_path(stage, ar, date.today())
+            from web.api.services.run_service import _read_run_date
+            run_date = _read_run_date(ar)
+            if run_date is None:
+                yield _sse("error", {"type": "error", "message": "Cannot determine run date", "stage": stage})
+                return
+            ap = _artifact_path(stage, ar, run_date)
             if ap and ap.exists():
                 yield _sse("done", {"type": "done", "stage": stage, "success": True})
             elif self._sentinel(name, stage, "failed").exists():

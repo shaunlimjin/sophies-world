@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 from pathlib import Path
 from typing import Optional
@@ -40,6 +41,23 @@ def _read_settings(ar: Path) -> dict[str, str]:
     return {}
 
 
+def _read_run_date(ar: Path) -> Optional[date]:
+    """Read run_date from settings.json, or infer from existing artifact filenames."""
+    settings = _read_settings(ar)
+    if settings.get("run_date"):
+        return date.fromisoformat(settings["run_date"])
+    # Fallback: scan artifact directories to find the actual date used
+    for subdir in ["research", "issues", "newsletters"]:
+        research_dir = ar / subdir
+        if research_dir.exists():
+            for f in research_dir.iterdir():
+                # Match sophie-YYYY-MM-DD pattern (research/issues) or sophies-world-YYYY-MM-DD.html (newsletters)
+                m = re.search(r"(\d{4}-\d{2}-\d{2})", f.name)
+                if m:
+                    return date.fromisoformat(m.group(1))
+    return None
+
+
 def _approaches_dir(repo_root: Path) -> Path:
     return repo_root / "artifacts" / "approaches"
 
@@ -48,8 +66,8 @@ def _artifacts_root(repo_root: Path, name: str) -> Path:
     return _approaches_dir(repo_root) / name
 
 
-def _stage_artifact_path(artifacts_root: Path, stage: str, today: date) -> Optional[Path]:
-    d = today.isoformat()
+def _stage_artifact_path(artifacts_root: Path, stage: str, run_date: date) -> Optional[Path]:
+    d = run_date.isoformat()
     mapping = {
         "research": artifacts_root / "research" / f"sophie-{d}-raw.json",
         "ranking":  artifacts_root / "research" / f"sophie-{d}.json",
@@ -60,11 +78,11 @@ def _stage_artifact_path(artifacts_root: Path, stage: str, today: date) -> Optio
 
 
 def _stage_status(
-    artifacts_root: Path, stage: str, today: date
+    artifacts_root: Path, stage: str, run_date: date
 ) -> tuple[str, Optional[str]]:
     running = artifacts_root / f".stage-{stage}.running"
     failed = artifacts_root / f".stage-{stage}.failed"
-    artifact = _stage_artifact_path(artifacts_root, stage, today)
+    artifact = _stage_artifact_path(artifacts_root, stage, run_date)
     if running.exists():
         return "running", None
     if failed.exists():
@@ -78,16 +96,16 @@ def list_runs(repo_root: Path) -> list[RunSummary]:
     d = _approaches_dir(repo_root)
     if not d.exists():
         return []
-    today = date.today()
     result = []
     for run_dir in sorted(d.iterdir(), key=lambda p: -p.stat().st_mtime):
         if not run_dir.is_dir():
             continue
         ar = run_dir
+        run_date = _read_run_date(ar) or date.today()
         result.append(RunSummary(
             name=run_dir.name,
             created_at=str(int(run_dir.stat().st_mtime)),
-            stage_statuses={s: _stage_status(ar, s, today)[0] for s in STAGES},
+            stage_statuses={s: _stage_status(ar, s, run_date)[0] for s in STAGES},
             settings=_read_settings(ar),
         ))
     return result
@@ -97,10 +115,10 @@ def get_run_state(repo_root: Path, name: str) -> RunState:
     ar = _artifacts_root(repo_root, name)
     if not ar.exists():
         raise FileNotFoundError(f"Run not found: {name}")
-    today = date.today()
+    run_date = _read_run_date(ar) or date.today()
     stages = []
     for s in STAGES:
-        status, artifact_path = _stage_status(ar, s, today)
+        status, artifact_path = _stage_status(ar, s, run_date)
         stages.append(StageState(name=s, status=status, artifact_path=artifact_path))
     return RunState(name=name, created_at=str(int(ar.stat().st_mtime)), stages=stages, settings=_read_settings(ar))
 
