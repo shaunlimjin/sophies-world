@@ -517,7 +517,11 @@ def run_synthesis_stage(
     model_override: str | None = None,
     log: Callable[[str], None] = print,
 ) -> dict:
-    """Synthesize newsletter issue. Returns issue dict."""
+    """Synthesize newsletter issue. Returns issue dict.
+
+    On primary provider failure (after its own retries exhausted), retries once
+    with MiniMax via the 'minimax-m2' preset to avoid silent delivery failures.
+    """
     from providers.model_providers import make_provider
     from providers.model_presets import load_presets, resolve_model_config
     from issue_schema import validate_issue_artifact, write_issue_artifact
@@ -532,6 +536,49 @@ def run_synthesis_stage(
 
     log(f"Running synthesis stage (provider: {synthesis_provider_name})...")
 
+    _primary_error: str | None = None
+    try:
+        raw_output = _synthesize_with_provider(
+            synthesis_provider_name, provider, config, today, issue_num,
+            recent_headlines, repo_root, artifacts_root, log,
+        )
+    except Exception as exc:
+        _primary_error = str(exc)
+        log(f"Primary synthesis provider failed ({exc}). Retrying with MiniMax fallback...")
+        try:
+            fallback_presets = load_presets(repo_root)
+            minimax_cfg = resolve_model_config("minimax-m2", fallback_presets)
+            fallback_provider = make_provider(minimax_cfg, repo_root=repo_root)
+            raw_output = _synthesize_with_provider(
+                synthesis_provider_name, fallback_provider, config, today, issue_num,
+                recent_headlines, repo_root, artifacts_root, log,
+            )
+            log("MiniMax fallback succeeded.")
+        except Exception as exc2:
+            raise RuntimeError(
+                f"Primary provider ({raw_cfg}) failed: {_primary_error}; "
+                f"MiniMax fallback also failed: {exc2}"
+            ) from exc2
+
+    issue = parse_content_output(raw_output, repo_root)
+    validate_issue_artifact(issue)
+    write_issue_artifact(repo_root, issue, artifacts_root=artifacts_root)
+    log("Issue artifact written.")
+    return issue
+
+
+def _synthesize_with_provider(
+    synthesis_provider_name: str,
+    provider,
+    config: dict,
+    today: date,
+    issue_num: int,
+    recent_headlines: List[str],
+    repo_root: Path,
+    artifacts_root: Path,
+    log: Callable[[str], None],
+) -> str:
+    """Internal synthesis dispatch for a given provider instance."""
     if synthesis_provider_name == "hosted_packet_synthesis":
         from research_stage import get_research_artifact_path, load_research_packet
         ranked_path = get_research_artifact_path(repo_root, today, artifacts_root=artifacts_root)
@@ -552,6 +599,7 @@ def run_synthesis_stage(
         )
     else:
         raise ValueError(f"Unknown synthesis provider: {synthesis_provider_name}")
+    return raw_output
 
     issue = parse_content_output(raw_output, repo_root)
     validate_issue_artifact(issue)
