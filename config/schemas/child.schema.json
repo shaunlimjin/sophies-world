@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sophies-world/child.schema.json",
+  "title": "Child Profile",
+  "description": "Profile for a child recipient, including interests and newsletter settings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "newsletter"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable machine identifier for this child profile."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "age_band": {
+      "type": "string",
+      "minLength": 1
+    },
+    "location": {
+      "type": "string"
+    },
+    "cultural_context": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "interests": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "inactive": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "newsletter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active_sections", "theme"],
+      "properties": {
+        "active_sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "theme": {
+          "type": "string",
+          "minLength": 1
+        },
+        "editorial": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "reading_level": {"type": "string"},
+            "tone": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "use_emojis": {"type": "boolean"},
+            "global_source_preferences": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          }
+        },
+        "generation": {
+          "type": "object",
+          "properties": {
+            "content_provider": {"type": "string"},
+            "ranker_provider": {"type": "string"}
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sophies-world/section.schema.json",
+  "title": "Newsletter Section (split-config)",
+  "description": "Definition of a single newsletter section under config/sections/<id>.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "display", "editorial"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Section ID — must match the filename stem."
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "block_type", "link_style"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "block_type": {
+          "type": "string",
+          "enum": [
+            "fact_list",
+            "story_list",
+            "spotlight",
+            "interest_feature",
+            "challenge"
+          ]
+        },
+        "link_style": {
+          "type": "string",
+          "pattern": "^link-[a-z]+$"
+        }
+      }
+    },
+    "editorial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goal"],
+      "properties": {
+        "goal": {"type": "string", "minLength": 1},
+        "content_rules": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "source_preferences": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "research": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "queries": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "freshness": {
+          "type": ["string", "null"],
+          "enum": [null, "pd", "pw", "pm", "py"]
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      }
+    },
+    "ranking": {
+      "type": "object",
+      "properties": {
+        "source_boost": {"type": "number"},
+        "freshness_boost": {"type": "number"},
+        "keyword_match_boost": {"type": "number"},
+        "geography_boost": {"type": "number"},
+        "kid_safe_boost": {"type": "number"},
+        "novelty_penalty": {"type": "number"},
+        "junk_penalty": {"type": "number"},
+        "min_score": {"type": "number"},
+        "max_ranked": {"type": "integer", "minimum": 1},
+        "keywords": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
