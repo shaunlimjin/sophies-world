@@ -17,6 +17,7 @@ except ImportError:
 from content_stage import build_content_prompt, parse_content_output, run_content_provider
 from content_stage import build_packet_synthesis_prompt, run_packet_synthesis_provider
 from issue_schema import validate_issue_artifact, write_issue_artifact
+from novelty_gate import assert_issue_novelty
 from render_stage import load_template, render_issue_html
 
 SCRIPTS_DIR = Path(__file__).parent
@@ -275,6 +276,17 @@ def main():
     else:
         print(f"Error: unknown content_provider '{content_provider}'", file=sys.stderr)
         sys.exit(1)
+
+    try:
+        findings = assert_issue_novelty(issue, REPO_ROOT, artifacts_root=artifacts_root)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        sys.exit(1)
+    warnings = [f for f in findings if f.severity == "warning"]
+    if warnings:
+        print("Novelty gate warnings:")
+        for finding in warnings[:5]:
+            print(f"- {finding.format()}")
 
     artifact_path = write_issue_artifact(REPO_ROOT, issue, args.run_tag, artifacts_root)
 

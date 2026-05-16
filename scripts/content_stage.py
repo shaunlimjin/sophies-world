@@ -542,6 +542,10 @@ def run_synthesis_stage(
             synthesis_provider_name, provider, config, today, issue_num,
             recent_headlines, repo_root, artifacts_root, log,
         )
+    except FileNotFoundError:
+        # Missing ranked packet is an operator/setup problem, not a model failure;
+        # fallback synthesis would fail the same way and obscure the useful error.
+        raise
     except Exception as exc:
         _primary_error = str(exc)
         log(f"Primary synthesis provider failed ({exc}). Retrying with MiniMax fallback...")

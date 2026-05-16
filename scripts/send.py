@@ -10,6 +10,8 @@ from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Optional
 
+from novelty_gate import assert_issue_novelty
+
 REPO_ROOT = Path(__file__).parent.parent
 NEWSLETTERS_DIR = REPO_ROOT / "newsletters"
 ENV_PATH = REPO_ROOT / ".env"
@@ -81,6 +83,17 @@ def main() -> None:
 
     issue_num = get_issue_number(NEWSLETTERS_DIR)
     subject = build_subject(today, issue_num)
+    issue_artifact = REPO_ROOT / "artifacts" / "issues" / f"sophie-{today.strftime('%Y-%m-%d')}.json"
+    if issue_artifact.exists():
+        import json
+        try:
+            issue = json.loads(issue_artifact.read_text(encoding="utf-8"))
+            assert_issue_novelty(issue, REPO_ROOT)
+        except ValueError as e:
+            print(str(e), file=sys.stderr)
+            print("Send blocked. Regenerate the issue with fresh stories/facts before sending.", file=sys.stderr)
+            sys.exit(1)
+
     html_body = newsletter.read_text(encoding="utf-8")
     msg = build_message(config["GMAIL_USER"], config["RECIPIENT_EMAIL"], subject, html_body)
 

@@ -57,6 +57,9 @@ resolved child + section + pipeline config
 issue_schema.py  (validate + persist structured issue artifact)
    │
    ▼
+novelty_gate.py  (block repeated recent stories/facts before final render/send)
+   │
+   ▼
 render_stage.py  (deterministic local HTML render into template.html)
    │
    ▼
@@ -139,6 +142,15 @@ These are useful for spot checks, debugging, and evaluation runs. They are **not
 - Want a lasting experiment with a different provider/model mix? → make or update an **approach**.
 - Want a quick spot check right now? → use a **CLI override**.
 - Want the normal weekly run? → rely on the **pipeline default**.
+
+### Novelty gate
+
+Generated issues are checked against the most recent structured issue artifacts before final render and again before send. The gate compares prior section items using:
+- item titles/headlines and body text, including Weird But True fact bodies
+- non-generic source URLs
+- same-section topic similarity across the recent issue window
+
+If a blocking repeat is found, generation/send fails with a concrete report, e.g. a repeated gecko fact or reused kid-entrepreneur story. Generic collection pages such as Nat Geo Kids Weird But True can still be reused as source pools, but the synthesized fact/story must be fresh.
 
 ### Research packet caching
 
