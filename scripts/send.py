@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Send today's Sophie's World newsletter via Gmail SMTP."""
 
+import argparse
 import smtplib
 import sys
 from datetime import date
@@ -68,14 +69,25 @@ def send_email(config: dict, msg: MIMEMultipart) -> None:
         server.sendmail(config["GMAIL_USER"], config["RECIPIENT_EMAIL"], msg.as_string())
 
 
+def parse_issue_date(value: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("--date must be YYYY-MM-DD") from exc
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date", type=parse_issue_date, default=None, help="Issue date to send (YYYY-MM-DD; default: today)")
+    args = parser.parse_args()
+
     try:
         config = load_config(ENV_PATH)
     except ValueError as e:
         print(f"Configuration error: {e}", file=sys.stderr)
         sys.exit(1)
 
-    today = date.today()
+    today = args.date or date.today()
     newsletter = find_newsletter(NEWSLETTERS_DIR, today)
     if newsletter is None:
         print(f"No newsletter found for {today}. Run generate.py first.", file=sys.stderr)

@@ -23,7 +23,14 @@ To send the real weekly issue:
 python3 scripts/generate.py && python3 scripts/send.py
 ```
 
-`scripts/run.sh` wraps this for cron and appends to `logs/run.log`.
+To regenerate or send a missed dated issue:
+
+```bash
+python3 scripts/generate.py --date 2026-05-23 --refresh-research
+python3 scripts/send.py --date 2026-05-23
+```
+
+`scripts/run.sh` wraps this for cron, appends to `logs/run.log`, and sends a Discord failure alert to `#app-sophies-world` if generation or send exits non-zero. Override the alert destination with `SOPHIES_WORLD_ALERT_CHANNEL` and `SOPHIES_WORLD_ALERT_TARGET`.
 
 ---
 
@@ -291,7 +298,7 @@ GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
 RECIPIENT_EMAIL=recipient@example.com
 ```
 
-**Automation** — a cron job on a Mac Mini runs `scripts/run.sh` every Saturday at 6am Pacific.
+**Automation** — a cron job on a Mac Mini runs `scripts/run.sh` every Saturday at 6am Pacific. The wrapper exits non-zero on generation/send failure and posts the last log lines to the configured Discord alert target so missed issues are not silent.
 
 ---
 

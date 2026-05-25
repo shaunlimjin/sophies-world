@@ -280,6 +280,7 @@ def build_packet_synthesis_prompt(
     issue_num: int,
     config: Dict[str, Any],
     research_packet: Dict[str, Any],
+    recent_headlines: List[str] | None = None,
 ) -> str:
     """Build the prompt for packet-driven synthesis (Mode B1/B2).
 
@@ -301,6 +302,9 @@ def build_packet_synthesis_prompt(
     sections_by_id = {s["section_id"]: s for s in research_packet.get("sections", [])}
 
     section_packets = []
+    avoid_text = ""
+    if recent_headlines:
+        avoid_text = "\nPreviously covered item/headline topics to avoid repeating:\n" + "\n".join(f"- {h}" for h in recent_headlines[:40])
     for section in research_packet.get("sections", []):
         section_id = section["section_id"]
         derived_from = section.get("derived_from")
@@ -370,6 +374,7 @@ Block-type item contracts:
 
 Pre-researched candidates per section (select and synthesize from these):
 {json.dumps(section_packets, ensure_ascii=False, indent=2)}
+{avoid_text}
 
 For sections marked "derived_from", the source_candidates field contains the stories
 to derive from. Do not invent other material for those sections.
@@ -408,6 +413,8 @@ Rules:
 - Keep `title` aligned to config, but make `render_title` richer and more editorial.
 - Use block-type-appropriate item shapes from the contracts above.
 - Links must be structured objects with label and url — use URLs from the provided candidates.
+- Do not repeat any previously covered item/headline topics listed above. If a candidate overlaps a previous topic, skip it and use a fresher candidate.
+- Avoid recurring fallback facts like geckos licking eyeballs, sleepiest animals, and Singapore having 63 islands unless no alternatives exist; pick a different angle instead.
 - Prefer 1-2 strong items over many weak ones.
 - For `spotlight`, usually return 2 items when there are two clearly distinct good ideas; fall back to 1 only when the second would be weak or repetitive.
 - Write for a smart 4th grader: warm, energetic, easy to follow, but not babyish.
@@ -591,7 +598,7 @@ def _synthesize_with_provider(
                 f"Ranked research packet not found: {ranked_path}. Run ranking stage first."
             )
         packet = load_research_packet(ranked_path)
-        prompt = build_packet_synthesis_prompt(today, issue_num, config, packet)
+        prompt = build_packet_synthesis_prompt(today, issue_num, config, packet, recent_headlines)
         log("Calling packet synthesis provider...")
         raw_output = run_packet_synthesis_provider(prompt, repo_root, provider=provider)
     elif synthesis_provider_name == "hosted_integrated_search":

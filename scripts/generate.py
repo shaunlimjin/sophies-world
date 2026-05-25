@@ -87,15 +87,54 @@ def get_next_issue_number(newsletters_dir: Path) -> int:
     return len(existing) + 1
 
 
-def get_recent_headlines(newsletters_dir: Path, today: date) -> List[str]:
+def get_recent_headlines(newsletters_dir: Path, today: date, repo_root: Optional[Path] = None) -> List[str]:
+    """Return recent prior item/headline text for anti-repeat prompting.
+
+    HTML headings alone miss some fact-list items, so prefer structured issue
+    artifacts when available and fall back to rendered HTML headings.
+    """
     today_name = f"sophies-world-{today.strftime('%Y-%m-%d')}.html"
+    today_artifact_name = f"sophie-{today.strftime('%Y-%m-%d')}.json"
+    seen = set()
+    recent: List[str] = []
+
+    if repo_root is not None:
+        artifacts_dir = repo_root / "artifacts" / "issues"
+        for artifact in sorted(artifacts_dir.glob("sophie-*.json")):
+            if artifact.name == today_artifact_name:
+                continue
+            try:
+                import json
+                issue = json.loads(artifact.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            for section in issue.get("sections", []):
+                for item in section.get("items", []):
+                    text = item.get("title") or item.get("headline") or item.get("prompt")
+                    if text and text not in seen:
+                        seen.add(text)
+                        recent.append(text)
+
     files = sorted(newsletters_dir.glob("sophies-world-*.html"))
     previous = [f for f in files if f.name != today_name]
-    if not previous:
-        return []
-    content = previous[-1].read_text(encoding="utf-8")
-    raw = re.findall(r"<h3[^>]*>(.*?)</h3>", content, re.DOTALL)
-    return [re.sub(r"<[^>]+>", "", h).strip() for h in raw if h.strip()]
+    html_window = previous[-4:] if repo_root is not None else previous[-1:]
+    for file in html_window:
+        content = file.read_text(encoding="utf-8")
+        heading_pattern = r"<h[34][^>]*>(.*?)</h[34]>" if repo_root is not None else r"<h3[^>]*>(.*?)</h3>"
+        raw = re.findall(heading_pattern, content, re.DOTALL)
+        for h in raw:
+            text = re.sub(r"<[^>]+>", "", h).strip()
+            if text and text not in seen:
+                seen.add(text)
+                recent.append(text)
+    return recent[-40:]
+
+
+def parse_issue_date(value: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("--date must be YYYY-MM-DD") from exc
 
 
 def get_output_path(newsletters_dir: Path, issue_date: date, suffix: Optional[str] = None) -> Path:
@@ -228,6 +267,7 @@ def main():
         action="store_true",
         help="Re-run Brave retrieval even if a cached research packet exists",
     )
+    parser.add_argument("--date", type=parse_issue_date, default=None, help="Issue date to generate (YYYY-MM-DD; default: today)")
     args = parser.parse_args()
 
     if args.approach and args.env != "staging":
@@ -247,10 +287,10 @@ def main():
     newsletters_dir.mkdir(parents=True, exist_ok=True)
     artifacts_root.mkdir(parents=True, exist_ok=True)
 
-    today = date.today()
+    today = args.date or date.today()
     # Issue number and recent headlines always reference prod newsletters
     issue_num = get_next_issue_number(NEWSLETTERS_DIR)
-    recent_headlines = get_recent_headlines(NEWSLETTERS_DIR, today)
+    recent_headlines = get_recent_headlines(NEWSLETTERS_DIR, today, REPO_ROOT)
 
     output_path = get_output_path(newsletters_dir, today, args.run_tag)
 
